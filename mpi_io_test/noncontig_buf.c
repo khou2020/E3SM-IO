@@ -29,7 +29,7 @@ static int verbose;
 #define ERR { \
     if (err != NC_NOERR) { \
         printf("Error in %s:%d: %s\n", __FILE__, __LINE__, \
-               ncmpi_strerror(err)); \
+               nc_strerror(err)); \
         nerrs++; \
         goto fn_exit; \
     } \
@@ -51,46 +51,46 @@ read_decomp(const char   *infname,
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     /* read from input file */
-    err = ncmpi_open(MPI_COMM_WORLD, infname, NC_NOWRITE, MPI_INFO_NULL,
+    err = nc_open(MPI_COMM_WORLD, infname, NC_NOWRITE, MPI_INFO_NULL,
                      &ncid); ERR
 
-    err = ncmpi_begin_indep_data(ncid); ERR
+    err = nc_begin_indep_data(ncid); ERR
 
     /* read num_procs */
-    err = ncmpi_inq_dimid(ncid, "num_procs", &dimid); ERR
-    err = ncmpi_inq_dimlen(ncid, dimid, &num_procs); ERR
+    err = nc_inq_dimid(ncid, "num_procs", &dimid); ERR
+    err = nc_inq_dimlen(ncid, dimid, &num_procs); ERR
 
     /* read array_size */
-    err = ncmpi_inq_dimid(ncid, "array_size", &dimid); ERR
-    err = ncmpi_inq_dimlen(ncid, dimid, array_size); ERR
+    err = nc_inq_dimid(ncid, "array_size", &dimid); ERR
+    err = nc_inq_dimlen(ncid, dimid, array_size); ERR
 
     if (rank >= num_procs) {
         nreqs = 0;
         blocklens = NULL;
         disps = NULL;
-        err = ncmpi_close(ncid); ERR
+        err = nc_close(ncid); ERR
         return 0;
     }
 
     /* read number of noncontiguous requests */
     sprintf(name, "nreq_%05d", rank);
-    err = ncmpi_inq_dimid(ncid, name, &dimid); ERR
-    err = ncmpi_inq_dimlen(ncid, dimid, &tmp); ERR
+    err = nc_inq_dimid(ncid, name, &dimid); ERR
+    err = nc_inq_dimlen(ncid, dimid, &tmp); ERR
     *nreqs = (int)tmp;
     offs = (int*) malloc(*nreqs * sizeof(int));
     lens = (int*) malloc(*nreqs * sizeof(int));
 
     /* get offsets */
     sprintf(name, "off_%05d", rank);
-    err = ncmpi_inq_varid(ncid, name, &varid); ERR
-    err = ncmpi_get_var_int(ncid, varid, offs); ERR
+    err = nc_inq_varid(ncid, name, &varid); ERR
+    err = nc_get_var_int(ncid, varid, offs); ERR
 
     /* get lengths */
     sprintf(name, "len_%05d", rank);
-    err = ncmpi_inq_varid(ncid, name, &varid); ERR
-    err = ncmpi_get_var_int(ncid, varid, lens); ERR
+    err = nc_inq_varid(ncid, name, &varid); ERR
+    err = nc_get_var_int(ncid, varid, lens); ERR
 
-    err = ncmpi_close(ncid); ERR
+    err = nc_close(ncid); ERR
 
     /* cast int to MPI_Aint */
     *disps = (MPI_Aint*) malloc(*nreqs * sizeof(MPI_Aint));

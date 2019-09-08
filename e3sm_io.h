@@ -36,7 +36,7 @@ int two_buf;
 #define ERR { \
     if (err != NC_NOERR) { \
         printf("Error in %s:%d: %s\n", __FILE__, __LINE__, \
-               ncmpi_strerror(err)); \
+               nc_strerror(err)); \
         nerrs++; \
         goto fn_exit; \
     } \

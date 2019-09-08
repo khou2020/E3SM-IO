@@ -201,7 +201,7 @@ data decompositions shared by 52 variables.
   Max number of requests             = 310598
   Max Time of open + metadata define = 0.0533 sec
   Max Time of I/O preparing          = 0.1156 sec
-  Max Time of ncmpi_put_vard         = 5.4311 sec
+  Max Time of nc_put_vard         = 5.4311 sec
   Max Time of close                  = 0.0306 sec
   Max Time of TOTAL                  = 5.6385 sec
   I/O bandwidth (open-to-close)      = 478.7341 MiB/sec
@@ -214,7 +214,7 @@ data decompositions shared by 52 variables.
   Max number of requests             = 6022
   Max Time of open + metadata define = 0.0338 sec
   Max Time of I/O preparing          = 0.0014 sec
-  Max Time of ncmpi_put_vard         = 0.2489 sec
+  Max Time of nc_put_vard         = 0.2489 sec
   Max Time of close                  = 0.0055 sec
   Max Time of TOTAL                  = 0.2907 sec
   I/O bandwidth (open-to-close)      = 179.8902 MiB/sec
@@ -231,8 +231,8 @@ data decompositions shared by 52 variables.
   Max number of requests             = 310464
   Max Time of open + metadata define = 0.0635 sec
   Max Time of I/O preparing          = 0.0018 sec
-  Max Time of ncmpi_iput_varn        = 0.2468 sec
-  Max Time of ncmpi_wait_all         = 5.8602 sec
+  Max Time of nc_iput_varn        = 0.2468 sec
+  Max Time of nc_wait_all         = 5.8602 sec
   Max Time of close                  = 0.0190 sec
   Max Time of TOTAL                  = 6.2001 sec
   I/O bandwidth (open-to-close)      = 435.3753 MiB/sec
@@ -245,8 +245,8 @@ data decompositions shared by 52 variables.
   Max number of requests             = 5888
   Max Time of open + metadata define = 0.0370 sec
   Max Time of I/O preparing          = 0.0005 sec
-  Max Time of ncmpi_iput_varn        = 0.0048 sec
-  Max Time of ncmpi_wait_all         = 0.2423 sec
+  Max Time of nc_iput_varn        = 0.0048 sec
+  Max Time of nc_wait_all         = 0.2423 sec
   Max Time of close                  = 0.0058 sec
   Max Time of TOTAL                  = 0.2925 sec
   I/O bandwidth (open-to-close)      = 178.7747 MiB/sec

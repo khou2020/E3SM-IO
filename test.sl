@@ -51,8 +51,8 @@ export PNETCDF_SHOW_PERFORMANCE_INFO=1
 
 for i in ${RUNS[@]}
 do
-    echo "srun -n 1 -t 10 /global/homes/k/khl7265/.local/ncmpi_zip/bin/ncmpidump /global/cscratch1/sd/dqwu/e3sm_output_files/FC5AV1C-H01B_ne120_oRRS18v3_21632p/FC5AV1C-H01B_ne120_oRRS18v3_21632.cam.h0.0001-01-01-00000.nc -h"
-    srun -n 1 -t 10 /global/homes/k/khl7265/.local/ncmpi_zip/bin/ncmpidump /global/cscratch1/sd/dqwu/e3sm_output_files/FC5AV1C-H01B_ne120_oRRS18v3_21632p/FC5AV1C-H01B_ne120_oRRS18v3_21632.cam.h0.0001-01-01-00000.nc -h
+    echo "srun -n 1 -t 10 /global/homes/k/khl7265/.local/nc_zip/bin/ncmpidump /global/cscratch1/sd/dqwu/e3sm_output_files/FC5AV1C-H01B_ne120_oRRS18v3_21632p/FC5AV1C-H01B_ne120_oRRS18v3_21632.cam.h0.0001-01-01-00000.nc -h"
+    srun -n 1 -t 10 /global/homes/k/khl7265/.local/nc_zip/bin/ncmpidump /global/cscratch1/sd/dqwu/e3sm_output_files/FC5AV1C-H01B_ne120_oRRS18v3_21632p/FC5AV1C-H01B_ne120_oRRS18v3_21632.cam.h0.0001-01-01-00000.nc -h
 
     exit 0
 

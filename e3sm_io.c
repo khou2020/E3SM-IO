@@ -4,8 +4,8 @@
  * See COPYRIGHT notice in top-level directory.
  *
  * This program uses the E3SM I/O patterns recorded by the PIO library to
- * evaluate the performance of two PnetCDF APIs: ncmpi_vard_all(), and
- * ncmpi_iput_varn(). The E3SM I/O patterns consist of a large number of small,
+ * evaluate the performance of two PnetCDF APIs: nc_vard_all(), and
+ * nc_iput_varn(). The E3SM I/O patterns consist of a large number of small,
  * noncontiguous requests on each MPI process, which presents a challenge for
  * achieving a good performance.
  *

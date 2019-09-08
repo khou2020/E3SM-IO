@@ -4,8 +4,8 @@
  * See COPYRIGHT notice in top-level directory.
  *
  * This program uses the E3SM I/O patterns recorded by the PIO library to
- * evaluate the performance of two PnetCDF APIs: ncmpi_vard_all(), and
- * ncmpi_iput_varn(). The E3SM I/O patterns consist of a large number of small,
+ * evaluate the performance of two PnetCDF APIs: nc_vard_all(), and
+ * nc_iput_varn(). The E3SM I/O patterns consist of a large number of small,
  * noncontiguous requests on each MPI process, which presents a challenge for
  * achieving a good performance.
  *
@@ -440,20 +440,20 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
     else{
         cmode = NC_CLOBBER | NC_64BIT_DATA;
     }
-    err = ncmpi_create(io_comm, outfname, cmode, info, &ncid); ERR
+    err = nc_create(io_comm, outfname, cmode, info, &ncid); ERR
 
     MPI_Offset put_buffer_size_limit = 10485760;
-    err = ncmpi_buffer_attach(ncid, put_buffer_size_limit); ERR
+    err = nc_buffer_attach(ncid, put_buffer_size_limit); ERR
 
     /* define dimensions, variables, and attributes */
     err = def_G_case_h0(ncid, dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], nvars, varids); ERR
 
     /* exit define mode and enter data mode */
-    err = ncmpi_enddef(ncid); ERR
+    err = nc_enddef(ncid); ERR
 
     /* I/O amount so far */
-    err = ncmpi_inq_put_size(ncid, &metadata_size); ERR
-    err = ncmpi_inq_file_info(ncid, &info_used); ERR
+    err = nc_inq_put_size(ncid, &metadata_size); ERR
+    err = nc_inq_file_info(ncid, &info_used); ERR
     open_timing += MPI_Wtime() - timing;
 
     MPI_Barrier(io_comm); /*-----------------------------------------*/
@@ -462,37 +462,37 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
     /* write 7 fixed-size variables */
 
     /* int maxLevelEdgeTop(nEdges) */
-    err = ncmpi_iput_varn(ncid, 8, xnreqs[1], fix_starts_D2, fix_counts_D2,
+    err = nc_iput_varn(ncid, 8, xnreqs[1], fix_starts_D2, fix_counts_D2,
                           D2_fix_int_buf, nelems[1], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[1];
 
     /* int maxLevelEdgeBot(nEdges) */
-    err = ncmpi_iput_varn(ncid, 37, xnreqs[1], fix_starts_D2, fix_counts_D2,
+    err = nc_iput_varn(ncid, 37, xnreqs[1], fix_starts_D2, fix_counts_D2,
                           D2_fix_int_buf + nelems[1], nelems[1], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[1];
 
     /* int edgeMask(nEdges, nVertLevels) */
-    err = ncmpi_iput_varn(ncid, 10, xnreqs[3], fix_starts_D4, fix_counts_D4,
+    err = nc_iput_varn(ncid, 10, xnreqs[3], fix_starts_D4, fix_counts_D4,
                           D4_fix_int_buf, nelems[3], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[3];
 
     /* int cellMask(nCells, nVertLevels) */
-    err = ncmpi_iput_varn(ncid, 11, xnreqs[2], fix_starts_D3, fix_counts_D3,
+    err = nc_iput_varn(ncid, 11, xnreqs[2], fix_starts_D3, fix_counts_D3,
                           D3_fix_int_buf, nelems[2], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[2];
 
     /* int vertexMask(nVertices, nVertLevels) */
-    err = ncmpi_iput_varn(ncid, 12, xnreqs[4], fix_starts_D5, fix_counts_D5,
+    err = nc_iput_varn(ncid, 12, xnreqs[4], fix_starts_D5, fix_counts_D5,
                           D5_fix_int_buf, nelems[4], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[4];
 
     /* double bottomDepth(nCells)  */
-    err = ncmpi_iput_varn(ncid, 35, xnreqs[0], fix_starts_D1, fix_counts_D1,
+    err = nc_iput_varn(ncid, 35, xnreqs[0], fix_starts_D1, fix_counts_D1,
                           D1_fix_dbl_buf, nelems[0], MPI_DOUBLE, NULL); ERR
     my_nreqs += xnreqs[0];
 
     /* int maxLevelCell(nCells) */
-    err = ncmpi_iput_varn(ncid, 36, xnreqs[0], fix_starts_D1, fix_counts_D1,
+    err = nc_iput_varn(ncid, 36, xnreqs[0], fix_starts_D1, fix_counts_D1,
                           D1_fix_int_buf, nelems[0], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[0];
 
@@ -501,16 +501,16 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
         count[0] = dims[2][1]; /* dimension nVertLevels */
 
         /* double vertCoordMovementWeights(nVertLevels) */
-        err = ncmpi_bput_vars_double(ncid, 9, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_bput_vars_double(ncid, 9, start, count, stride, dummy_double_buf, NULL); ERR
 
         /* double refZMid(nVertLevels) */
-        err = ncmpi_bput_vars_double(ncid, 13, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_bput_vars_double(ncid, 13, start, count, stride, dummy_double_buf, NULL); ERR
 
         /* double refLayerThickness(nVertLevels) */
-        err = ncmpi_bput_vars_double(ncid, 14, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_bput_vars_double(ncid, 14, start, count, stride, dummy_double_buf, NULL); ERR
 
         /* double refBottomDepth(nVertLevels) */
-        err = ncmpi_bput_vars_double(ncid, 33, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_bput_vars_double(ncid, 33, start, count, stride, dummy_double_buf, NULL); ERR
 
         my_nreqs += 4; /* 4 non-record variables */
 
@@ -520,25 +520,25 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
             count[1] = 64; /* dimension StrLen */
 
             /* char xtime(Time, StrLen) */
-            err = ncmpi_bput_vars_text(ncid, 15, start, count, stride, dummy_char_buf, NULL); ERR
+            err = nc_bput_vars_text(ncid, 15, start, count, stride, dummy_char_buf, NULL); ERR
 
             /* double areaCellGlobal(Time) */
-            err = ncmpi_bput_vars_double(ncid, 20, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_bput_vars_double(ncid, 20, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double areaEdgeGlobal(Time) */
-            err = ncmpi_bput_vars_double(ncid, 21, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_bput_vars_double(ncid, 21, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double areaTriangleGlobal(Time) */
-            err = ncmpi_bput_vars_double(ncid, 22, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_bput_vars_double(ncid, 22, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double volumeCellGlobal(Time) */
-            err = ncmpi_bput_vars_double(ncid, 23, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_bput_vars_double(ncid, 23, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double volumeEdgeGlobal(Time) */
-            err = ncmpi_bput_vars_double(ncid, 24, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_bput_vars_double(ncid, 24, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double CFLNumberGlobal(Time) */
-            err = ncmpi_bput_vars_double(ncid, 25, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_bput_vars_double(ncid, 25, start, count, stride, dummy_double_buf, NULL); ERR
 
             my_nreqs += 7; /* 7 record variables */
         }
@@ -552,7 +552,7 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
 
         rec_buf_ptr = D1_rec_dbl_buf;
         for (j = 0; j < nD1_rec_2d_vars; j++) {
-            err = ncmpi_iput_varn(ncid, D1_rec_2d_varids[j], xnreqs[0], starts_D1,
+            err = nc_iput_varn(ncid, D1_rec_2d_varids[j], xnreqs[0], starts_D1,
                                   counts_D1, rec_buf_ptr, nelems[0], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[0];
             my_nreqs += xnreqs[0];
@@ -565,7 +565,7 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
 
         rec_buf_ptr = D6_rec_dbl_buf;
         for (j = 0; j < nD6_rec_3d_vars; j++) {
-            err = ncmpi_iput_varn(ncid, D6_rec_3d_varids[j], xnreqs[5], starts_D6,
+            err = nc_iput_varn(ncid, D6_rec_3d_varids[j], xnreqs[5], starts_D6,
                                   counts_D6, rec_buf_ptr, nelems[5], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[5];
             my_nreqs += xnreqs[5];
@@ -578,7 +578,7 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
 
         rec_buf_ptr = D3_rec_dbl_buf;
         for (j = 0; j < nD3_rec_3d_vars; j++) {
-            err = ncmpi_iput_varn(ncid, D3_rec_3d_varids[j], xnreqs[2], starts_D3,
+            err = nc_iput_varn(ncid, D3_rec_3d_varids[j], xnreqs[2], starts_D3,
                                   counts_D3, rec_buf_ptr, nelems[2], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[2];
             my_nreqs += xnreqs[2];
@@ -591,7 +591,7 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
 
         rec_buf_ptr = D4_rec_dbl_buf;
         for (j = 0; j < nD4_rec_3d_vars; j++) {
-            err = ncmpi_iput_varn(ncid, D4_rec_3d_varids[j], xnreqs[3], starts_D4,
+            err = nc_iput_varn(ncid, D4_rec_3d_varids[j], xnreqs[3], starts_D4,
                                   counts_D4, rec_buf_ptr, nelems[3], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[3];
             my_nreqs += xnreqs[3];
@@ -604,7 +604,7 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
 
         rec_buf_ptr = D5_rec_dbl_buf;
         for (j = 0; j < nD5_rec_3d_vars; j++) {
-            err = ncmpi_iput_varn(ncid, D5_rec_3d_varids[j], xnreqs[4], starts_D5,
+            err = nc_iput_varn(ncid, D5_rec_3d_varids[j], xnreqs[4], starts_D5,
                                   counts_D5, rec_buf_ptr, nelems[4], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[4];
             my_nreqs += xnreqs[4];
@@ -617,17 +617,17 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
     MPI_Barrier(io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime();
 
-    err = ncmpi_wait_all(ncid, NC_PUT_REQ_ALL, NULL, NULL); ERR
+    err = nc_wait_all(ncid, NC_PUT_REQ_ALL, NULL, NULL); ERR
 
     wait_timing += MPI_Wtime() - timing;
 
     MPI_Barrier(io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime();
 
-    err = ncmpi_inq_put_size(ncid, &total_size); ERR
+    err = nc_inq_put_size(ncid, &total_size); ERR
     put_size = total_size - metadata_size;
-    err = ncmpi_buffer_detach(ncid); ERR
-    err = ncmpi_close(ncid); ERR
+    err = nc_buffer_detach(ncid); ERR
+    err = nc_close(ncid); ERR
     close_timing += MPI_Wtime() - timing;
 
     if (dummy_double_buf != NULL) free(dummy_double_buf);
@@ -696,7 +696,7 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
 
     /* check if there is any PnetCDF internal malloc residue */
     MPI_Offset malloc_size, sum_size;
-    err = ncmpi_inq_malloc_size(&malloc_size);
+    err = nc_inq_malloc_size(&malloc_size);
     if (err == NC_NOERR) {
         MPI_Reduce(&malloc_size, &sum_size, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
         if (rank == 0 && sum_size > 0) {
@@ -706,7 +706,7 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
         }
     }
     MPI_Offset m_alloc=0, max_alloc;
-    ncmpi_inq_malloc_max_size(&m_alloc);
+    nc_inq_malloc_max_size(&m_alloc);
     MPI_Reduce(&m_alloc, &max_alloc, 1, MPI_OFFSET, MPI_MAX, 0, io_comm);
     if (rank == 0) {
         printf("History output file postfix        = %s\n", outfname);
@@ -999,14 +999,14 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
     else{
         cmode = NC_64BIT_DATA;
     }
-    err = ncmpi_open(io_comm, infname, cmode, info, &ncid); ERR
+    err = nc_open(io_comm, infname, cmode, info, &ncid); ERR
 
     /* inquery dimensions, variables, and attributes */
     err = inq_G_case_h0(ncid, dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], nvars, varids); ERR
 
     /* I/O amount so far */
-    err = ncmpi_inq_get_size(ncid, &metadata_size); ERR
-    err = ncmpi_inq_file_info(ncid, &info_used); ERR
+    err = nc_inq_get_size(ncid, &metadata_size); ERR
+    err = nc_inq_file_info(ncid, &info_used); ERR
     open_timing += MPI_Wtime() - timing;
 
     MPI_Barrier(io_comm); /*-----------------------------------------*/
@@ -1015,37 +1015,37 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
     /* read 7 fixed-size variables */
 
     /* int maxLevelEdgeTop(nEdges) */
-    err = ncmpi_iget_varn(ncid, 8, xnreqs[1], fix_starts_D2, fix_counts_D2,
+    err = nc_iget_varn(ncid, 8, xnreqs[1], fix_starts_D2, fix_counts_D2,
                           D2_fix_int_buf, nelems[1], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[1];
 
     /* int maxLevelEdgeBot(nEdges) */
-    err = ncmpi_iget_varn(ncid, 37, xnreqs[1], fix_starts_D2, fix_counts_D2,
+    err = nc_iget_varn(ncid, 37, xnreqs[1], fix_starts_D2, fix_counts_D2,
                           D2_fix_int_buf + nelems[1], nelems[1], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[1];
 
     /* int edgeMask(nEdges, nVertLevels) */
-    err = ncmpi_iget_varn(ncid, 10, xnreqs[3], fix_starts_D4, fix_counts_D4,
+    err = nc_iget_varn(ncid, 10, xnreqs[3], fix_starts_D4, fix_counts_D4,
                           D4_fix_int_buf, nelems[3], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[3];
 
     /* int cellMask(nCells, nVertLevels) */
-    err = ncmpi_iget_varn(ncid, 11, xnreqs[2], fix_starts_D3, fix_counts_D3,
+    err = nc_iget_varn(ncid, 11, xnreqs[2], fix_starts_D3, fix_counts_D3,
                           D3_fix_int_buf, nelems[2], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[2];
 
     /* int vertexMask(nVertices, nVertLevels) */
-    err = ncmpi_iget_varn(ncid, 12, xnreqs[4], fix_starts_D5, fix_counts_D5,
+    err = nc_iget_varn(ncid, 12, xnreqs[4], fix_starts_D5, fix_counts_D5,
                           D5_fix_int_buf, nelems[4], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[4];
 
     /* double bottomDepth(nCells)  */
-    err = ncmpi_iget_varn(ncid, 35, xnreqs[0], fix_starts_D1, fix_counts_D1,
+    err = nc_iget_varn(ncid, 35, xnreqs[0], fix_starts_D1, fix_counts_D1,
                           D1_fix_dbl_buf, nelems[0], MPI_DOUBLE, NULL); ERR
     my_nreqs += xnreqs[0];
 
     /* int maxLevelCell(nCells) */
-    err = ncmpi_iget_varn(ncid, 36, xnreqs[0], fix_starts_D1, fix_counts_D1,
+    err = nc_iget_varn(ncid, 36, xnreqs[0], fix_starts_D1, fix_counts_D1,
                           D1_fix_int_buf, nelems[0], MPI_INT, NULL); ERR
     my_nreqs += xnreqs[0];
 
@@ -1054,16 +1054,16 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
         count[0] = dims[2][1]; /* dimension nVertLevels */
 
         /* double vertCoordMovementWeights(nVertLevels) */
-        err = ncmpi_iget_vars_double(ncid, 9, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_iget_vars_double(ncid, 9, start, count, stride, dummy_double_buf, NULL); ERR
 
         /* double refZMid(nVertLevels) */
-        err = ncmpi_iget_vars_double(ncid, 13, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_iget_vars_double(ncid, 13, start, count, stride, dummy_double_buf, NULL); ERR
 
         /* double refLayerThickness(nVertLevels) */
-        err = ncmpi_iget_vars_double(ncid, 14, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_iget_vars_double(ncid, 14, start, count, stride, dummy_double_buf, NULL); ERR
 
         /* double refBottomDepth(nVertLevels) */
-        err = ncmpi_iget_vars_double(ncid, 33, start, count, stride, dummy_double_buf, NULL); ERR
+        err = nc_iget_vars_double(ncid, 33, start, count, stride, dummy_double_buf, NULL); ERR
 
         my_nreqs += 4; /* 4 non-record variables */
 
@@ -1073,25 +1073,25 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
             count[1] = 64; /* dimension StrLen */
 
             /* char xtime(Time, StrLen) */
-            err = ncmpi_iget_vars_text(ncid, 15, start, count, stride, dummy_char_buf, NULL); ERR
+            err = nc_iget_vars_text(ncid, 15, start, count, stride, dummy_char_buf, NULL); ERR
 
             /* double areaCellGlobal(Time) */
-            err = ncmpi_iget_vars_double(ncid, 20, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_iget_vars_double(ncid, 20, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double areaEdgeGlobal(Time) */
-            err = ncmpi_iget_vars_double(ncid, 21, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_iget_vars_double(ncid, 21, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double areaTriangleGlobal(Time) */
-            err = ncmpi_iget_vars_double(ncid, 22, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_iget_vars_double(ncid, 22, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double volumeCellGlobal(Time) */
-            err = ncmpi_iget_vars_double(ncid, 23, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_iget_vars_double(ncid, 23, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double volumeEdgeGlobal(Time) */
-            err = ncmpi_iget_vars_double(ncid, 24, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_iget_vars_double(ncid, 24, start, count, stride, dummy_double_buf, NULL); ERR
 
             /* double CFLNumberGlobal(Time) */
-            err = ncmpi_iget_vars_double(ncid, 25, start, count, stride, dummy_double_buf, NULL); ERR
+            err = nc_iget_vars_double(ncid, 25, start, count, stride, dummy_double_buf, NULL); ERR
 
             my_nreqs += 7; /* 7 record variables */
         }
@@ -1105,7 +1105,7 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
 
         rec_buf_ptr = D1_rec_dbl_buf;
         for (j = 0; j < nD1_rec_2d_vars; j++) {
-            err = ncmpi_iget_varn(ncid, D1_rec_2d_varids[j], xnreqs[0], starts_D1,
+            err = nc_iget_varn(ncid, D1_rec_2d_varids[j], xnreqs[0], starts_D1,
                                   counts_D1, rec_buf_ptr, nelems[0], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[0];
             my_nreqs += xnreqs[0];
@@ -1118,7 +1118,7 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
 
         rec_buf_ptr = D6_rec_dbl_buf;
         for (j = 0; j < nD6_rec_3d_vars; j++) {
-            err = ncmpi_iget_varn(ncid, D6_rec_3d_varids[j], xnreqs[5], starts_D6,
+            err = nc_iget_varn(ncid, D6_rec_3d_varids[j], xnreqs[5], starts_D6,
                                   counts_D6, rec_buf_ptr, nelems[5], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[5];
             my_nreqs += xnreqs[5];
@@ -1131,7 +1131,7 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
 
         rec_buf_ptr = D3_rec_dbl_buf;
         for (j = 0; j < nD3_rec_3d_vars; j++) {
-            err = ncmpi_iget_varn(ncid, D3_rec_3d_varids[j], xnreqs[2], starts_D3,
+            err = nc_iget_varn(ncid, D3_rec_3d_varids[j], xnreqs[2], starts_D3,
                                   counts_D3, rec_buf_ptr, nelems[2], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[2];
             my_nreqs += xnreqs[2];
@@ -1144,7 +1144,7 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
 
         rec_buf_ptr = D4_rec_dbl_buf;
         for (j = 0; j < nD4_rec_3d_vars; j++) {
-            err = ncmpi_iget_varn(ncid, D4_rec_3d_varids[j], xnreqs[3], starts_D4,
+            err = nc_iget_varn(ncid, D4_rec_3d_varids[j], xnreqs[3], starts_D4,
                                   counts_D4, rec_buf_ptr, nelems[3], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[3];
             my_nreqs += xnreqs[3];
@@ -1157,7 +1157,7 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
 
         rec_buf_ptr = D5_rec_dbl_buf;
         for (j = 0; j < nD5_rec_3d_vars; j++) {
-            err = ncmpi_iget_varn(ncid, D5_rec_3d_varids[j], xnreqs[4], starts_D5,
+            err = nc_iget_varn(ncid, D5_rec_3d_varids[j], xnreqs[4], starts_D5,
                                   counts_D5, rec_buf_ptr, nelems[4], MPI_DOUBLE, NULL); ERR
             rec_buf_ptr += nelems[4];
             my_nreqs += xnreqs[4];
@@ -1170,16 +1170,16 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
     MPI_Barrier(io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime();
 
-    err = ncmpi_wait_all(ncid, NC_GET_REQ_ALL, NULL, NULL); ERR
+    err = nc_wait_all(ncid, NC_GET_REQ_ALL, NULL, NULL); ERR
 
     wait_timing += MPI_Wtime() - timing;
 
     MPI_Barrier(io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime();
 
-    err = ncmpi_inq_get_size(ncid, &total_size); ERR
+    err = nc_inq_get_size(ncid, &total_size); ERR
     get_size = total_size - metadata_size;
-    err = ncmpi_close(ncid); ERR
+    err = nc_close(ncid); ERR
     close_timing += MPI_Wtime() - timing;
 
     if (dummy_double_buf != NULL) free(dummy_double_buf);
@@ -1248,7 +1248,7 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
 
     /* check if there is any PnetCDF internal malloc residue */
     MPI_Offset malloc_size, sum_size;
-    err = ncmpi_inq_malloc_size(&malloc_size);
+    err = nc_inq_malloc_size(&malloc_size);
     if (err == NC_NOERR) {
         MPI_Reduce(&malloc_size, &sum_size, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
         if (rank == 0 && sum_size > 0) {
@@ -1258,7 +1258,7 @@ run_varn_G_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
         }
     }
     MPI_Offset m_alloc=0, max_alloc;
-    ncmpi_inq_malloc_max_size(&m_alloc);
+    nc_inq_malloc_max_size(&m_alloc);
     MPI_Reduce(&m_alloc, &max_alloc, 1, MPI_OFFSET, MPI_MAX, 0, io_comm);
     if (rank == 0) {
         printf("History input file postfix        = %s\n", infname);

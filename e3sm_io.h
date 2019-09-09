@@ -13,12 +13,8 @@
 #include <stdio.h>
 
 #include <mpi.h>
-#include <pnetcdf.h>
-
-/* minimum PnetCDF version required is 1.10.0 */
-#if (PNETCDF_VERSION_MAJOR*1000000 + PNETCDF_VERSION_MINOR*1000 + PNETCDF_VERSION_SUB < 1010000)
-#error "PnetCDF 1.10.0 and later is required to build this program"
-#endif
+#include <netcdf.h>
+#include <netcdf_par.h>
 
 #define MAX_NUM_DECOMP 6
 

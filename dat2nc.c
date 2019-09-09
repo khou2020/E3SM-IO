@@ -20,7 +20,7 @@
 
 #define LINE_SIZE 4692802
 
-#define ERR {if(err!=NC_NOERR){printf("Error at line %d in %s: %s\n", __LINE__,__FILE__, nc_strerrno(err));nerrs++;}}
+#define ERR {if(err!=NC_NOERR){printf("Error at line %d in %s: %s\n", __LINE__,__FILE__, ncmpi_strerrno(err));nerrs++;}}
 
 static int verbose, line_sz;
 
@@ -200,14 +200,14 @@ add_decomp(int         ncid,
     free(map);
 
     /* check if dimension decomp_nprocs has been defined in the netCDF file */
-    err = nc_inq_dimid(ncid, "decomp_nprocs", &dimid);
+    err = ncmpi_inq_dimid(ncid, "decomp_nprocs", &dimid);
     if (err == NC_EBADDIM) {  /* not defined */
-        err = nc_def_dim(ncid, "decomp_nprocs", nprocs, &dimid); ERR
+        err = ncmpi_def_dim(ncid, "decomp_nprocs", nprocs, &dimid); ERR
     }
     else {
         /* if decomp_nprocs already exist, check if value matches */
         MPI_Offset decomp_nprocs;
-        err = nc_inq_dimlen(ncid, dimid, &decomp_nprocs); ERR
+        err = ncmpi_inq_dimlen(ncid, dimid, &decomp_nprocs); ERR
         if (decomp_nprocs != nprocs) {
             printf("Error: decomp_nprocs=%lld mismatches among input files %d\n", decomp_nprocs, nprocs);
             MPI_Finalize();
@@ -217,50 +217,50 @@ add_decomp(int         ncid,
 
     /* define variable nreqs for this decomposition */
     sprintf(name, "D%d.nreqs", label);
-    err = nc_def_var(ncid, name, NC_INT, 1, &dimid, &varid[0]); ERR
+    err = ncmpi_def_var(ncid, name, NC_INT, 1, &dimid, &varid[0]); ERR
 
     /* define attribute description for this variable */
     str = "Number of noncontiguous requests per process";
-    err = nc_put_att_text(ncid, varid[0], "description", strlen(str), str); ERR
+    err = ncmpi_put_att_text(ncid, varid[0], "description", strlen(str), str); ERR
 
     /* define dimension total_nreqs for this decomposition */
     sprintf(name, "D%d.total_nreqs", label);
-    err = nc_def_dim(ncid, name, total_nreqs, &dimid); ERR
+    err = ncmpi_def_dim(ncid, name, total_nreqs, &dimid); ERR
 
     /* define variable offsets (store starting element indices) */
     sprintf(name, "D%d.offsets", label);
-    err = nc_def_var(ncid, name, NC_INT, 1, &dimid, &varid[1]); ERR
+    err = ncmpi_def_var(ncid, name, NC_INT, 1, &dimid, &varid[1]); ERR
     str = "Flattened starting indices of noncontiguous requests";
-    err = nc_put_att_text(ncid, varid[1], "description", strlen(str), str); ERR
+    err = ncmpi_put_att_text(ncid, varid[1], "description", strlen(str), str); ERR
 
     /* define variable lengths (store number of elements) */
     sprintf(name, "D%d.lengths", label);
-    err = nc_def_var(ncid, name, NC_INT, 1, &dimid, &varid[2]); ERR
+    err = ncmpi_def_var(ncid, name, NC_INT, 1, &dimid, &varid[2]); ERR
     str = "Lengths of noncontiguous requests";
-    err = nc_put_att_text(ncid, varid[2], "description", strlen(str), str); ERR
+    err = ncmpi_put_att_text(ncid, varid[2], "description", strlen(str), str); ERR
 
     /* add attribute to describe dimensionality */
     sprintf(name, "D%d.ndims", label);
-    err = nc_put_att_int(ncid, NC_GLOBAL, name, NC_INT, 1, &ndims); ERR
+    err = ncmpi_put_att_int(ncid, NC_GLOBAL, name, NC_INT, 1, &ndims); ERR
 
     /* swap dims in Fortran order to dims_C in C order */
     dims_C = (MPI_Offset*) malloc(ndims * sizeof(MPI_Offset));
     for (i=0; i<ndims; i++) dims_C[i] = dims[ndims-i-1];
     sprintf(name, "D%d.dims", label);
-    err = nc_put_att_longlong(ncid, NC_GLOBAL, name, NC_INT, ndims, dims_C);
+    err = ncmpi_put_att_longlong(ncid, NC_GLOBAL, name, NC_INT, ndims, dims_C);
     ERR
     free(dims_C);
 
     sprintf(name, "D%d.max_nreqs", label);
-    err = nc_put_att_int(ncid, NC_GLOBAL, name, NC_INT, 1, &max_nreqs); ERR
+    err = ncmpi_put_att_int(ncid, NC_GLOBAL, name, NC_INT, 1, &max_nreqs); ERR
     sprintf(name, "D%d.min_nreqs", label);
-    err = nc_put_att_int(ncid, NC_GLOBAL, name, NC_INT, 1, &min_nreqs); ERR
+    err = ncmpi_put_att_int(ncid, NC_GLOBAL, name, NC_INT, 1, &min_nreqs); ERR
 
     /* exit define mode */
-    err = nc_enddef(ncid); ERR
+    err = ncmpi_enddef(ncid); ERR
 
     /* write variable containing number of requests for each process */
-    err = nc_put_var_int_all(ncid, varid[0], nreqs); ERR
+    err = ncmpi_put_var_int_all(ncid, varid[0], nreqs); ERR
 
     /* read the offsets again into allocated array off */
     start = 0;
@@ -329,8 +329,8 @@ add_decomp(int         ncid,
 
         /* write/append to variables offsets and lengths */
         count = ncontig;
-        err = nc_put_vara_int_all(ncid, varid[1], &start, &count, off); ERR
-        err = nc_put_vara_int_all(ncid, varid[2], &start, &count, len); ERR
+        err = ncmpi_put_vara_int_all(ncid, varid[1], &start, &count, off); ERR
+        err = ncmpi_put_vara_int_all(ncid, varid[2], &start, &count, len); ERR
         start += ncontig;
 
         free(off);
@@ -467,27 +467,27 @@ int main(int argc, char **argv) {
     }
 
     /* create a new NC file */
-    err = nc_create(MPI_COMM_WORLD, outfname, NC_NOCLOBBER, MPI_INFO_NULL, &ncid);
+    err = ncmpi_create(MPI_COMM_WORLD, outfname, NC_NOCLOBBER, MPI_INFO_NULL, &ncid);
     if (err != NC_NOERR) {
-        printf("Error at line %d in %s: %s\n", __LINE__,__FILE__, nc_strerrno(err));
+        printf("Error at line %d in %s: %s\n", __LINE__,__FILE__, ncmpi_strerrno(err));
         printf("Abort\n");
         nerrs++;
         goto fn_exit;
     }
 
     /* add the number of decompositions */
-    err = nc_def_dim(ncid, "num_decomp", num_decomp, &dimid); ERR
+    err = ncmpi_def_dim(ncid, "num_decomp", num_decomp, &dimid); ERR
 
     /* add command line used */
-    err = nc_put_att_text(ncid, NC_GLOBAL, "command_line", strlen(cmd_line), cmd_line); ERR
+    err = ncmpi_put_att_text(ncid, NC_GLOBAL, "command_line", strlen(cmd_line), cmd_line); ERR
 
     for (i=0; i<6; i++) {
         if (infname[i] == NULL) continue;
         nerrs += add_decomp(ncid, infname[i], i+1);
-        err = nc_redef(ncid); ERR;
+        err = ncmpi_redef(ncid); ERR;
     }
 
-    err = nc_close(ncid); ERR
+    err = ncmpi_close(ncid); ERR
 
 fn_exit:
     MPI_Finalize();

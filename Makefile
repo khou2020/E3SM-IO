@@ -2,11 +2,11 @@
 MPICC		= mpicc
 CFLAGS		= -O0 -ggdb
 
-PnetCDF_prefix	= ${HOME}/.local/nc_nc4
+NetCDF_prefix	= ${HOME}/.local
 
-INCLUDES	= -I$(PnetCDF_prefix)/include -I. -I${HOME}/.local/include
-LDFLAGS		= -L$(PnetCDF_prefix)/lib -L${HOME}/.local/lib
-LIBS		= -lpnetcdf $(shell $(PnetCDF_prefix)/bin/pnetcdf-config --libs)
+INCLUDES	= -I$(NetCDF_prefix)/include -I. -I${HOME}/.local/include
+LDFLAGS		= -L$(NetCDF_prefix)/lib -L${HOME}/.local/lib
+LIBS		= -lpnetcdf $(shell $(NetCDF_prefix)/bin/nc-config --libs)
 
 .c.o:
 	$(MPICC) $(CFLAGS) $(INCLUDES) -c $<

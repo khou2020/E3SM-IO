@@ -434,16 +434,11 @@ run_varn_G_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
     sprintf(outfname, "%s%s",out_prefix, out_postfix);
 
     /* create a new CDF-5 file for writing */
-    if (format == 4){
-        cmode = NC_CLOBBER | NC_NETCDF4;
-    }
-    else{
-        cmode = NC_CLOBBER | NC_64BIT_DATA;
-    }
-    err = nc_create(io_comm, outfname, cmode, info, &ncid); ERR
+    cmode = NC_CLOBBER | NC_NETCDF4 | NC_MPIIO;
+    err = nc_create_par(outfname, cmode, io_comm, info, &ncid); ERR
 
     MPI_Offset put_buffer_size_limit = 10485760;
-    err = nc_buffer_attach(ncid, put_buffer_size_limit); ERR
+    //err = nc_buffer_attach(ncid, put_buffer_size_limit); ERR
 
     /* define dimensions, variables, and attributes */
     err = def_G_case_h0(ncid, dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], nvars, varids); ERR

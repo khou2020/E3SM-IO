@@ -267,48 +267,6 @@ int main(int argc, char** argv)
                 printf("Using noncontiguous write buffer   = %s\n",noncontig_buf?"yes":"no");
             }
 
-            /* vard APIs require internal data type matches external one */
-            if (tst_vard) {
-#if REC_XTYPE != NC_FLOAT
-                if (!rank)
-                    printf("PnetCDF vard API requires internal and external data types match, skip\n");
-#else
-                if (tst_rd){
-                    if (!rank)
-                        printf("Reading not supported for vard\n");
-                }
-
-                if (tst_wr){
-                    if (format == 4){
-                        if (!rank)
-                            printf("NetCDF4 not supported for vard\n");
-                    }
-                    else{
-                        if (!rank) {
-                            printf("\n==== benchmarking F case writing using vard API ========================\n");
-                            printf("Variable written order: same as variables are defined\n\n");
-                        }
-                        fflush(stdout);
-                        MPI_Barrier(io_comm);
-
-                        nvars = 408;
-                        outfname = "f_case_h0_vard.nc";
-                        nerrs += run_vard_F_case(io_comm, out_prefix, outfname, nvars, num_recs,
-                                                noncontig_buf, info, dims,
-                                                contig_nreqs, disps, blocklens);
-
-                        MPI_Barrier(io_comm);
-
-                        nvars = 51;
-                        outfname = "f_case_h1_vard.nc";
-                        nerrs += run_vard_F_case(io_comm, out_prefix, outfname, nvars, num_recs,
-                                                noncontig_buf, info, dims,
-                                                contig_nreqs, disps, blocklens);
-                    }
-                }
-#endif
-            }
-
             if (tst_varn) {
                 if (tst_rd && (!read_after_write)){
                     if (!rank) {

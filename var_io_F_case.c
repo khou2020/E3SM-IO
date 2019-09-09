@@ -5,7 +5,7 @@
  *
  * This program uses the E3SM I/O patterns recorded by the PIO library to
  * evaluate the performance of two PnetCDF APIs: nc_vard_all(), and
- * nc_iput_varn(). The E3SM I/O patterns consist of a large number of small,
+ * nc_put_varn(). The E3SM I/O patterns consist of a large number of small,
  * noncontiguous requests on each MPI process, which presents a challenge for
  * achieving a good performance.
  *
@@ -18,6 +18,96 @@
 #include <unistd.h> /* unlink() */
 
 #include <e3sm_io.h>
+
+static int nc_put_varn(int ncid, int vid, int nreq, MPI_Offset* const *starts, MPI_Offset* const *counts, void *buf, MPI_Offset bufcount, MPI_Datatype buftype){
+    int err;
+    int i;
+    int nreq_all;
+    int esize, rsize;
+    int ndim;
+    MPI_Offset dummycount[16] = {0}; 
+    MPI_Offset dummystart[16] = {0}; 
+    char *bufp = (char*)buf;
+
+    MPI_Allreduce(&nreq, &nreq_all, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
+    MPI_Type_size(buftype, &esize);
+
+    err = nc_inq_varndims(ncid, vid, &ndim);
+
+    for(i = 0; i < nreq_all; i++){
+        if (i < nreq){
+            rsize = esize;
+            for(j = 0; j < ndim; j++){
+                rsize *= count[j];
+            }
+            
+            if (buftype == MPI_FLOAT){
+                err = nc_put_vara_float(ncid, vid, dummystart, dummycount, (float*)bufp);
+            }
+            else{
+                err = nc_put_vara_double(ncid, vid, dummystart, dummycount, (double*)bufp);  
+            }
+            ERR
+
+            bufp += rsize;
+        }
+        else{
+            if (buftype == MPI_FLOAT){
+                err = nc_put_vara_float(ncid, vid, dummystart, dummycount, (float*)buf);
+            }
+            else{
+                err = nc_put_vara_double(ncid, vid, dummystart, dummycount, (double*)buf);  
+            }
+            ERR
+        }
+    }
+}
+
+static int nc_get_varn(int ncid, int vid, int nreq, MPI_Offset* const *starts, MPI_Offset* const *counts, void *buf, MPI_Offset bufcount, MPI_Datatype buftype){
+    int err;
+    int i;
+    int nreq_all;
+    int esize, rsize;
+    int ndim;
+    MPI_Offset dummycount[16] = {0}; 
+    MPI_Offset dummystart[16] = {0}; 
+    char *bufp = (char*)buf;
+
+    MPI_Allreduce(&nreq, &nreq_all, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
+    MPI_Type_size(buftype, &esize);
+
+    err = nc_inq_varndims(ncid, vid, &ndim);
+
+    for(i = 0; i < nreq_all; i++){
+        if (i < nreq){
+            rsize = esize;
+            for(j = 0; j < ndim; j++){
+                rsize *= count[j];
+            }
+            
+            if (buftype == MPI_FLOAT){
+                err = nc_put_vara_float(ncid, vid, dummystart, dummycount, (float*)bufp);
+            }
+            else{
+                err = nc_put_vara_double(ncid, vid, dummystart, dummycount, (double*)bufp);  
+            }
+            ERR
+
+            bufp += rsize;
+        }
+        else{
+            if (buftype == MPI_FLOAT){
+                err = nc_put_vara_float(ncid, vid, dummystart, dummycount, (float*)buf);
+            }
+            else{
+                err = nc_put_vara_double(ncid, vid, dummystart, dummycount, (double*)buf);  
+            }
+            ERR
+        }
+    }
+}
 
 /*----< write_small_vars_F_case() >------------------------------------------*/
 static int
@@ -42,25 +132,25 @@ write_small_vars_F_case(int          ncid,
 
     if (rec_no == 0) {
         /* lev */
-        err = nc_iput_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_put_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += lev + gap;
         /* hyam */
-        err = nc_iput_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_put_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += lev + gap;
         /* hybm */
-        err = nc_iput_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_put_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += lev + gap;
         /* P0 */
-        err = nc_iput_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_put_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += 1 + gap;
         /* ilev */
-        err = nc_iput_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_put_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += ilev + gap;
         /* hyai */
-        err = nc_iput_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_put_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += ilev + gap;
         /* hybi */
-        err = nc_iput_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_put_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += ilev + gap;
     }
     else
@@ -68,47 +158,47 @@ write_small_vars_F_case(int          ncid,
 
     /* time */
     start[0] = rec_no;
-    err = nc_iput_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_put_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* date */
     start[0] = rec_no;
-    err = nc_iput_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_put_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* datesec */
     start[0] = rec_no;
-    err = nc_iput_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_put_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* time_bnds */
     start[0] = rec_no; start[1] = 0;
     count[0] = 1;      count[1] = nbnd;
-    err = nc_iput_vara_double(ncid, varids[i++], start, count, *dbl_buf, NULL); ERR
+    err = nc_put_vara_double(ncid, varids[i++], start, count, *dbl_buf); ERR
     *dbl_buf += nbnd + gap;
     /* date_written */
     start[0] = rec_no; start[1] = 0;
     count[0] = 1;      count[1] = nchars;
-    err = nc_iput_vara_text(ncid, varids[i++], start, count, *txt_buf, NULL); ERR
+    err = nc_put_vara_text(ncid, varids[i++], start, count, *txt_buf); ERR
     *txt_buf += nchars;
     /* time_written */
     start[0] = rec_no; start[1] = 0;
     count[0] = 1;      count[1] = nchars;
-    err = nc_iput_vara_text(ncid, varids[i++], start, count, *txt_buf, NULL); ERR
+    err = nc_put_vara_text(ncid, varids[i++], start, count, *txt_buf); ERR
     *txt_buf += nchars;
 
     if (rec_no == 0) {
         /* ndbase */
-        err = nc_iput_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_put_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* nsbase */
-        err = nc_iput_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_put_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* nbdate */
-        err = nc_iput_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_put_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* nbsec */
-        err = nc_iput_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_put_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* mdt */
-        err = nc_iput_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_put_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
     }
     else
@@ -116,39 +206,39 @@ write_small_vars_F_case(int          ncid,
 
     /* ndcur */
     start[0] = rec_no;
-    err = nc_iput_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_put_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* nscur */
     start[0] = rec_no;
-    err = nc_iput_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_put_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* co2vmr */
     start[0] = rec_no;
-    err = nc_iput_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_put_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* ch4vmr */
     start[0] = rec_no;
-    err = nc_iput_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_put_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* n2ovmr */
     start[0] = rec_no;
-    err = nc_iput_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_put_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* f11vmr */
     start[0] = rec_no;
-    err = nc_iput_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_put_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* f12vmr */
     start[0] = rec_no;
-    err = nc_iput_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_put_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* sol_tsi */
     start[0] = rec_no;
-    err = nc_iput_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_put_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* nsteph */
     start[0] = rec_no;
-    err = nc_iput_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_put_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
 fn_exit:
     return err;
@@ -177,25 +267,25 @@ read_small_vars_F_case(int          ncid,
 
     if (rec_no == 0) {
         /* lev */
-        err = nc_iget_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_get_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += lev + gap;
         /* hyam */
-        err = nc_iget_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_get_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += lev + gap;
         /* hybm */
-        err = nc_iget_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_get_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += lev + gap;
         /* P0 */
-        err = nc_iget_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_get_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += 1 + gap;
         /* ilev */
-        err = nc_iget_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_get_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += ilev + gap;
         /* hyai */
-        err = nc_iget_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_get_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += ilev + gap;
         /* hybi */
-        err = nc_iget_var_double(ncid, varids[i++], *dbl_buf, NULL); ERR
+        err = nc_get_var_double(ncid, varids[i++], *dbl_buf); ERR
         *dbl_buf += ilev + gap;
     }
     else
@@ -203,47 +293,47 @@ read_small_vars_F_case(int          ncid,
 
     /* time */
     start[0] = rec_no;
-    err = nc_iget_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_get_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* date */
     start[0] = rec_no;
-    err = nc_iget_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_get_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* datesec */
     start[0] = rec_no;
-    err = nc_iget_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_get_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* time_bnds */
     start[0] = rec_no; start[1] = 0;
     count[0] = 1;      count[1] = nbnd;
-    err = nc_iget_vara_double(ncid, varids[i++], start, count, *dbl_buf, NULL); ERR
+    err = nc_get_vara_double(ncid, varids[i++], start, count, *dbl_buf); ERR
     *dbl_buf += nbnd + gap;
     /* date_written */
     start[0] = rec_no; start[1] = 0;
     count[0] = 1;      count[1] = nchars;
-    err = nc_iget_vara_text(ncid, varids[i++], start, count, *txt_buf, NULL); ERR
+    err = nc_get_vara_text(ncid, varids[i++], start, count, *txt_buf); ERR
     *txt_buf += nchars;
     /* time_written */
     start[0] = rec_no; start[1] = 0;
     count[0] = 1;      count[1] = nchars;
-    err = nc_iget_vara_text(ncid, varids[i++], start, count, *txt_buf, NULL); ERR
+    err = nc_get_vara_text(ncid, varids[i++], start, count, *txt_buf); ERR
     *txt_buf += nchars;
 
     if (rec_no == 0) {
         /* ndbase */
-        err = nc_iget_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_get_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* nsbase */
-        err = nc_iget_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_get_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* nbdate */
-        err = nc_iget_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_get_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* nbsec */
-        err = nc_iget_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_get_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
         /* mdt */
-        err = nc_iget_var_int(ncid, varids[i++], *int_buf, NULL); ERR
+        err = nc_get_var_int(ncid, varids[i++], *int_buf); ERR
         *int_buf += 1;
     }
     else
@@ -251,458 +341,42 @@ read_small_vars_F_case(int          ncid,
 
     /* ndcur */
     start[0] = rec_no;
-    err = nc_iget_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_get_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* nscur */
     start[0] = rec_no;
-    err = nc_iget_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_get_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
     /* co2vmr */
     start[0] = rec_no;
-    err = nc_iget_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_get_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* ch4vmr */
     start[0] = rec_no;
-    err = nc_iget_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_get_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* n2ovmr */
     start[0] = rec_no;
-    err = nc_iget_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_get_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* f11vmr */
     start[0] = rec_no;
-    err = nc_iget_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_get_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* f12vmr */
     start[0] = rec_no;
-    err = nc_iget_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_get_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* sol_tsi */
     start[0] = rec_no;
-    err = nc_iget_var1_double(ncid, varids[i++], start, *dbl_buf, NULL); ERR
+    err = nc_get_var1_double(ncid, varids[i++], start, *dbl_buf); ERR
     *dbl_buf += 1 + gap;
     /* nsteph */
     start[0] = rec_no;
-    err = nc_iget_var1_int(ncid, varids[i++], start, *int_buf, NULL); ERR
+    err = nc_get_var1_int(ncid, varids[i++], start, *int_buf); ERR
     *int_buf += 1;
 fn_exit:
     return err;
-}
-
-#define SET_TYPE(kind) { \
-    var_types[i] = type[kind]; \
-    err = nc_inq_varoffset(ncid, varids[i], &var_offset); ERR \
-    var_disps[i] = var_offset - offset_rec; \
-    if (kind == 2) { \
-        my_nreqs += xnreqs[1]; \
-        if (i < nvars-1) buf_disps[i+1] = buf_disps[i] + (nelems[1]+gap) * sizeof(itype); \
-        buf_blocklens[i] = nelems[1]; \
-    } else { /* kind == 3 */ \
-        my_nreqs += xnreqs[2]; \
-        if (i < nvars-1) buf_disps[i+1] = buf_disps[i] + (nelems[2]+gap) * sizeof(itype); \
-        buf_blocklens[i] = nelems[2]; \
-    } \
-    i++; \
-}
-
-#define SET_TYPES(kind, num) \
-    for (j=0; j<num; j++) { \
-        var_types[i] = type[kind]; \
-        err = nc_inq_varoffset(ncid, varids[i], &var_offset); ERR \
-        var_disps[i] = var_offset - offset_rec; \
-        if (kind == 2) { \
-            my_nreqs += xnreqs[1]; \
-            if (i < nvars-1) buf_disps[i+1] = buf_disps[i] + (nelems[1]+gap) * sizeof(itype); \
-            buf_blocklens[i] = nelems[1]; \
-        } else { /* kind == 3 */ \
-            my_nreqs += xnreqs[2]; \
-            if (i < nvars-1) buf_disps[i+1] = buf_disps[i] + (nelems[2]+gap) * sizeof(itype); \
-            buf_blocklens[i] = nelems[2]; \
-        } \
-        i++; \
-    }
-
-/*----< run_vard_F_case() >--------------------------------------------------*/
-int
-run_vard_F_case(MPI_Comm io_comm,         /* MPI communicator that includes all the tasks involved in IO */
-                const char *out_prefix,   /* output file prefix */
-                const char *out_postfix,  /* output file postfix */
-                int         nvars,        /* number of variables 408 or 51 */
-                int         num_recs,     /* number of records */
-                int         noncontig_buf,/* whether to us noncontiguous buffer */
-                MPI_Info    info,
-                MPI_Offset  dims[3][2],   /* dimension lengths */
-                const int   nreqs[3],     /* no. request in decompositions 1,2,3 */
-                int* const  disps[3],     /* request's displacements */
-                int* const  blocklens[3]) /* request's block lengths */
-{
-    char outfname[512], txt_buf[16], *txt_buf_ptr;
-    int i, j, k, err, nerrs=0, rank, ncid, cmode, *varids;
-    int *var_blocklens, *buf_blocklens, my_nreqs, rec_no, gap=0;
-    int int_buf[10], *int_buf_ptr, xnreqs[3];
-    size_t fix_buflen, dbl_buflen, rec_buflen;
-    size_t nelems[3];
-    itype *rec_buf;
-    double *dbl_buf, *dbl_buf_ptr;
-    double pre_timing, open_timing, io_timing, close_timing;
-    double timing, total_timing,  max_timing;
-    MPI_Aint *var_disps, *buf_disps;
-    MPI_Offset tmp, metadata_size, rec_size, put_size, total_size;
-    MPI_Offset offset_fix, offset_rec, var_offset, max_nreqs, total_nreqs;
-    MPI_Datatype *var_types, type[4], *filetype_rec, filetype_dbl;
-    MPI_Datatype buftype_rec, buftype_dbl;
-    MPI_Info info_used=MPI_INFO_NULL;
-
-    MPI_Barrier(io_comm); /*-----------------------------------------*/
-    total_timing = pre_timing = MPI_Wtime();
-
-    MPI_Comm_rank(io_comm, &rank);
-
-    if (noncontig_buf) gap = 10;
-
-    for (i=0; i<3; i++) xnreqs[i] = nreqs[i];
-
-    varids = (int*) malloc(nvars * sizeof(int));
-
-    /* allocate arrays for constructing fileview and buffer type */
-    var_types = (MPI_Datatype*) malloc(nvars * sizeof(MPI_Datatype));
-    var_blocklens = (int*) malloc(nvars * 2 * sizeof(int));
-    buf_blocklens = var_blocklens + nvars;
-    var_disps = (MPI_Aint*) malloc(nvars * 2 * sizeof(MPI_Aint));
-    buf_disps = var_disps + nvars;
-
-    /* define MPI datatypes for 4 kinds from 3 decompositions */
-    MPI_Type_indexed(xnreqs[0], blocklens[0], disps[0], MPI_DOUBLE, &type[0]);
-    MPI_Type_commit(&type[0]);
-    MPI_Type_indexed(xnreqs[1], blocklens[1], disps[1], MPI_DOUBLE, &type[1]);
-    MPI_Type_commit(&type[1]);
-    MPI_Type_indexed(xnreqs[1], blocklens[1], disps[1], REC_ITYPE, &type[2]);
-    MPI_Type_commit(&type[2]);
-    MPI_Type_indexed(xnreqs[2], blocklens[2], disps[2], REC_ITYPE, &type[3]);
-    MPI_Type_commit(&type[3]);
-
-    /* number of variable elements from 3 decompositions */
-    for (i=0; i<nvars; i++) var_blocklens[i] = 1;
-    for (i=0; i<3; i++)
-        for (nelems[i]=0, j=0; j<xnreqs[i]; j++)
-            nelems[i] += blocklens[i][j];
-
-    if (verbose && rank == 0)
-        printf("nelems=%zd %zd %zd\n", nelems[0],nelems[1],nelems[2]);
-
-    /* allocate and initialize write buffer for small variables */
-    dbl_buflen = nelems[1]*2 + nelems[0] + gap*3
-               + 3 * dims[2][0] + 3 * (dims[2][0]+1) + 8 + 2 + 20 * gap;
-
-    dbl_buf = (double*) malloc(dbl_buflen * sizeof(double));
-    for (i=0; i<dbl_buflen; i++) dbl_buf[i] = rank + i;
-
-    for (i=0; i<10; i++) int_buf[i] = rank + i;
-    for (i=0; i<16; i++) txt_buf[i] = 'a' + rank + i;
-
-    /* allocate and initialize write buffer for large variables */
-    if (nvars == 408)
-        rec_buflen = nelems[1] * 315 + nelems[2] * 63 + (315+63) * gap;
-    else
-        rec_buflen = nelems[1] * 20 + nelems[2] + (20+1) * gap;
-
-    rec_buf = (itype*) malloc(rec_buflen * sizeof(itype));
-    for (i=0; i<rec_buflen; i++) rec_buf[i] = rank + i;
-
-    pre_timing = MPI_Wtime() - pre_timing;
-
-    MPI_Barrier(io_comm); /*-----------------------------------------*/
-    open_timing = MPI_Wtime();
-
-    /* set output file name */
-    sprintf(outfname, "%s%s",out_prefix, out_postfix);
-
-    /* create a new CDF-5 file for writing */
-    cmode = NC_CLOBBER | NC_64BIT_DATA;
-    err = nc_create(io_comm, outfname, cmode, info, &ncid); ERR
-
-    /* define dimensions, variables, and attributes */
-    if (nvars == 408) {
-        /* for h0 file */
-        err = def_F_case_h0(ncid, dims[2], nvars, varids); ERR
-    }
-    else {
-        /* for h1 file */
-        err = def_F_case_h1(ncid, dims[2], nvars, varids); ERR
-    }
-
-    /* exit define mode and enter data mode */
-    err = nc_enddef(ncid); ERR
-
-    /* I/O amount so far */
-    err = nc_inq_put_size(ncid, &metadata_size); ERR
-    err = nc_inq_file_info(ncid, &info_used); ERR
-    open_timing = MPI_Wtime() - open_timing;
-
-    MPI_Barrier(io_comm); /*-----------------------------------------*/
-    timing = MPI_Wtime();
-
-    /* the first 3 variables are of type NC_DOUBLE -------------------*/
-    i = 0;
-    my_nreqs = 0;
-
-    /* lat */
-    var_types[i] = type[1];
-    err = nc_inq_varoffset(ncid, varids[i], &offset_fix); ERR
-    var_disps[i] = 0;
-    buf_disps[0] = 0;
-    buf_blocklens[0] = nelems[1];
-    i++;
-    my_nreqs += xnreqs[1];
-
-    /* lon */
-    var_types[i] = type[1];
-    err = nc_inq_varoffset(ncid, varids[i], &var_offset); ERR
-    var_disps[i] = var_offset - offset_fix;
-    buf_disps[i] = buf_disps[i-1] + (nelems[1] + gap) * sizeof (double);
-    buf_blocklens[1] = nelems[1];
-    i++;
-    my_nreqs += xnreqs[1];
-
-    /* area */
-    var_types[i] = type[0];
-    err = nc_inq_varoffset(ncid, varids[i], &var_offset); ERR
-    var_disps[i] = var_offset - offset_fix;
-    buf_disps[i] = buf_disps[i-1] + (nelems[1] + gap) * sizeof (double);
-    buf_blocklens[2] = nelems[0];
-    i++;
-    my_nreqs += xnreqs[0];
-    fix_buflen = nelems[1]*2 + nelems[0] + gap*3;
-
-    /* skip next 27 small variables */
-    i += 27;
-
-    /* concatenate 3 var_types[] into filetype_dbl */
-    MPI_Type_create_struct(3, var_blocklens, var_disps, var_types,
-                           &filetype_dbl);
-    MPI_Type_commit(&filetype_dbl);
-
-    if (noncontig_buf) {
-        /* construct buffer type for 3 variables */
-        MPI_Type_create_hindexed(3, buf_blocklens, buf_disps, MPI_DOUBLE,
-                                 &buftype_dbl);
-        MPI_Type_commit(&buftype_dbl);
-    }
-    else {
-        /* buffer type is contiguous */
-        buftype_dbl = MPI_DOUBLE;
-    }
-
-    err = nc_inq_varoffset(ncid, varids[i], &offset_rec); ERR
-    err = nc_inq_recsize(ncid, &rec_size); ERR
-    buf_disps[i] = 0;
-
-    if (nvars == 408) {
-        SET_TYPE(2)       /* AEROD_v */
-        SET_TYPES(3, 2)   /* ANRAIN and ANSNOW */
-        SET_TYPES(2, 18)  /* AODABS ... ANSNOW */
-        SET_TYPES(3, 2)   /* AQRAIN and AQSNOW */
-        SET_TYPES(2, 6)   /* AQ_DMS ... AQ_SOAG */
-        SET_TYPES(3, 5)   /* AREI ... CCN3 */
-        SET_TYPES(2, 2)   /* CDNUMC and CLDHGH */
-        SET_TYPES(3, 2)   /* CLDICE and CLDLIQ */
-        SET_TYPES(2, 3)   /* CLDLOW ... CLDTOT */
-        SET_TYPES(3, 4)   /* CLOUD ... DCQ */
-        SET_TYPES(2, 11)  /* DF_DMS ... DSTSFMBL */
-        SET_TYPE(3)       /* DTCOND */
-        SET_TYPES(2, 2)   /* DTENDTH and DTENDTQ */
-        SET_TYPES(3, 2)   /* EXTINCT and FICE */
-        SET_TYPES(2, 7)   /* FLDS ... FLUTC */
-        SET_TYPES(3, 4)   /* FREQI ... FREQS */
-        SET_TYPES(2, 15)  /* FSDS ... ICEFRAC */
-        SET_TYPES(3, 3)   /* ICIMR ... IWC */
-        SET_TYPES(2, 2)   /* LANDFRAC and LHFLX */
-        SET_TYPES(3, 5)   /* LINOZ_DO3 ... LINOZ_SSO3 */
-        SET_TYPES(2, 3)   /* LINOZ_SZA ... LWCF */
-        SET_TYPES(3, 12)  /* Mass_bc ... O3 */
-        SET_TYPES(2, 2)   /* O3_SRF and OCNFRAC */
-        SET_TYPE(3)       /* OMEGA */
-        SET_TYPE(2)       /* OMEGA500 */
-        SET_TYPE(3)       /* OMEGAT */
-        SET_TYPES(2, 8)   /* PBLH ... PSL */
-        SET_TYPE(3)       /* Q */
-        SET_TYPES(2, 2)   /* QFLX and QREFHT */
-        SET_TYPES(3, 3)   /* QRL ... RAINQM */
-        SET_TYPE(2)       /* RAM1 */
-        SET_TYPE(3)       /* RELHUM */
-        SET_TYPES(2, 37)  /* SFDMS ... SNOWHLND */
-        SET_TYPES(3, 2)   /* SNOWQM and SO2 */
-        SET_TYPES(2, 10)  /* SO2_CLXF ... SWCF */
-        SET_TYPE(3)       /* T */
-        SET_TYPES(2, 19)  /* TAUGWX ... TVQ */
-        SET_TYPE(3)       /* U */
-        SET_TYPE(2)       /* U10 */
-        SET_TYPES(3, 6)   /* UU ... VV */
-        SET_TYPES(2, 3)   /* WD_H2O2 ... WD_SO2 */
-        SET_TYPES(3, 3)   /* WSUB ... aero_water */
-        SET_TYPES(2, 32)  /* airFV ... dst_c3SFWET */
-        SET_TYPE(3)       /* hstobie_linoz */
-        SET_TYPES(2, 129) /* mlip ... soa_c3SFWET */
-    }
-    else {
-        SET_TYPES(2, 13)  /* CLDHGH ... T5 */
-        SET_TYPE(3)       /* U */
-        SET_TYPES(2, 7)   /* U250 ... Z500 */
-    }
-
-    if (noncontig_buf) {
-        /* construct buffer type for record variables */
-        MPI_Type_create_hindexed(nvars-30, buf_blocklens+30, buf_disps+30,
-                                 REC_ITYPE, &buftype_rec);
-        MPI_Type_commit(&buftype_rec);
-    }
-    else {
-        /* all record variables are in a single contiguous buffer */
-        buftype_rec = REC_ITYPE;
-    }
-
-    filetype_rec = (MPI_Datatype*)malloc(num_recs * sizeof(MPI_Datatype));
-    for (j=0; j<num_recs; j++) {
-        if (j > 0) {
-            for (k=30; k<nvars; k++)
-                var_disps[k] += rec_size;
-        }
-        /* concatenate nvars-30 var_types[] into filetype_rec[j] */
-        MPI_Type_create_struct(nvars-30, var_blocklens+30, var_disps+30,
-                               var_types+30, filetype_rec+j);
-        MPI_Type_commit(filetype_rec+j);
-    }
-
-    for (j=0; j<4; j++) MPI_Type_free(&type[j]);
-    free(var_types);
-    free(var_disps);
-    free(var_blocklens);
-
-    pre_timing += MPI_Wtime() - timing;
-
-    MPI_Barrier(io_comm); /*-----------------------------------------*/
-    io_timing = MPI_Wtime();
-
-    if (noncontig_buf) fix_buflen = rec_buflen = 1;
-    else {
-        if (nvars == 408)
-            rec_buflen = nelems[1] * 315 + nelems[2] * 63;
-        else
-            rec_buflen = nelems[1] * 20 + nelems[2];
-    }
-
-    /* write first 3 NC_DOUBLE fixed-size variables in one vard call */
-    err = nc_put_vard_all(ncid, varids[0], filetype_dbl, dbl_buf,
-                             fix_buflen, buftype_dbl); ERR
-
-    for (rec_no=0; rec_no<num_recs; rec_no++) {
-        i=3;
-        dbl_buf_ptr = dbl_buf + nelems[1]*2 + nelems[0] + gap*3;
-        int_buf_ptr = int_buf;
-        txt_buf_ptr = txt_buf;
-
-        /* next 27 small variables are written by rank 0 only */
-        if (rank == 0) {
-            /* post nonblocking requests using nc_iput_varn() */
-            err = write_small_vars_F_case(ncid, i, varids, rec_no, gap,
-                                          dims[2][0], dims[2][0]+1, 2, 8,
-                                          &int_buf_ptr, &txt_buf_ptr,
-                                          &dbl_buf_ptr);
-            ERR
-            my_nreqs += 27;
-        }
-        i += 27;
-
-        err = nc_wait_all(ncid, NC_PUT_REQ_ALL, NULL, NULL); ERR
-
-        /* write remaining record variables in one vard call */
-        err = nc_put_vard_all(ncid, varids[30], filetype_rec[rec_no],
-                                 rec_buf, rec_buflen, buftype_rec); ERR
-    }
-    io_timing = MPI_Wtime() - io_timing;
-
-    MPI_Barrier(io_comm); /*-----------------------------------------*/
-    close_timing = MPI_Wtime();
-
-    err = nc_inq_put_size(ncid, &total_size); ERR
-    put_size = total_size - metadata_size;
-    err = nc_close(ncid); ERR
-    close_timing = MPI_Wtime() - close_timing;
-
-    for (j=0; j<num_recs; j++) MPI_Type_free(filetype_rec+j);
-    free(filetype_rec);
-    MPI_Type_free(&filetype_dbl);
-
-    if (noncontig_buf) {
-        MPI_Type_free(&buftype_rec);
-        MPI_Type_free(&buftype_dbl);
-    }
-
-    free(rec_buf);
-    free(dbl_buf);
-    free(varids);
-
-    total_timing = MPI_Wtime() - total_timing;
-
-    tmp = my_nreqs;
-    MPI_Reduce(&tmp,           &max_nreqs,  1, MPI_OFFSET, MPI_MAX, 0, io_comm);
-    MPI_Reduce(&tmp,           &total_nreqs,1, MPI_OFFSET, MPI_MAX, 0, io_comm);
-    MPI_Reduce(&put_size,      &tmp,        1, MPI_OFFSET, MPI_SUM, 0, io_comm);
-    put_size = tmp;
-    MPI_Reduce(&total_size,    &tmp,        1, MPI_OFFSET, MPI_SUM, 0, io_comm);
-    total_size = tmp;
-    MPI_Reduce(&open_timing,   &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
-    open_timing = max_timing;
-    MPI_Reduce(&pre_timing,    &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
-    pre_timing = max_timing;
-    MPI_Reduce(&io_timing,     &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
-    io_timing = max_timing;
-    MPI_Reduce(&close_timing,  &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
-    close_timing = max_timing;
-    MPI_Reduce(&total_timing,  &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
-    total_timing = max_timing;
-
-    /* check if there is any PnetCDF internal malloc residue */
-    MPI_Offset malloc_size, sum_size;
-    err = nc_inq_malloc_size(&malloc_size);
-    if (err == NC_NOERR) {
-        MPI_Reduce(&malloc_size, &sum_size, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
-        if (rank == 0 && sum_size > 0) {
-            printf("-----------------------------------------------------------\n");
-            printf("heap memory allocated by PnetCDF internally has %lld bytes yet to be freed\n",
-                   sum_size);
-        }
-    }
-    MPI_Offset m_alloc=0, max_alloc;
-    nc_inq_malloc_max_size(&m_alloc);
-    MPI_Reduce(&m_alloc, &max_alloc, 1, MPI_OFFSET, MPI_MAX, 0, io_comm);
-    if (rank == 0) {
-        printf("History output file postfix        = %s\n", out_postfix);
-        printf("MAX heap memory allocated by PnetCDF internally is %.2f MiB\n",
-               (float)max_alloc/1048576);
-        printf("Total number of variables          = %d\n",nvars);
-        printf("Total write amount                 = %.2f MiB = %.2f GiB\n",
-               (double)total_size/1048576,(double)total_size/1073741824);
-        printf("Total number of requests           = %lld\n",total_nreqs);
-        printf("Max number of requests             = %lld\n",max_nreqs);
-        printf("Max Time of open + metadata define = %.4f sec\n",open_timing);
-        printf("Max Time of I/O preparing          = %.4f sec\n",pre_timing);
-        printf("Max Time of nc_put_vard         = %.4f sec\n",io_timing);
-        printf("Max Time of close                  = %.4f sec\n",close_timing);
-        printf("Max Time of TOTAL                  = %.4f sec\n",total_timing);
-        printf("I/O bandwidth (open-to-close)      = %.4f MiB/sec\n",
-               (double)total_size/1048576.0/total_timing);
-        printf("I/O bandwidth (write-only)         = %.4f MiB/sec\n",
-               (double)put_size/1048576.0/io_timing);
-        if (verbose) print_info(&info_used);
-        printf("-----------------------------------------------------------\n");
-    }
-fn_exit:
-    if (info_used != MPI_INFO_NULL) MPI_Info_free(&info_used);
-    if (!keep_outfile) unlink(outfname);
-    fflush(stdout);
-    MPI_Barrier(io_comm);
-    return nerrs;
 }
 
 #define FIX_1D_VAR_STARTS_COUNTS(starts, counts, nreqs, disps, blocklens) { \
@@ -816,8 +490,8 @@ fn_exit:
 
 #define POST_VARN(k, num, vid) \
     for (j=0; j<num; j++) { \
-        err = nc_iput_varn(ncid, vid+j, xnreqs[k-1], starts_D##k, \
-                              counts_D##k, rec_buf_ptr, -1, REC_ITYPE, NULL); \
+        err = nc_put_varn(ncid, vid+j, xnreqs[k-1], starts_D##k, \
+                              counts_D##k, rec_buf_ptr, -1, REC_ITYPE); \
         ERR \
         rec_buf_ptr += nelems[k-1] + gap; \
         my_nreqs += xnreqs[k-1]; \
@@ -825,8 +499,8 @@ fn_exit:
 
 #define POST_VARN_RD(k, num, vid) \
     for (j=0; j<num; j++) { \
-        err = nc_iget_varn(ncid, vid+j, xnreqs[k-1], starts_D##k, \
-                              counts_D##k, rec_buf_ptr, -1, REC_ITYPE, NULL); \
+        err = nc_get_varn(ncid, vid+j, xnreqs[k-1], starts_D##k, \
+                              counts_D##k, rec_buf_ptr, -1, REC_ITYPE); \
         ERR \
         rec_buf_ptr += nelems[k-1] + gap; \
         my_nreqs += xnreqs[k-1]; \
@@ -928,13 +602,8 @@ run_varn_F_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
     sprintf(outfname, "%s%s",out_prefix, out_postfix);
 
     /* create a new CDF-5 file for writing */
-    if (format == 4){
-        cmode = NC_CLOBBER | NC_NETCDF4;
-    }
-    else{
-        cmode = NC_CLOBBER | NC_64BIT_DATA;
-    }
-    err = nc_create(io_comm, outfname, cmode, info, &ncid); ERR
+    cmode = NC_CLOBBER | NC_NETCDF4 | NC_MPIIO;
+    err = nc_create_par(outfname, cmode, io_comm, info, &ncid); ERR
 
     /* define dimensions, variables, and attributes */
     if (nvars == 408) {
@@ -970,14 +639,14 @@ run_varn_F_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
 
         REC_2D_VAR_STARTS_COUNTS(0, starts_D2, counts_D2, xnreqs[1], disps[1], blocklens[1])
 
-        err = nc_iput_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
-                              dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL); ERR
+        err = nc_put_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
+                              dbl_buf_ptr, nelems[1], MPI_DOUBLE); ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
 
         /* lon */
-        err = nc_iput_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
-                              dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL); ERR
+        err = nc_put_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
+                              dbl_buf_ptr, nelems[1], MPI_DOUBLE); ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
 
@@ -993,8 +662,8 @@ run_varn_F_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
         /* construct varn API arguments starts[][] and counts[][] */
         FIX_1D_VAR_STARTS_COUNTS(fix_starts_D1, fix_counts_D1, xnreqs[0], disps[0], blocklens[0])
 
-        err = nc_iput_varn(ncid, varids[i++], xnreqs[0], fix_starts_D1, fix_counts_D1,
-                              dbl_buf_ptr, nelems[0], MPI_DOUBLE, NULL); ERR
+        err = nc_put_varn(ncid, varids[i++], xnreqs[0], fix_starts_D1, fix_counts_D1,
+                              dbl_buf_ptr, nelems[0], MPI_DOUBLE); ERR
         dbl_buf_ptr += nelems[0] + gap;
         my_nreqs += xnreqs[0];
 
@@ -1021,7 +690,7 @@ run_varn_F_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
         /* next 27 small variables are written by rank 0 only */
         if (rank == 0) {
             my_nreqs += 27;
-            /* post nonblocking requests using nc_iput_varn() */
+            /* post nonblocking requests using nc_put_varn() */
             err = write_small_vars_F_case(ncid, i, varids, rec_no, gap,
                                           dims[2][0], dims[2][0]+1, 2, 8,
                                           &int_buf_ptr, &txt_buf_ptr,
@@ -1036,7 +705,7 @@ run_varn_F_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
         timing = MPI_Wtime();
 
         /* flush fixed-size and small variables */
-        err = nc_wait_all(ncid, NC_PUT_REQ_ALL, NULL, NULL); ERR
+        err = nc_wait_all(ncid, NC_PUT_REQ_ALL, NULL); ERR
 
         wait_timing += MPI_Wtime() - timing;
 
@@ -1165,7 +834,7 @@ run_varn_F_case(MPI_Comm io_comm,         /* MPI communicator that includes all 
         MPI_Barrier(io_comm); /*-----------------------------------------*/
         timing = MPI_Wtime();
 
-        err = nc_wait_all(ncid, NC_PUT_REQ_ALL, NULL, NULL); ERR
+        err = nc_wait_all(ncid, NC_PUT_REQ_ALL, NULL); ERR
 
         wait_timing += MPI_Wtime() - timing;
     }
@@ -1348,13 +1017,8 @@ run_varn_F_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
     sprintf(infname, "%s%s",in_prefix, in_postfix);
 
     /* open a new CDF-5 file for reading */
-    if (format == 4){
-        cmode = NC_NETCDF4;
-    }
-    else{
-        cmode = NC_64BIT_DATA;
-    }
-    err = nc_open(io_comm, infname, cmode, info, &ncid); ERR
+    cmode = NC_NETCDF4 | NC_MPIIO;
+    err = nc_open_par(infname, cmode, io_comm, info, &ncid); ERR
 
     /* inquery dimensions, variables, and attributes */
     if (nvars == 408) {
@@ -1387,14 +1051,14 @@ run_varn_F_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
 
         REC_2D_VAR_STARTS_COUNTS(0, starts_D2, counts_D2, xnreqs[1], disps[1], blocklens[1])
 
-        err = nc_iget_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
-                              dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL); ERR
+        err = nc_get_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
+                              dbl_buf_ptr, nelems[1], MPI_DOUBLE); ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
 
         /* lon */
-        err = nc_iget_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
-                              dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL); ERR
+        err = nc_get_varn(ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
+                              dbl_buf_ptr, nelems[1], MPI_DOUBLE); ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
 
@@ -1410,8 +1074,8 @@ run_varn_F_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
         /* construct varn API arguments starts[][] and counts[][] */
         FIX_1D_VAR_STARTS_COUNTS(fix_starts_D1, fix_counts_D1, xnreqs[0], disps[0], blocklens[0])
 
-        err = nc_iget_varn(ncid, varids[i++], xnreqs[0], fix_starts_D1, fix_counts_D1,
-                              dbl_buf_ptr, nelems[0], MPI_DOUBLE, NULL); ERR
+        err = nc_get_varn(ncid, varids[i++], xnreqs[0], fix_starts_D1, fix_counts_D1,
+                              dbl_buf_ptr, nelems[0], MPI_DOUBLE); ERR
         dbl_buf_ptr += nelems[0] + gap;
         my_nreqs += xnreqs[0];
 
@@ -1438,7 +1102,7 @@ run_varn_F_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
         /* next 27 small variables are read by rank 0 only */
         if (rank == 0) {
             my_nreqs += 27;
-            /* post nonblocking requests using nc_iget_varn() */
+            /* post nonblocking requests using nc_get_varn() */
             err = read_small_vars_F_case(ncid, i, varids, rec_no, gap,
                                           dims[2][0], dims[2][0]+1, 2, 8,
                                           &int_buf_ptr, &txt_buf_ptr,
@@ -1453,7 +1117,7 @@ run_varn_F_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
         timing = MPI_Wtime();
 
         /* flush fixed-size and small variables */
-        err = nc_wait_all(ncid, NC_GET_REQ_ALL, NULL, NULL); ERR
+        err = nc_wait_all(ncid, NC_GET_REQ_ALL, NULL); ERR
 
         wait_timing += MPI_Wtime() - timing;
 
@@ -1582,7 +1246,7 @@ run_varn_F_case_rd( MPI_Comm io_comm,         /* MPI communicator that includes 
         MPI_Barrier(io_comm); /*-----------------------------------------*/
         timing = MPI_Wtime();
 
-        err = nc_wait_all(ncid, NC_GET_REQ_ALL, NULL, NULL); ERR
+        err = nc_wait_all(ncid, NC_GET_REQ_ALL, NULL); ERR
 
         wait_timing += MPI_Wtime() - timing;
     }

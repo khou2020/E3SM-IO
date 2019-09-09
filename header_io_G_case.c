@@ -14,16 +14,37 @@
 #define INQ_VID(A, B, D, E, F, C) nc_inq_varid(A, B, C)
 #define NOP(A, B, D, E, C) NC_NOERR
 #define NOP2(A, B, D, E, F, C) NC_NOERR
+#define DEF_VAR(A, B, C, D, E, F) nc_e3sm_def_var(i, A, B, C, D, E, F)
 
-#define DEF_VAR(A, B, C, D, E, F) { \
-    err = nc_def_var(A, B, C, D, E, F); \
-    if (i > 2 && i < 30){ \
-        err |= nc_var_par_access(A, F, NC_INDEPENDENT); \
-    } \
-    else{ \
-        err |= nc_var_par_access(A, F, NC_COLLECTIVE); \
-    } \
+static int nc_e3sm_def_var(int i, int ncid, const char *name, nc_type xtype, int ndims, const int *dimidsp, int *varidp) { 
+    int err, nerrs;
+    int j;
+
+    err = nc_def_var(ncid, name, xtype, ndims, dimidsp, varidp); 
+    if (i > 2 && i < 30){ 
+        err = nc_var_par_access(ncid, *varidp, NC_INDEPENDENT); ERR
+    } 
+    else{ 
+        err = nc_var_par_access(ncid, *varidp, NC_COLLECTIVE); ERR
+    } 
+    if (ndims > 0 && ndims < 16){ 
+        int j;
+        size_t csize[16]; 
+
+        for(j = 0; j < ndims; j++){ 
+            err = nc_inq_dim(ncid, *varidp, NULL, csize + j); ERR
+            if (csize[j] == 0){ // recdim 
+                csize[j] = 1;
+            }
+        }
+        err = nc_def_var_chunking(ncid, *varidp, NC_CHUNKED, csize); ERR
+        err = nc_def_var_deflate(ncid, *varidp, NC_SHUFFLE, 1, 5); ERR
+    }
+
+fn_exit:
+    return err;
 }
+
 
 static int
 define_global_attributes(int ncid)
@@ -1480,7 +1501,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_nCells;
 
-    err = nc_def_var(ncid, "salinitySurfaceRestoringTendency", NC_DOUBLE, 2, dimids, &salinitySurfaceRestoringTendency); ERR
+    err = DEF_VAR(ncid, "salinitySurfaceRestoringTendency", NC_DOUBLE, 2, dimids, &salinitySurfaceRestoringTendency); ERR
     err = nc_put_att_text(ncid, salinitySurfaceRestoringTendency, "units", 7, "m PSU/s"); ERR
     err = nc_put_att_text(ncid, salinitySurfaceRestoringTendency, "long_name", 42, "salinity tendency due to surface restoring"); ERR
     varids[i++] = salinitySurfaceRestoringTendency;
@@ -1490,7 +1511,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevelsP1;
 
-    err = nc_def_var(ncid, "vertTransportVelocityTop", NC_DOUBLE, 3, dimids, &vertTransportVelocityTop); ERR
+    err = DEF_VAR(ncid, "vertTransportVelocityTop", NC_DOUBLE, 3, dimids, &vertTransportVelocityTop); ERR
     err = nc_put_att_text(ncid, vertTransportVelocityTop, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, vertTransportVelocityTop, "long_name", 280,
                              "vertical tracer-transport velocity defined at center (horizontally) "
@@ -1499,7 +1520,7 @@ def_G_case_h0(int               ncid,       /* file ID */
                               "continuity equation from the horizontal total tracer-transport velocity."); ERR
     varids[i++] = vertTransportVelocityTop;
 
-    err = nc_def_var(ncid, "vertGMBolusVelocityTop", NC_DOUBLE, 3, dimids, &vertGMBolusVelocityTop); ERR
+    err = DEF_VAR(ncid, "vertGMBolusVelocityTop", NC_DOUBLE, 3, dimids, &vertGMBolusVelocityTop); ERR
     err = nc_put_att_text(ncid, vertGMBolusVelocityTop, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, vertGMBolusVelocityTop, "long_name", 266,
                              "vertical tracer-transport velocity defined at center (horizontally) "
@@ -1508,7 +1529,7 @@ def_G_case_h0(int               ncid,       /* file ID */
                               "continuity equation from the horizontal GM Bolus velocity."); ERR
     varids[i++] = vertGMBolusVelocityTop;
 
-    err = nc_def_var(ncid, "vertAleTransportTop", NC_DOUBLE, 3, dimids, &vertAleTransportTop); ERR
+    err = DEF_VAR(ncid, "vertAleTransportTop", NC_DOUBLE, 3, dimids, &vertAleTransportTop); ERR
     err = nc_put_att_text(ncid, vertAleTransportTop, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, vertAleTransportTop, "long_name", 69, "vertical transport through "
                              "the layer interface at the top of the cell"); ERR
@@ -1518,7 +1539,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_nCells;
 
-    err = nc_def_var(ncid, "tendSSH", NC_DOUBLE, 2, dimids, &tendSSH); ERR
+    err = DEF_VAR(ncid, "tendSSH", NC_DOUBLE, 2, dimids, &tendSSH); ERR
     err = nc_put_att_text(ncid, tendSSH, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, tendSSH, "long_name", 35, "time tendency of sea-surface height"); ERR
     varids[i++] = tendSSH;
@@ -1528,7 +1549,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "layerThickness", NC_DOUBLE, 3, dimids, &layerThickness); ERR
+    err = DEF_VAR(ncid, "layerThickness", NC_DOUBLE, 3, dimids, &layerThickness); ERR
     err = nc_put_att_text(ncid, layerThickness, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, layerThickness, "long_name", 15, "layer thickness"); ERR
     varids[i++] = layerThickness;
@@ -1538,7 +1559,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nEdges;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "normalVelocity", NC_DOUBLE, 3, dimids, &normalVelocity); ERR
+    err = DEF_VAR(ncid, "normalVelocity", NC_DOUBLE, 3, dimids, &normalVelocity); ERR
     err = nc_put_att_text(ncid, normalVelocity, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, normalVelocity, "long_name", 47, "horizonal velocity, "
                              "normal component to an edge"); ERR
@@ -1548,7 +1569,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_nCells;
 
-    err = nc_def_var(ncid, "ssh", NC_DOUBLE, 2, dimids, &ssh); ERR
+    err = DEF_VAR(ncid, "ssh", NC_DOUBLE, 2, dimids, &ssh); ERR
     err = nc_put_att_text(ncid, ssh, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, ssh, "long_name", 18, "sea surface height"); ERR
     varids[i++] = ssh;
@@ -1556,7 +1577,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 1 int (nEdges) */
     dimids[0] = dim_nEdges;
 
-    err = nc_def_var(ncid, "maxLevelEdgeTop", NC_INT, 1, dimids, &maxLevelEdgeTop); ERR
+    err = DEF_VAR(ncid, "maxLevelEdgeTop", NC_INT, 1, dimids, &maxLevelEdgeTop); ERR
     err = nc_put_att_text(ncid, maxLevelEdgeTop, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, maxLevelEdgeTop, "long_name", 79, "Index to the last edge "
                              "in a column with active ocean cells on both sides of it."); ERR
@@ -1565,7 +1586,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 1 double (nVertLevels) */
     dimids[0] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "vertCoordMovementWeights", NC_DOUBLE, 1, dimids, &vertCoordMovementWeights); ERR
+    err = DEF_VAR(ncid, "vertCoordMovementWeights", NC_DOUBLE, 1, dimids, &vertCoordMovementWeights); ERR
     err = nc_put_att_text(ncid, vertCoordMovementWeights, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, vertCoordMovementWeights, "long_name", 98, "Weights used "
                              "for distribution of sea surface heigh purturbations through "
@@ -1576,7 +1597,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_nEdges;
     dimids[1] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "edgeMask", NC_INT, 2, dimids, &edgeMask); ERR
+    err = DEF_VAR(ncid, "edgeMask", NC_INT, 2, dimids, &edgeMask); ERR
     err = nc_put_att_text(ncid, edgeMask, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, edgeMask, "long_name", 69, "Mask on edges that determines "
                              "if computations should be done on edge."); ERR
@@ -1586,7 +1607,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_nCells;
     dimids[1] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "cellMask", NC_INT, 2, dimids, &cellMask); ERR
+    err = DEF_VAR(ncid, "cellMask", NC_INT, 2, dimids, &cellMask); ERR
     err = nc_put_att_text(ncid, cellMask, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, cellMask, "long_name", 69, "Mask on cells that determines "
                              "if computations should be done on cell."); ERR
@@ -1596,7 +1617,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_nVertices;
     dimids[1] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "vertexMask", NC_INT, 2, dimids, &vertexMask); ERR
+    err = DEF_VAR(ncid, "vertexMask", NC_INT, 2, dimids, &vertexMask); ERR
     err = nc_put_att_text(ncid, vertexMask, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, vertexMask, "long_name", 75, "Mask on vertices that determines "
                              "if computations should be done on vertice."); ERR
@@ -1605,13 +1626,13 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 2 double (nVertLevels) */
     dimids[0] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "refZMid", NC_DOUBLE, 1, dimids, &refZMid); ERR
+    err = DEF_VAR(ncid, "refZMid", NC_DOUBLE, 1, dimids, &refZMid); ERR
     err = nc_put_att_text(ncid, refZMid, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, refZMid, "long_name", 87, "Reference mid z-coordinate of ocean "
                              "for each vertical level. This has a negative value."); ERR
     varids[i++] = refZMid;
 
-    err = nc_def_var(ncid, "refLayerThickness", NC_DOUBLE, 1, dimids, &refLayerThickness); ERR
+    err = DEF_VAR(ncid, "refLayerThickness", NC_DOUBLE, 1, dimids, &refLayerThickness); ERR
     err = nc_put_att_text(ncid, refLayerThickness, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, refLayerThickness, "long_name", 58, "Reference layerThickness "
                              "of ocean for each vertical level."); ERR
@@ -1621,7 +1642,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_StrLen;
 
-    err = nc_def_var(ncid, "xtime", NC_CHAR, 2, dimids, &xtime); ERR
+    err = DEF_VAR(ncid, "xtime", NC_CHAR, 2, dimids, &xtime); ERR
     err = nc_put_att_text(ncid, xtime, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, xtime, "long_name", 45, "model time, with format \'YYYY-MM-DD_HH:MM:SS\'"); ERR
     varids[i++] = xtime;
@@ -1631,13 +1652,13 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "kineticEnergyCell", NC_DOUBLE, 3, dimids, &kineticEnergyCell); ERR
+    err = DEF_VAR(ncid, "kineticEnergyCell", NC_DOUBLE, 3, dimids, &kineticEnergyCell); ERR
     err = nc_put_att_text(ncid, kineticEnergyCell, "units", 10, "m^2 s^{-2}"); ERR
     err = nc_put_att_text(ncid, kineticEnergyCell, "long_name", 45, "kinetic energy of horizonal "
                              "velocity on cells"); ERR
     varids[i++] = kineticEnergyCell;
 
-    err = nc_def_var(ncid, "relativeVorticityCell", NC_DOUBLE, 3, dimids, &relativeVorticityCell); ERR
+    err = DEF_VAR(ncid, "relativeVorticityCell", NC_DOUBLE, 3, dimids, &relativeVorticityCell); ERR
     err = nc_put_att_text(ncid, relativeVorticityCell, "units", 6, "s^{-1}"); ERR
     err = nc_put_att_text(ncid, relativeVorticityCell, "long_name", 67, "curl of horizontal velocity, "
                              "averaged from vertices to cell centers"); ERR
@@ -1648,7 +1669,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nVertices;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "relativeVorticity", NC_DOUBLE, 3, dimids, &relativeVorticity); ERR
+    err = DEF_VAR(ncid, "relativeVorticity", NC_DOUBLE, 3, dimids, &relativeVorticity); ERR
     err = nc_put_att_text(ncid, relativeVorticity, "units", 6, "s^{-1}"); ERR
     err = nc_put_att_text(ncid, relativeVorticity, "long_name", 48, "curl of horizontal velocity, "
                              "defined at vertices"); ERR
@@ -1659,7 +1680,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "divergence", NC_DOUBLE, 3, dimids, &divergence); ERR
+    err = DEF_VAR(ncid, "divergence", NC_DOUBLE, 3, dimids, &divergence); ERR
     err = nc_put_att_text(ncid, divergence, "units", 6, "s^{-1}"); ERR
     err = nc_put_att_text(ncid, divergence, "long_name", 32, "divergence of horizonal velocity"); ERR
     varids[i++] = divergence;
@@ -1667,37 +1688,37 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 6 double (Time) */
     dimids[0] = dim_Time;
 
-    err = nc_def_var(ncid, "areaCellGlobal", NC_DOUBLE, 1, dimids, &areaCellGlobal); ERR
+    err = DEF_VAR(ncid, "areaCellGlobal", NC_DOUBLE, 1, dimids, &areaCellGlobal); ERR
     err = nc_put_att_text(ncid, areaCellGlobal, "units", 3, "m^2"); ERR
     err = nc_put_att_text(ncid, areaCellGlobal, "long_name", 86, "sum of the areaCell variable over "
                              "the full domain, used to normalize global statistics"); ERR
     varids[i++] = areaCellGlobal;
 
-    err = nc_def_var(ncid, "areaEdgeGlobal", NC_DOUBLE, 1, dimids, &areaEdgeGlobal); ERR
+    err = DEF_VAR(ncid, "areaEdgeGlobal", NC_DOUBLE, 1, dimids, &areaEdgeGlobal); ERR
     err = nc_put_att_text(ncid, areaEdgeGlobal, "units", 3, "m^2"); ERR
     err = nc_put_att_text(ncid, areaEdgeGlobal, "long_name", 86, "sum of the areaEdge variable over "
                              "the full domain, used to normalize global statistics"); ERR
     varids[i++] = areaEdgeGlobal;
 
-    err = nc_def_var(ncid, "areaTriangleGlobal", NC_DOUBLE, 1, dimids, &areaTriangleGlobal); ERR
+    err = DEF_VAR(ncid, "areaTriangleGlobal", NC_DOUBLE, 1, dimids, &areaTriangleGlobal); ERR
     err = nc_put_att_text(ncid, areaTriangleGlobal, "units", 3, "m^2"); ERR
     err = nc_put_att_text(ncid, areaTriangleGlobal, "long_name", 90, "sum of the areaTriangle variable "
                              "over the full domain, used to normalize global statistics"); ERR
     varids[i++] = areaTriangleGlobal;
 
-    err = nc_def_var(ncid, "volumeCellGlobal", NC_DOUBLE, 1, dimids, &volumeCellGlobal); ERR
+    err = DEF_VAR(ncid, "volumeCellGlobal", NC_DOUBLE, 1, dimids, &volumeCellGlobal); ERR
     err = nc_put_att_text(ncid, volumeCellGlobal, "units", 3, "m^3"); ERR
     err = nc_put_att_text(ncid, volumeCellGlobal, "long_name", 88, "sum of the volumeCell variable over "
                              "the full domain, used to normalize global statistics"); ERR
     varids[i++] = volumeCellGlobal;
 
-    err = nc_def_var(ncid, "volumeEdgeGlobal", NC_DOUBLE, 1, dimids, &volumeEdgeGlobal); ERR
+    err = DEF_VAR(ncid, "volumeEdgeGlobal", NC_DOUBLE, 1, dimids, &volumeEdgeGlobal); ERR
     err = nc_put_att_text(ncid, volumeEdgeGlobal, "units", 3, "m^3"); ERR
     err = nc_put_att_text(ncid, volumeEdgeGlobal, "long_name", 88, "sum of the volumeEdge variable over "
                              "the full domain, used to normalize global statistics"); ERR
     varids[i++] = volumeEdgeGlobal;
 
-    err = nc_def_var(ncid, "CFLNumberGlobal", NC_DOUBLE, 1, dimids, &CFLNumberGlobal); ERR
+    err = DEF_VAR(ncid, "CFLNumberGlobal", NC_DOUBLE, 1, dimids, &CFLNumberGlobal); ERR
     err = nc_put_att_text(ncid, CFLNumberGlobal, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, CFLNumberGlobal, "long_name", 39, "maximum CFL number over the full domain"); ERR
     varids[i++] = CFLNumberGlobal;
@@ -1707,7 +1728,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "BruntVaisalaFreqTop", NC_DOUBLE, 3, dimids, &BruntVaisalaFreqTop); ERR
+    err = DEF_VAR(ncid, "BruntVaisalaFreqTop", NC_DOUBLE, 3, dimids, &BruntVaisalaFreqTop); ERR
     err = nc_put_att_text(ncid, BruntVaisalaFreqTop, "units", 6, "s^{-2}"); ERR
     err = nc_put_att_text(ncid, BruntVaisalaFreqTop, "long_name", 89, "Brunt Vaisala frequency defined at "
                              "the center (horizontally) and top (vertically) of cell"); ERR
@@ -1718,7 +1739,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevelsP1;
 
-    err = nc_def_var(ncid, "vertVelocityTop", NC_DOUBLE, 3, dimids, &vertVelocityTop); ERR
+    err = DEF_VAR(ncid, "vertVelocityTop", NC_DOUBLE, 3, dimids, &vertVelocityTop); ERR
     err = nc_put_att_text(ncid, vertVelocityTop, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, vertVelocityTop, "long_name", 79, "vertical velocity defined at center "
                              "(horizontally) and top (vertically) of cell"); ERR
@@ -1729,32 +1750,32 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "velocityZonal", NC_DOUBLE, 3, dimids, &velocityZonal); ERR
+    err = DEF_VAR(ncid, "velocityZonal", NC_DOUBLE, 3, dimids, &velocityZonal); ERR
     err = nc_put_att_text(ncid, velocityZonal, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, velocityZonal, "long_name", 58, "component of horizontal velocity in "
                              "the eastward direction"); ERR
     varids[i++] = velocityZonal;
 
-    err = nc_def_var(ncid, "velocityMeridional", NC_DOUBLE, 3, dimids, &velocityMeridional); ERR
+    err = DEF_VAR(ncid, "velocityMeridional", NC_DOUBLE, 3, dimids, &velocityMeridional); ERR
     err = nc_put_att_text(ncid, velocityMeridional, "units", 8, "m s^{-1}"); ERR
     err = nc_put_att_text(ncid, velocityMeridional, "long_name", 59, "component of horizontal velocity in "
                              "the northward direction"); ERR
     varids[i++] = velocityMeridional;
 
-    err = nc_def_var(ncid, "displacedDensity", NC_DOUBLE, 3, dimids, &displacedDensity); ERR
+    err = DEF_VAR(ncid, "displacedDensity", NC_DOUBLE, 3, dimids, &displacedDensity); ERR
     err = nc_put_att_text(ncid, displacedDensity, "units", 9, "kg m^{-3}"); ERR
     err = nc_put_att_text(ncid, displacedDensity, "long_name", 130, "Density displaced adiabatically to "
                              "the mid-depth one layer deeper.  That is, layer k has been displaced to the "
                              "depth of layer k+1."); ERR
     varids[i++] = displacedDensity;
 
-    err = nc_def_var(ncid, "potentialDensity", NC_DOUBLE, 3, dimids, &potentialDensity); ERR
+    err = DEF_VAR(ncid, "potentialDensity", NC_DOUBLE, 3, dimids, &potentialDensity); ERR
     err = nc_put_att_text(ncid, potentialDensity, "units", 9, "kg m^{-3}"); ERR
     err = nc_put_att_text(ncid, potentialDensity, "long_name", 80, "potential density: density displaced "
                              "adiabatically to the mid-depth of top layer"); ERR
     varids[i++] = potentialDensity;
 
-    err = nc_def_var(ncid, "pressure", NC_DOUBLE, 3, dimids, &pressure); ERR
+    err = DEF_VAR(ncid, "pressure", NC_DOUBLE, 3, dimids, &pressure); ERR
     err = nc_put_att_text(ncid, pressure, "units", 8, "N m^{-2}"); ERR
     err = nc_put_att_text(ncid, pressure, "long_name", 38, "pressure used in the momentum equation"); ERR
     varids[i++] = pressure;
@@ -1762,7 +1783,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 1 double (nVertLevels) */
     dimids[0] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "refBottomDepth", NC_DOUBLE, 1, dimids, &refBottomDepth); ERR
+    err = DEF_VAR(ncid, "refBottomDepth", NC_DOUBLE, 1, dimids, &refBottomDepth); ERR
     err = nc_put_att_text(ncid, refBottomDepth, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, refBottomDepth, "long_name", 78, "Reference depth of ocean for each "
                              "vertical level. Used in \'z-level\' type runs."); ERR
@@ -1773,7 +1794,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "zMid", NC_DOUBLE, 3, dimids, &zMid); ERR
+    err = DEF_VAR(ncid, "zMid", NC_DOUBLE, 3, dimids, &zMid); ERR
     err = nc_put_att_text(ncid, zMid, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, zMid, "long_name", 42, "z-coordinate of the mid-depth of the layer"); ERR
     varids[i++] = zMid;
@@ -1781,7 +1802,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 1 double (nCells) */
     dimids[0] = dim_nCells;
 
-    err = nc_def_var(ncid, "bottomDepth", NC_DOUBLE, 1, dimids, &bottomDepth); ERR
+    err = DEF_VAR(ncid, "bottomDepth", NC_DOUBLE, 1, dimids, &bottomDepth); ERR
     err = nc_put_att_text(ncid, bottomDepth, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, bottomDepth, "long_name", 78, "Depth of the bottom of the ocean. Given "
                              "as a positive distance from sea level."); ERR
@@ -1790,7 +1811,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 1 int (nCells) */
     dimids[0] = dim_nCells;
 
-    err = nc_def_var(ncid, "maxLevelCell", NC_INT, 1, dimids, &maxLevelCell); ERR
+    err = DEF_VAR(ncid, "maxLevelCell", NC_INT, 1, dimids, &maxLevelCell); ERR
     err = nc_put_att_text(ncid, maxLevelCell, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, maxLevelCell, "long_name", 51, "Index to the last active ocean cell in each column."); ERR
     varids[i++] = maxLevelCell;
@@ -1798,7 +1819,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     /* 1 int (nEdges) */
     dimids[0] = dim_nEdges;
 
-    err = nc_def_var(ncid, "maxLevelEdgeBot", NC_INT, 1, dimids, &maxLevelEdgeBot); ERR
+    err = DEF_VAR(ncid, "maxLevelEdgeBot", NC_INT, 1, dimids, &maxLevelEdgeBot); ERR
     err = nc_put_att_text(ncid, maxLevelEdgeBot, "units", 8, "unitless"); ERR
     err = nc_put_att_text(ncid, maxLevelEdgeBot, "long_name", 92, "Index to the last edge in a column with at "
                              "least one active ocean cell on either side of it."); ERR
@@ -1808,7 +1829,7 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_nCells;
 
-    err = nc_def_var(ncid, "columnIntegratedSpeed", NC_DOUBLE, 2, dimids, &columnIntegratedSpeed); ERR
+    err = DEF_VAR(ncid, "columnIntegratedSpeed", NC_DOUBLE, 2, dimids, &columnIntegratedSpeed); ERR
     err = nc_put_att_text(ncid, columnIntegratedSpeed, "units", 10, "m^2 s^{-1}"); ERR
     err = nc_put_att_text(ncid, columnIntegratedSpeed, "long_name", 109, "speed = sum(h*sqrt(2*ke)), where ke "
                              "is kineticEnergyCell and the sum is over the full column at cell centers."); ERR
@@ -1819,75 +1840,75 @@ def_G_case_h0(int               ncid,       /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = nc_def_var(ncid, "temperatureHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids, &temperatureHorizontalAdvectionTendency); ERR
+    err = DEF_VAR(ncid, "temperatureHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids, &temperatureHorizontalAdvectionTendency); ERR
     err = nc_put_att_text(ncid, temperatureHorizontalAdvectionTendency, "long_name", 58, "potential temperature "
                              "tendency due to horizontal advection"); ERR
     err = nc_put_att_text(ncid, temperatureHorizontalAdvectionTendency, "units", 26, "degrees Celsius per second"); ERR
     varids[i++] = temperatureHorizontalAdvectionTendency;
 
-    err = nc_def_var(ncid, "salinityHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids, &salinityHorizontalAdvectionTendency); ERR
+    err = DEF_VAR(ncid, "salinityHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids, &salinityHorizontalAdvectionTendency); ERR
     err = nc_put_att_text(ncid, salinityHorizontalAdvectionTendency, "long_name", 45, "salinity tendency due "
                              "to horizontal advection"); ERR
     err = nc_put_att_text(ncid, salinityHorizontalAdvectionTendency, "units", 14, "PSU per second"); ERR
     varids[i++] = salinityHorizontalAdvectionTendency;
 
-    err = nc_def_var(ncid, "temperatureVerticalAdvectionTendency", NC_DOUBLE, 3, dimids, &temperatureVerticalAdvectionTendency); ERR
+    err = DEF_VAR(ncid, "temperatureVerticalAdvectionTendency", NC_DOUBLE, 3, dimids, &temperatureVerticalAdvectionTendency); ERR
     err = nc_put_att_text(ncid, temperatureVerticalAdvectionTendency, "long_name", 56, "potential temperature "
                              "tendency due to vertical advection"); ERR
     err = nc_put_att_text(ncid, temperatureVerticalAdvectionTendency, "units", 26, "degrees Celsius per second"); ERR
     varids[i++] = temperatureVerticalAdvectionTendency;
 
-    err = nc_def_var(ncid, "salinityVerticalAdvectionTendency", NC_DOUBLE, 3, dimids, &salinityVerticalAdvectionTendency); ERR
+    err = DEF_VAR(ncid, "salinityVerticalAdvectionTendency", NC_DOUBLE, 3, dimids, &salinityVerticalAdvectionTendency); ERR
     err = nc_put_att_text(ncid, salinityVerticalAdvectionTendency, "long_name", 43, "salinity tendency due "
                              "to vertical advection"); ERR
     err = nc_put_att_text(ncid, salinityVerticalAdvectionTendency, "units", 14, "PSU per second"); ERR
     varids[i++] = salinityVerticalAdvectionTendency;
 
-    err = nc_def_var(ncid, "temperatureVertMixTendency", NC_DOUBLE, 3, dimids, &temperatureVertMixTendency); ERR
+    err = DEF_VAR(ncid, "temperatureVertMixTendency", NC_DOUBLE, 3, dimids, &temperatureVertMixTendency); ERR
     err = nc_put_att_text(ncid, temperatureVertMixTendency, "long_name", 53, "potential temperature tendency "
                              "due to vertical mixing"); ERR
     err = nc_put_att_text(ncid, temperatureVertMixTendency, "units", 26, "degrees Celsius per second"); ERR
     varids[i++] = temperatureVertMixTendency;
 
-    err = nc_def_var(ncid, "salinityVertMixTendency", NC_DOUBLE, 3, dimids, &salinityVertMixTendency); ERR
+    err = DEF_VAR(ncid, "salinityVertMixTendency", NC_DOUBLE, 3, dimids, &salinityVertMixTendency); ERR
     err = nc_put_att_text(ncid, salinityVertMixTendency, "long_name", 40, "salinity tendency due to vertical mixing"); ERR
     err = nc_put_att_text(ncid, salinityVertMixTendency, "units", 14, "PSU per second"); ERR
     varids[i++] = salinityVertMixTendency;
 
-    err = nc_def_var(ncid, "temperatureSurfaceFluxTendency", NC_DOUBLE, 3, dimids, &temperatureSurfaceFluxTendency); ERR
+    err = DEF_VAR(ncid, "temperatureSurfaceFluxTendency", NC_DOUBLE, 3, dimids, &temperatureSurfaceFluxTendency); ERR
     err = nc_put_att_text(ncid, temperatureSurfaceFluxTendency, "long_name", 52, "potential temperature tendency "
                              "due to surface fluxes"); ERR
     err = nc_put_att_text(ncid, temperatureSurfaceFluxTendency, "units", 26, "degrees Celsius per second"); ERR
     varids[i++] = temperatureSurfaceFluxTendency;
 
-    err = nc_def_var(ncid, "salinitySurfaceFluxTendency", NC_DOUBLE, 3, dimids, &salinitySurfaceFluxTendency); ERR
+    err = DEF_VAR(ncid, "salinitySurfaceFluxTendency", NC_DOUBLE, 3, dimids, &salinitySurfaceFluxTendency); ERR
     err = nc_put_att_text(ncid, salinitySurfaceFluxTendency, "long_name", 39, "salinity tendency due to surface fluxes"); ERR
     err = nc_put_att_text(ncid, salinitySurfaceFluxTendency, "units", 14, "PSU per second"); ERR
     varids[i++] = salinitySurfaceFluxTendency;
 
-    err = nc_def_var(ncid, "temperatureShortWaveTendency", NC_DOUBLE, 3, dimids, &temperatureShortWaveTendency); ERR
+    err = DEF_VAR(ncid, "temperatureShortWaveTendency", NC_DOUBLE, 3, dimids, &temperatureShortWaveTendency); ERR
     err = nc_put_att_text(ncid, temperatureShortWaveTendency, "units", 26, "degrees Celsius per second"); ERR
     err = nc_put_att_text(ncid, temperatureShortWaveTendency, "long_name", 59, "potential temperature tendency due "
                              "to penetrating shortwave"); ERR
     varids[i++] = temperatureShortWaveTendency;
 
-    err = nc_def_var(ncid, "temperatureNonLocalTendency", NC_DOUBLE, 3, dimids, &temperatureNonLocalTendency); ERR
+    err = DEF_VAR(ncid, "temperatureNonLocalTendency", NC_DOUBLE, 3, dimids, &temperatureNonLocalTendency); ERR
     err = nc_put_att_text(ncid, temperatureNonLocalTendency, "long_name", 56, "potential temperature tendency due "
                              "to kpp non-local flux"); ERR
     err = nc_put_att_text(ncid, temperatureNonLocalTendency, "units", 26, "degrees Celsius per second"); ERR
     varids[i++] = temperatureNonLocalTendency;
 
-    err = nc_def_var(ncid, "salinityNonLocalTendency", NC_DOUBLE, 3, dimids, &salinityNonLocalTendency); ERR
+    err = DEF_VAR(ncid, "salinityNonLocalTendency", NC_DOUBLE, 3, dimids, &salinityNonLocalTendency); ERR
     err = nc_put_att_text(ncid, salinityNonLocalTendency, "long_name", 43, "salinity tendency due to kpp non-local flux"); ERR
     err = nc_put_att_text(ncid, salinityNonLocalTendency, "units", 14, "PSU per second"); ERR
     varids[i++] = salinityNonLocalTendency;
 
-    err = nc_def_var(ncid, "temperature", NC_DOUBLE, 3, dimids, &temperature); ERR
+    err = DEF_VAR(ncid, "temperature", NC_DOUBLE, 3, dimids, &temperature); ERR
     err = nc_put_att_text(ncid, temperature, "long_name", 21, "potential temperature"); ERR
     err = nc_put_att_text(ncid, temperature, "units", 15, "degrees Celsius"); ERR
     varids[i++] = temperature;
 
-    err = nc_def_var(ncid, "salinity", NC_DOUBLE, 3, dimids, &salinity); ERR
+    err = DEF_VAR(ncid, "salinity", NC_DOUBLE, 3, dimids, &salinity); ERR
     err = nc_put_att_text(ncid, salinity, "long_name", 8, "salinity"); ERR
     err = nc_put_att_text(ncid, salinity, "units", 32, "grams salt per kilogram seawater"); ERR
     varids[i++] = salinity;

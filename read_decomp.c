@@ -4,8 +4,8 @@
  * See COPYRIGHT notice in top-level directory.
  *
  * This program uses the E3SM I/O patterns recorded by the PIO library to
- * evaluate the performance of two PnetCDF APIs: nc_vard_all(), and
- * nc_iput_varn(). The E3SM I/O patterns consist of a large number of small,
+ * evaluate the performance of two PnetCDF APIs: ncmpi_vard_all(), and
+ * ncmpi_iput_varn(). The E3SM I/O patterns consist of a large number of small,
  * noncontiguous requests on each MPI process, which presents a challenge for
  * achieving a good performance.
  *
@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 #include <e3sm_io.h>
+#include <pnetcdf.h>
 
 struct off_len {
     int off;
@@ -118,17 +119,17 @@ read_decomp(MPI_Comm io_comm,           /* MPI communicator that includes all th
     MPI_Comm_size(io_comm, &nprocs);
 
     /* open input file that contains I/O decomposition information */
-    err = nc_open(io_comm, infname, NC_NOWRITE, MPI_INFO_NULL,
+    err = ncmpi_open(io_comm, infname, NC_NOWRITE, MPI_INFO_NULL,
                      &ncid); ERR
 
     /* number of decompositions stored in file */
-    err = nc_inq_dimid(ncid, "num_decomp", &dimids[0]); ERR
-    err = nc_inq_dimlen(ncid, dimids[0], &num); ERR
+    err = ncmpi_inq_dimid(ncid, "num_decomp", &dimids[0]); ERR
+    err = ncmpi_inq_dimlen(ncid, dimids[0], &num); ERR
     *num_decomp = (int)num;
 
     /* number of processes used when the decomposition was produced */
-    err = nc_inq_dimid(ncid, "decomp_nprocs", &dimids[0]); ERR
-    err = nc_inq_dimlen(ncid, dimids[0], &decomp_nprocs); ERR
+    err = ncmpi_inq_dimid(ncid, "decomp_nprocs", &dimids[0]); ERR
+    err = ncmpi_inq_dimlen(ncid, dimids[0], &decomp_nprocs); ERR
 
     /* decomp_nprocs is the number of processes used to generate the E3SM data
      * decomposition. nprocs is the number of processes running this benchmark.
@@ -161,8 +162,8 @@ read_decomp(MPI_Comm io_comm,           /* MPI communicator that includes all th
 
         /* total number of noncontiguous requests of all processes */
         sprintf(name, "D%d.total_nreqs", decomp_id+1);
-        err = nc_inq_dimid(ncid, name, &dimids[1]); ERR
-        err = nc_inq_dimlen(ncid, dimids[1], &total_nreqs); ERR
+        err = ncmpi_inq_dimid(ncid, name, &dimids[1]); ERR
+        err = ncmpi_inq_dimlen(ncid, dimids[1], &total_nreqs); ERR
 
         /* ndims: number of decomposition dimensions, not variable dimensions
          * In E3SM, decomposition is along the lowest 1 or 2 dimensions of 2D
@@ -170,18 +171,18 @@ read_decomp(MPI_Comm io_comm,           /* MPI communicator that includes all th
          */
         sprintf(name, "D%d.dims", decomp_id+1);
         /* obtain the number of dimensions of this decomposition */
-        err = nc_inq_attlen(ncid, NC_GLOBAL, name, &num); ERR
+        err = ncmpi_inq_attlen(ncid, NC_GLOBAL, name, &num); ERR
         ndims = num;
         /* obtain the dimension lengths of this decomposition */
-        err = nc_get_att_longlong(ncid, NC_GLOBAL, name, dims[decomp_id]); ERR
+        err = ncmpi_get_att_longlong(ncid, NC_GLOBAL, name, dims[decomp_id]); ERR
 
         /* obtain varid of request variable Dx.nreqs */
         sprintf(name, "D%d.nreqs", decomp_id+1);
-        err = nc_inq_varid(ncid, name, &varid); ERR
+        err = ncmpi_inq_varid(ncid, name, &varid); ERR
 
         /* read all numbers of requests */
         all_nreqs = (int*) malloc(decomp_nprocs * sizeof(int));
-        err = nc_get_var_int_all(ncid, varid, all_nreqs); ERR
+        err = ncmpi_get_var_int_all(ncid, varid, all_nreqs); ERR
 
         /* calculate start index in Dx.offsets for this process */
         i = 0;
@@ -201,14 +202,14 @@ read_decomp(MPI_Comm io_comm,           /* MPI communicator that includes all th
         /* read starting offsets of requests into disps[] */
         disps[decomp_id] = (int*) malloc(nreqs * sizeof(int));
         sprintf(name, "D%d.offsets", decomp_id+1);
-        err = nc_inq_varid(ncid, name, &varid); ERR
-        err = nc_get_vara_int_all(ncid, varid, &start, &count, disps[decomp_id]); ERR
+        err = ncmpi_inq_varid(ncid, name, &varid); ERR
+        err = ncmpi_get_vara_int_all(ncid, varid, &start, &count, disps[decomp_id]); ERR
 
         /* read lengths of requests into blocklens[] */
         blocklens[decomp_id] = (int*) malloc(nreqs * sizeof(int));
         sprintf(name, "D%d.lengths", decomp_id+1);
-        err = nc_inq_varid(ncid, name, &varid); ERR
-        err = nc_get_vara_int_all(ncid, varid, &start, &count, blocklens[decomp_id]); ERR
+        err = ncmpi_inq_varid(ncid, name, &varid); ERR
+        err = ncmpi_get_vara_int_all(ncid, varid, &start, &count, blocklens[decomp_id]); ERR
 
         /* sort all disps[] of all responsible requests into an increasing
          * order (this is to satisfy the MPI fileview or monotonically
@@ -256,7 +257,7 @@ read_decomp(MPI_Comm io_comm,           /* MPI communicator that includes all th
         }
     }
 
-    err = nc_close(ncid); ERR
+    err = ncmpi_close(ncid); ERR
 
 fn_exit:
     if (nerrs) {

@@ -14,6 +14,36 @@
 #define INQ_VID(A, B, D, E, F, C) nc_inq_varid(A, B, C)
 #define NOP(A, B, D, E, C) NC_NOERR
 #define NOP2(A, B, D, E, F, C) NC_NOERR
+#define DEF_VAR(A, B, C, D, E, F) nc_e3sm_def_var(i, A, B, C, D, E, F)
+
+static int nc_e3sm_def_var(int i, int ncid, const char *name, nc_type xtype, int ndims, const int *dimidsp, int *varidp) { 
+    int err, nerrs;
+    int j;
+
+    err = nc_def_var(ncid, name, xtype, ndims, dimidsp, varidp); 
+    if (i > 2 && i < 30){ 
+        err = nc_var_par_access(ncid, *varidp, NC_INDEPENDENT); ERR
+    } 
+    else{ 
+        err = nc_var_par_access(ncid, *varidp, NC_COLLECTIVE); ERR
+    } 
+    if (ndims > 0 && ndims < 16){ 
+        int j;
+        size_t csize[16]; 
+
+        for(j = 0; j < ndims; j++){ 
+            err = nc_inq_dim(ncid, *varidp, NULL, csize + j); ERR
+            if (csize[j] == 0){ // recdim 
+                csize[j] = 1;
+            }
+        }
+        err = nc_def_var_chunking(ncid, *varidp, NC_CHUNKED, csize); ERR
+        err = nc_def_var_deflate(ncid, *varidp, NC_SHUFFLE, 1, 5); ERR
+    }
+
+fn_exit:
+    return err;
+}
 
 /*----< def_F_case_h0() >----------------------------------------------------*/
 int def_F_case_h0(int               ncid,    /* file ID */
@@ -115,24 +145,24 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     /* define variables */
     dimids[0] = dim_ncol;
-    err = nc_def_var(ncid, "lat", NC_DOUBLE, 1, dimids, &lat); ERR
+    err = DEF_VAR(ncid, "lat", NC_DOUBLE, 1, dimids, &lat); ERR
     err = nc_put_att_text(ncid, lat, "long_name", 8, "latitude"); ERR
     err = nc_put_att_text(ncid, lat, "units", 13, "degrees_north"); ERR
     varids[i++] = lat;
 
     dimids[0] = dim_ncol;
-    err = nc_def_var(ncid, "lon", NC_DOUBLE, 1, dimids, &lon); ERR
+    err = DEF_VAR(ncid, "lon", NC_DOUBLE, 1, dimids, &lon); ERR
     err = nc_put_att_text(ncid, lon, "long_name", 9, "longitude"); ERR
     err = nc_put_att_text(ncid, lon, "units", 12, "degrees_east"); ERR
     varids[i++] = lon;
 
     dimids[0] = dim_ncol;
-    err = nc_def_var(ncid, "area", NC_DOUBLE, 1, dimids, &area); ERR
+    err = DEF_VAR(ncid, "area", NC_DOUBLE, 1, dimids, &area); ERR
     err = nc_put_att_text(ncid, area, "long_name", 14, "gll grid areas"); ERR
     varids[i++] = area;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "lev", NC_DOUBLE, 1, dimids, &lev); ERR
+    err = DEF_VAR(ncid, "lev", NC_DOUBLE, 1, dimids, &lev); ERR
     err = nc_put_att_text(ncid, lev, "long_name", 38, "hybrid level at midpoints (1000*(A+B))"); ERR
     err = nc_put_att_text(ncid, lev, "units", 3, "hPa"); ERR
     err = nc_put_att_text(ncid, lev, "positive", 4, "down"); ERR
@@ -141,23 +171,23 @@ int def_F_case_h0(int               ncid,    /* file ID */
     varids[i++] = lev;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "hyam", NC_DOUBLE, 1, dimids, &hyam); ERR
+    err = DEF_VAR(ncid, "hyam", NC_DOUBLE, 1, dimids, &hyam); ERR
     err = nc_put_att_text(ncid, hyam, "long_name", 39, "hybrid A coefficient at layer midpoints"); ERR
     varids[i++] = hyam;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "hybm", NC_DOUBLE, 1, dimids, &hybm); ERR
+    err = DEF_VAR(ncid, "hybm", NC_DOUBLE, 1, dimids, &hybm); ERR
     err = nc_put_att_text(ncid, hybm, "long_name", 39, "hybrid B coefficient at layer midpoints"); ERR
     varids[i++] = hybm;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "P0", NC_DOUBLE, 0, NULL, &P0); ERR
+    err = DEF_VAR(ncid, "P0", NC_DOUBLE, 0, NULL, &P0); ERR
     err = nc_put_att_text(ncid, P0, "long_name", 18, "reference pressure"); ERR
     err = nc_put_att_text(ncid, P0, "units", 2, "Pa"); ERR
     varids[i++] = P0;
 
     dimids[0] = dim_ilev;
-    err = nc_def_var(ncid, "ilev", NC_DOUBLE, 1, dimids, &ilev); ERR
+    err = DEF_VAR(ncid, "ilev", NC_DOUBLE, 1, dimids, &ilev); ERR
     err = nc_put_att_text(ncid, ilev, "long_name", 39, "hybrid level at interfaces (1000*(A+B))"); ERR
     err = nc_put_att_text(ncid, ilev, "units", 3, "hPa"); ERR
     err = nc_put_att_text(ncid, ilev, "positive", 4, "down"); ERR
@@ -166,17 +196,17 @@ int def_F_case_h0(int               ncid,    /* file ID */
     varids[i++] = ilev;
 
     dimids[0] = dim_ilev;
-    err = nc_def_var(ncid, "hyai", NC_DOUBLE, 1, dimids, &hyai); ERR
+    err = DEF_VAR(ncid, "hyai", NC_DOUBLE, 1, dimids, &hyai); ERR
     err = nc_put_att_text(ncid, hyai, "long_name", 40, "hybrid A coefficient at layer interfaces"); ERR
     varids[i++] = hyai;
 
     dimids[0] = dim_ilev;
-    err = nc_def_var(ncid, "hybi", NC_DOUBLE, 1, dimids, &hybi); ERR
+    err = DEF_VAR(ncid, "hybi", NC_DOUBLE, 1, dimids, &hybi); ERR
     err = nc_put_att_text(ncid, hybi, "long_name", 40, "hybrid B coefficient at layer interfaces"); ERR
     varids[i++] = hybi;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "time", NC_DOUBLE, 1, dimids, &time); ERR
+    err = DEF_VAR(ncid, "time", NC_DOUBLE, 1, dimids, &time); ERR
     err = nc_put_att_text(ncid, time, "long_name", 4, "time"); ERR
     err = nc_put_att_text(ncid, time, "units", 30, "days since 0001-01-01 00:00:00"); ERR
     err = nc_put_att_text(ncid, time, "calendar", 6, "noleap"); ERR
@@ -184,100 +214,100 @@ int def_F_case_h0(int               ncid,    /* file ID */
     varids[i++] = time;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "date", NC_INT, 1, dimids, &date); ERR
+    err = DEF_VAR(ncid, "date", NC_INT, 1, dimids, &date); ERR
     err = nc_put_att_text(ncid, date, "long_name", 23, "current date (YYYYMMDD)"); ERR
     varids[i++] = date;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "datesec", NC_INT, 1, dimids, &datesec); ERR
+    err = DEF_VAR(ncid, "datesec", NC_INT, 1, dimids, &datesec); ERR
     err = nc_put_att_text(ncid, datesec, "long_name", 31, "current seconds of current date"); ERR
     varids[i++] = datesec;
 
     dimids[0] = dim_time;
     dimids[1] = dim_nbnd;
-    err = nc_def_var(ncid, "time_bnds", NC_DOUBLE, 2, dimids, &time_bnds); ERR
+    err = DEF_VAR(ncid, "time_bnds", NC_DOUBLE, 2, dimids, &time_bnds); ERR
     err = nc_put_att_text(ncid, time_bnds, "long_name", 23, "time interval endpoints"); ERR
     varids[i++] = time_bnds;
 
     dimids[0] = dim_time;
     dimids[1] = dim_chars;
-    err = nc_def_var(ncid, "date_written", NC_CHAR, 2, dimids, &date_written); ERR
+    err = DEF_VAR(ncid, "date_written", NC_CHAR, 2, dimids, &date_written); ERR
     varids[i++] = date_written;
 
     dimids[0] = dim_time;
     dimids[1] = dim_chars;
-    err = nc_def_var(ncid, "time_written", NC_CHAR, 2, dimids, &time_written); ERR
+    err = DEF_VAR(ncid, "time_written", NC_CHAR, 2, dimids, &time_written); ERR
     varids[i++] = time_written;
 
-    err = nc_def_var(ncid, "ndbase", NC_INT, 0, NULL, &ndbase); ERR
+    err = DEF_VAR(ncid, "ndbase", NC_INT, 0, NULL, &ndbase); ERR
     err = nc_put_att_text(ncid, ndbase, "long_name", 8, "base day"); ERR
     varids[i++] = ndbase;
-    err = nc_def_var(ncid, "nsbase", NC_INT, 0, NULL, &nsbase); ERR
+    err = DEF_VAR(ncid, "nsbase", NC_INT, 0, NULL, &nsbase); ERR
     err = nc_put_att_text(ncid, nsbase, "long_name", 19, "seconds of base day"); ERR
     varids[i++] = nsbase;
 
-    err = nc_def_var(ncid, "nbdate", NC_INT, 0, NULL, &nbdate); ERR
+    err = DEF_VAR(ncid, "nbdate", NC_INT, 0, NULL, &nbdate); ERR
     err = nc_put_att_text(ncid, nbdate, "long_name", 20, "base date (YYYYMMDD)"); ERR
     varids[i++] = nbdate;
 
-    err = nc_def_var(ncid, "nbsec", NC_INT, 0, NULL, &nbsec); ERR
+    err = DEF_VAR(ncid, "nbsec", NC_INT, 0, NULL, &nbsec); ERR
     err = nc_put_att_text(ncid, nbsec, "long_name", 20, "seconds of base date"); ERR
     varids[i++] = nbsec;
 
-    err = nc_def_var(ncid, "mdt", NC_INT, 0, NULL, &mdt); ERR
+    err = DEF_VAR(ncid, "mdt", NC_INT, 0, NULL, &mdt); ERR
     err = nc_put_att_text(ncid, mdt, "long_name", 8, "timestep"); ERR
     err = nc_put_att_text(ncid, mdt, "units", 1, "s"); ERR
     varids[i++] = mdt;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "ndcur", NC_INT, 1, dimids, &ndcur); ERR
+    err = DEF_VAR(ncid, "ndcur", NC_INT, 1, dimids, &ndcur); ERR
     err = nc_put_att_text(ncid, ndcur, "long_name", 27, "current day (from base day)"); ERR
     varids[i++] = ndcur;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "nscur", NC_INT, 1, dimids, &nscur); ERR
+    err = DEF_VAR(ncid, "nscur", NC_INT, 1, dimids, &nscur); ERR
     err = nc_put_att_text(ncid, nscur, "long_name", 30, "current seconds of current day"); ERR
     varids[i++] = nscur;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "co2vmr", NC_DOUBLE, 1, dimids, &co2vmr); ERR
+    err = DEF_VAR(ncid, "co2vmr", NC_DOUBLE, 1, dimids, &co2vmr); ERR
     err = nc_put_att_text(ncid, co2vmr, "long_name", 23, "co2 volume mixing ratio"); ERR
     varids[i++] = co2vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "ch4vmr", NC_DOUBLE, 1, dimids, &ch4vmr); ERR
+    err = DEF_VAR(ncid, "ch4vmr", NC_DOUBLE, 1, dimids, &ch4vmr); ERR
     err = nc_put_att_text(ncid, ch4vmr, "long_name", 23, "ch4 volume mixing ratio"); ERR
     varids[i++] = ch4vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "n2ovmr", NC_DOUBLE, 1, dimids, &n2ovmr); ERR
+    err = DEF_VAR(ncid, "n2ovmr", NC_DOUBLE, 1, dimids, &n2ovmr); ERR
     err = nc_put_att_text(ncid, n2ovmr, "long_name", 23, "n2o volume mixing ratio"); ERR
     varids[i++] = n2ovmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "f11vmr", NC_DOUBLE, 1, dimids, &f11vmr); ERR
+    err = DEF_VAR(ncid, "f11vmr", NC_DOUBLE, 1, dimids, &f11vmr); ERR
     err = nc_put_att_text(ncid, f11vmr, "long_name", 23, "f11 volume mixing ratio"); ERR
     varids[i++] = f11vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "f12vmr", NC_DOUBLE, 1, dimids, &f12vmr); ERR
+    err = DEF_VAR(ncid, "f12vmr", NC_DOUBLE, 1, dimids, &f12vmr); ERR
     err = nc_put_att_text(ncid, f12vmr, "long_name", 23, "f12 volume mixing ratio"); ERR
     varids[i++] = f12vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "sol_tsi", NC_DOUBLE, 1, dimids, &sol_tsi); ERR
+    err = DEF_VAR(ncid, "sol_tsi", NC_DOUBLE, 1, dimids, &sol_tsi); ERR
     err = nc_put_att_text(ncid, sol_tsi, "long_name", 22, "total solar irradiance"); ERR
     err = nc_put_att_text(ncid, sol_tsi, "units", 4, "W/m2"); ERR
     varids[i++] = sol_tsi;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "nsteph", NC_INT, 1, dimids, &nsteph); ERR
+    err = DEF_VAR(ncid, "nsteph", NC_INT, 1, dimids, &nsteph); ERR
     err = nc_put_att_text(ncid, nsteph, "long_name", 16, "current timestep"); ERR
     varids[i++] = nsteph;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AEROD_v", NC_FLOAT, 2, dimids, &AEROD_v); ERR
+    err = DEF_VAR(ncid, "AEROD_v", NC_FLOAT, 2, dimids, &AEROD_v); ERR
     err = nc_put_att_float(ncid, AEROD_v, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AEROD_v, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AEROD_v, "units", 1, "1"); ERR
@@ -288,7 +318,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "ANRAIN", NC_FLOAT, 3, dimids, &ANRAIN); ERR
+    err = DEF_VAR(ncid, "ANRAIN", NC_FLOAT, 3, dimids, &ANRAIN); ERR
     err = nc_put_att_int(ncid, ANRAIN, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, ANRAIN, "units", 3, "m-3"); ERR
     err = nc_put_att_text(ncid, ANRAIN, "long_name", 24, "Average rain number conc"); ERR
@@ -298,7 +328,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "ANSNOW", NC_FLOAT, 3, dimids, &ANSNOW); ERR
+    err = DEF_VAR(ncid, "ANSNOW", NC_FLOAT, 3, dimids, &ANSNOW); ERR
     err = nc_put_att_int(ncid, ANSNOW, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, ANSNOW, "units", 3, "m-3"); ERR
     err = nc_put_att_text(ncid, ANSNOW, "long_name", 24, "Average snow number conc"); ERR
@@ -307,7 +337,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODABS", NC_FLOAT, 2, dimids, &AODABS); ERR
+    err = DEF_VAR(ncid, "AODABS", NC_FLOAT, 2, dimids, &AODABS); ERR
     err = nc_put_att_float(ncid, AODABS, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODABS, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODABS, "long_name", 39, "Aerosol absorption optical depth 550 nm"); ERR
@@ -316,7 +346,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODABSBC", NC_FLOAT, 2, dimids, &AODABSBC); ERR
+    err = DEF_VAR(ncid, "AODABSBC", NC_FLOAT, 2, dimids, &AODABSBC); ERR
     err = nc_put_att_float(ncid, AODABSBC, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODABSBC, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODABSBC, "long_name", 47, "Aerosol absorption optical depth 550 nm from BC"); ERR
@@ -325,7 +355,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODBC", NC_FLOAT, 2, dimids, &AODBC); ERR
+    err = DEF_VAR(ncid, "AODBC", NC_FLOAT, 2, dimids, &AODBC); ERR
     err = nc_put_att_float(ncid, AODBC, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODBC, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODBC, "long_name", 36, "Aerosol optical depth 550 nm from BC"); ERR
@@ -334,7 +364,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODDUST", NC_FLOAT, 2, dimids, &AODDUST); ERR
+    err = DEF_VAR(ncid, "AODDUST", NC_FLOAT, 2, dimids, &AODDUST); ERR
     err = nc_put_att_float(ncid, AODDUST, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODDUST, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODDUST, "long_name", 38, "Aerosol optical depth 550 nm from dust"); ERR
@@ -343,7 +373,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODDUST1", NC_FLOAT, 2, dimids, &AODDUST1); ERR
+    err = DEF_VAR(ncid, "AODDUST1", NC_FLOAT, 2, dimids, &AODDUST1); ERR
     err = nc_put_att_float(ncid, AODDUST1, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODDUST1, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODDUST1, "long_name", 46, "Aerosol optical depth 550 nm model 1 from dust"); ERR
@@ -352,7 +382,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODDUST3", NC_FLOAT, 2, dimids, &AODDUST3); ERR
+    err = DEF_VAR(ncid, "AODDUST3", NC_FLOAT, 2, dimids, &AODDUST3); ERR
     err = nc_put_att_float(ncid, AODDUST3, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODDUST3, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODDUST3, "long_name", 46, "Aerosol optical depth 550 nm model 3 from dust"); ERR
@@ -361,7 +391,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODDUST4", NC_FLOAT, 2, dimids, &AODDUST4); ERR
+    err = DEF_VAR(ncid, "AODDUST4", NC_FLOAT, 2, dimids, &AODDUST4); ERR
     err = nc_put_att_float(ncid, AODDUST4, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODDUST4, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODDUST4, "long_name", 46, "Aerosol optical depth 550 nm model 4 from dust"); ERR
@@ -370,7 +400,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODMODE1", NC_FLOAT, 2, dimids, &AODMODE1); ERR
+    err = DEF_VAR(ncid, "AODMODE1", NC_FLOAT, 2, dimids, &AODMODE1); ERR
     err = nc_put_att_float(ncid, AODMODE1, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODMODE1, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODMODE1, "long_name", 35, "Aerosol optical depth 550 nm mode 1"); ERR
@@ -379,7 +409,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODMODE2", NC_FLOAT, 2, dimids, &AODMODE2); ERR
+    err = DEF_VAR(ncid, "AODMODE2", NC_FLOAT, 2, dimids, &AODMODE2); ERR
     err = nc_put_att_float(ncid, AODMODE2, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODMODE2, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODMODE2, "long_name", 35, "Aerosol optical depth 550 nm mode 2"); ERR
@@ -388,7 +418,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODMODE3", NC_FLOAT, 2, dimids, &AODMODE3); ERR
+    err = DEF_VAR(ncid, "AODMODE3", NC_FLOAT, 2, dimids, &AODMODE3); ERR
     err = nc_put_att_float(ncid, AODMODE3, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODMODE3, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODMODE3, "long_name", 35, "Aerosol optical depth 550 nm mode 3"); ERR
@@ -397,7 +427,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODMODE4", NC_FLOAT, 2, dimids, &AODMODE4); ERR
+    err = DEF_VAR(ncid, "AODMODE4", NC_FLOAT, 2, dimids, &AODMODE4); ERR
     err = nc_put_att_float(ncid, AODMODE4, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODMODE4, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODMODE4, "long_name", 35, "Aerosol optical depth 550 nm mode 4"); ERR
@@ -406,7 +436,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODNIR", NC_FLOAT, 2, dimids, &AODNIR); ERR
+    err = DEF_VAR(ncid, "AODNIR", NC_FLOAT, 2, dimids, &AODNIR); ERR
     err = nc_put_att_float(ncid, AODNIR, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODNIR, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODNIR, "long_name", 28, "Aerosol optical depth 850 nm"); ERR
@@ -415,7 +445,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODPOM", NC_FLOAT, 2, dimids, &AODPOM); ERR
+    err = DEF_VAR(ncid, "AODPOM", NC_FLOAT, 2, dimids, &AODPOM); ERR
     err = nc_put_att_float(ncid, AODPOM, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODPOM, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODPOM, "long_name", 37, "Aerosol optical depth 550 nm from POM"); ERR
@@ -424,7 +454,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODSO4", NC_FLOAT, 2, dimids, &AODSO4); ERR
+    err = DEF_VAR(ncid, "AODSO4", NC_FLOAT, 2, dimids, &AODSO4); ERR
     err = nc_put_att_float(ncid, AODSO4, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODSO4, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODSO4, "long_name", 37, "Aerosol optical depth 550 nm from SO4"); ERR
@@ -433,7 +463,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODSOA", NC_FLOAT, 2, dimids, &AODSOA); ERR
+    err = DEF_VAR(ncid, "AODSOA", NC_FLOAT, 2, dimids, &AODSOA); ERR
     err = nc_put_att_float(ncid, AODSOA, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODSOA, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODSOA, "long_name", 37, "Aerosol optical depth 550 nm from SOA"); ERR
@@ -442,7 +472,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODSS", NC_FLOAT, 2, dimids, &AODSS); ERR
+    err = DEF_VAR(ncid, "AODSS", NC_FLOAT, 2, dimids, &AODSS); ERR
     err = nc_put_att_float(ncid, AODSS, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODSS, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODSS, "long_name", 41, "Aerosol optical depth 550 nm from seasalt"); ERR
@@ -451,7 +481,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODUV", NC_FLOAT, 2, dimids, &AODUV); ERR
+    err = DEF_VAR(ncid, "AODUV", NC_FLOAT, 2, dimids, &AODUV); ERR
     err = nc_put_att_float(ncid, AODUV, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODUV, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODUV, "long_name", 28, "Aerosol optical depth 350 nm"); ERR
@@ -460,7 +490,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AODVIS", NC_FLOAT, 2, dimids, &AODVIS); ERR
+    err = DEF_VAR(ncid, "AODVIS", NC_FLOAT, 2, dimids, &AODVIS); ERR
     err = nc_put_att_float(ncid, AODVIS, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, AODVIS, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, AODVIS, "long_name", 28, "Aerosol optical depth 550 nm"); ERR
@@ -470,7 +500,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "AQRAIN", NC_FLOAT, 3, dimids, &AQRAIN); ERR
+    err = DEF_VAR(ncid, "AQRAIN", NC_FLOAT, 3, dimids, &AQRAIN); ERR
     err = nc_put_att_int(ncid, AQRAIN, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, AQRAIN, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, AQRAIN, "long_name", 25, "Average rain mixing ratio"); ERR
@@ -480,7 +510,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "AQSNOW", NC_FLOAT, 3, dimids, &AQSNOW); ERR
+    err = DEF_VAR(ncid, "AQSNOW", NC_FLOAT, 3, dimids, &AQSNOW); ERR
     err = nc_put_att_int(ncid, AQSNOW, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, AQSNOW, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, AQSNOW, "long_name", 25, "Average snow mixing ratio"); ERR
@@ -489,7 +519,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AQ_DMS", NC_FLOAT, 2, dimids, &AQ_DMS); ERR
+    err = DEF_VAR(ncid, "AQ_DMS", NC_FLOAT, 2, dimids, &AQ_DMS); ERR
     err = nc_put_att_text(ncid, AQ_DMS, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, AQ_DMS, "long_name", 39, "DMS aqueous chemistry (for gas species)"); ERR
     err = nc_put_att_text(ncid, AQ_DMS, "cell_methods", 10, "time: mean"); ERR
@@ -497,7 +527,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AQ_H2O2", NC_FLOAT, 2, dimids, &AQ_H2O2); ERR
+    err = DEF_VAR(ncid, "AQ_H2O2", NC_FLOAT, 2, dimids, &AQ_H2O2); ERR
     err = nc_put_att_text(ncid, AQ_H2O2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, AQ_H2O2, "long_name", 40, "H2O2 aqueous chemistry (for gas species)"); ERR
     err = nc_put_att_text(ncid, AQ_H2O2, "cell_methods", 10, "time: mean"); ERR
@@ -505,7 +535,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AQ_H2SO4", NC_FLOAT, 2, dimids, &AQ_H2SO4); ERR
+    err = DEF_VAR(ncid, "AQ_H2SO4", NC_FLOAT, 2, dimids, &AQ_H2SO4); ERR
     err = nc_put_att_text(ncid, AQ_H2SO4, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, AQ_H2SO4, "long_name", 41, "H2SO4 aqueous chemistry (for gas species)"); ERR
     err = nc_put_att_text(ncid, AQ_H2SO4, "cell_methods", 10, "time: mean"); ERR
@@ -513,7 +543,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AQ_O3", NC_FLOAT, 2, dimids, &AQ_O3); ERR
+    err = DEF_VAR(ncid, "AQ_O3", NC_FLOAT, 2, dimids, &AQ_O3); ERR
     err = nc_put_att_text(ncid, AQ_O3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, AQ_O3, "long_name", 38, "O3 aqueous chemistry (for gas species)"); ERR
     err = nc_put_att_text(ncid, AQ_O3, "cell_methods", 10, "time: mean"); ERR
@@ -521,7 +551,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AQ_SO2", NC_FLOAT, 2, dimids, &AQ_SO2); ERR
+    err = DEF_VAR(ncid, "AQ_SO2", NC_FLOAT, 2, dimids, &AQ_SO2); ERR
     err = nc_put_att_text(ncid, AQ_SO2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, AQ_SO2, "long_name", 39, "SO2 aqueous chemistry (for gas species)"); ERR
     err = nc_put_att_text(ncid, AQ_SO2, "cell_methods", 10, "time: mean"); ERR
@@ -529,7 +559,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "AQ_SOAG", NC_FLOAT, 2, dimids, &AQ_SOAG); ERR
+    err = DEF_VAR(ncid, "AQ_SOAG", NC_FLOAT, 2, dimids, &AQ_SOAG); ERR
     err = nc_put_att_text(ncid, AQ_SOAG, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, AQ_SOAG, "long_name", 40, "SOAG aqueous chemistry (for gas species)"); ERR
     err = nc_put_att_text(ncid, AQ_SOAG, "cell_methods", 10, "time: mean"); ERR
@@ -538,7 +568,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "AREI", NC_FLOAT, 3, dimids, &AREI); ERR
+    err = DEF_VAR(ncid, "AREI", NC_FLOAT, 3, dimids, &AREI); ERR
     err = nc_put_att_int(ncid, AREI, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, AREI, "units", 6, "Micron"); ERR
     err = nc_put_att_text(ncid, AREI, "long_name", 28, "Average ice effective radius"); ERR
@@ -548,7 +578,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "AREL", NC_FLOAT, 3, dimids, &AREL); ERR
+    err = DEF_VAR(ncid, "AREL", NC_FLOAT, 3, dimids, &AREL); ERR
     err = nc_put_att_int(ncid, AREL, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, AREL, "units", 6, "Micron"); ERR
     err = nc_put_att_text(ncid, AREL, "long_name", 32, "Average droplet effective radius"); ERR
@@ -558,7 +588,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "AWNC", NC_FLOAT, 3, dimids, &AWNC); ERR
+    err = DEF_VAR(ncid, "AWNC", NC_FLOAT, 3, dimids, &AWNC); ERR
     err = nc_put_att_int(ncid, AWNC, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, AWNC, "units", 3, "m-3"); ERR
     err = nc_put_att_text(ncid, AWNC, "long_name", 31, "Average cloud water number conc"); ERR
@@ -568,7 +598,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "AWNI", NC_FLOAT, 3, dimids, &AWNI); ERR
+    err = DEF_VAR(ncid, "AWNI", NC_FLOAT, 3, dimids, &AWNI); ERR
     err = nc_put_att_int(ncid, AWNI, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, AWNI, "units", 3, "m-3"); ERR
     err = nc_put_att_text(ncid, AWNI, "long_name", 29, "Average cloud ice number conc"); ERR
@@ -578,7 +608,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "CCN3", NC_FLOAT, 3, dimids, &CCN3); ERR
+    err = DEF_VAR(ncid, "CCN3", NC_FLOAT, 3, dimids, &CCN3); ERR
     err = nc_put_att_int(ncid, CCN3, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, CCN3, "units", 5, "#/cm3"); ERR
     err = nc_put_att_text(ncid, CCN3, "long_name", 27, "CCN concentration at S=0.1%"); ERR
@@ -587,7 +617,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CDNUMC", NC_FLOAT, 2, dimids, &CDNUMC); ERR
+    err = DEF_VAR(ncid, "CDNUMC", NC_FLOAT, 2, dimids, &CDNUMC); ERR
     err = nc_put_att_text(ncid, CDNUMC, "units", 4, "1/m2"); ERR
     err = nc_put_att_text(ncid, CDNUMC, "long_name", 43, "Vertically-integrated droplet concentration"); ERR
     err = nc_put_att_text(ncid, CDNUMC, "cell_methods", 10, "time: mean"); ERR
@@ -595,7 +625,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CLDHGH", NC_FLOAT, 2, dimids, &CLDHGH); ERR
+    err = DEF_VAR(ncid, "CLDHGH", NC_FLOAT, 2, dimids, &CLDHGH); ERR
     err = nc_put_att_text(ncid, CLDHGH, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLDHGH, "long_name", 32, "Vertically-integrated high cloud"); ERR
     err = nc_put_att_text(ncid, CLDHGH, "cell_methods", 10, "time: mean"); ERR
@@ -604,7 +634,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "CLDICE", NC_FLOAT, 3, dimids, &CLDICE); ERR
+    err = DEF_VAR(ncid, "CLDICE", NC_FLOAT, 3, dimids, &CLDICE); ERR
     err = nc_put_att_int(ncid, CLDICE, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, CLDICE, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, CLDICE, "long_name", 34, "Grid box averaged cloud ice amount"); ERR
@@ -614,7 +644,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "CLDLIQ", NC_FLOAT, 3, dimids, &CLDLIQ); ERR
+    err = DEF_VAR(ncid, "CLDLIQ", NC_FLOAT, 3, dimids, &CLDLIQ); ERR
     err = nc_put_att_int(ncid, CLDLIQ, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, CLDLIQ, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, CLDLIQ, "long_name", 37, "Grid box averaged cloud liquid amount"); ERR
@@ -623,7 +653,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CLDLOW", NC_FLOAT, 2, dimids, &CLDLOW); ERR
+    err = DEF_VAR(ncid, "CLDLOW", NC_FLOAT, 2, dimids, &CLDLOW); ERR
     err = nc_put_att_text(ncid, CLDLOW, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLDLOW, "long_name", 31, "Vertically-integrated low cloud"); ERR
     err = nc_put_att_text(ncid, CLDLOW, "cell_methods", 10, "time: mean"); ERR
@@ -631,7 +661,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CLDMED", NC_FLOAT, 2, dimids, &CLDMED); ERR
+    err = DEF_VAR(ncid, "CLDMED", NC_FLOAT, 2, dimids, &CLDMED); ERR
     err = nc_put_att_text(ncid, CLDMED, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLDMED, "long_name", 37, "Vertically-integrated mid-level cloud"); ERR
     err = nc_put_att_text(ncid, CLDMED, "cell_methods", 10, "time: mean"); ERR
@@ -639,7 +669,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CLDTOT", NC_FLOAT, 2, dimids, &CLDTOT); ERR
+    err = DEF_VAR(ncid, "CLDTOT", NC_FLOAT, 2, dimids, &CLDTOT); ERR
     err = nc_put_att_text(ncid, CLDTOT, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLDTOT, "long_name", 33, "Vertically-integrated total cloud"); ERR
     err = nc_put_att_text(ncid, CLDTOT, "cell_methods", 10, "time: mean"); ERR
@@ -648,7 +678,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "CLOUD", NC_FLOAT, 3, dimids, &CLOUD); ERR
+    err = DEF_VAR(ncid, "CLOUD", NC_FLOAT, 3, dimids, &CLOUD); ERR
     err = nc_put_att_int(ncid, CLOUD, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, CLOUD, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLOUD, "long_name", 14, "Cloud fraction"); ERR
@@ -658,7 +688,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "CLOUDFRAC_CLUBB", NC_FLOAT, 3, dimids, &CLOUDFRAC_CLUBB); ERR
+    err = DEF_VAR(ncid, "CLOUDFRAC_CLUBB", NC_FLOAT, 3, dimids, &CLOUDFRAC_CLUBB); ERR
     err = nc_put_att_int(ncid, CLOUDFRAC_CLUBB, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, CLOUDFRAC_CLUBB, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLOUDFRAC_CLUBB, "long_name", 14, "Cloud Fraction"); ERR
@@ -668,7 +698,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "CONCLD", NC_FLOAT, 3, dimids, &CONCLD); ERR
+    err = DEF_VAR(ncid, "CONCLD", NC_FLOAT, 3, dimids, &CONCLD); ERR
     err = nc_put_att_int(ncid, CONCLD, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, CONCLD, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CONCLD, "long_name", 22, "Convective cloud cover"); ERR
@@ -678,7 +708,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "DCQ", NC_FLOAT, 3, dimids, &DCQ); ERR
+    err = DEF_VAR(ncid, "DCQ", NC_FLOAT, 3, dimids, &DCQ); ERR
     err = nc_put_att_int(ncid, DCQ, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, DCQ, "units", 7, "kg/kg/s"); ERR
     err = nc_put_att_text(ncid, DCQ, "long_name", 33, "Q tendency due to moist processes"); ERR
@@ -687,7 +717,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DF_DMS", NC_FLOAT, 2, dimids, &DF_DMS); ERR
+    err = DEF_VAR(ncid, "DF_DMS", NC_FLOAT, 2, dimids, &DF_DMS); ERR
     err = nc_put_att_text(ncid, DF_DMS, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DF_DMS, "long_name", 19, "dry deposition flux"); ERR
     err = nc_put_att_text(ncid, DF_DMS, "cell_methods", 10, "time: mean"); ERR
@@ -695,7 +725,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DF_H2O2", NC_FLOAT, 2, dimids, &DF_H2O2); ERR
+    err = DEF_VAR(ncid, "DF_H2O2", NC_FLOAT, 2, dimids, &DF_H2O2); ERR
     err = nc_put_att_text(ncid, DF_H2O2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DF_H2O2, "long_name", 19, "dry deposition flux"); ERR
     err = nc_put_att_text(ncid, DF_H2O2, "cell_methods", 10, "time: mean"); ERR
@@ -703,7 +733,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DF_H2SO4", NC_FLOAT, 2, dimids, &DF_H2SO4); ERR
+    err = DEF_VAR(ncid, "DF_H2SO4", NC_FLOAT, 2, dimids, &DF_H2SO4); ERR
     err = nc_put_att_text(ncid, DF_H2SO4, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DF_H2SO4, "long_name", 19, "dry deposition flux"); ERR
     err = nc_put_att_text(ncid, DF_H2SO4, "cell_methods", 10, "time: mean"); ERR
@@ -711,7 +741,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DF_O3", NC_FLOAT, 2, dimids, &DF_O3); ERR
+    err = DEF_VAR(ncid, "DF_O3", NC_FLOAT, 2, dimids, &DF_O3); ERR
     err = nc_put_att_text(ncid, DF_O3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DF_O3, "long_name", 19, "dry deposition flux"); ERR
     err = nc_put_att_text(ncid, DF_O3, "cell_methods", 10, "time: mean"); ERR
@@ -719,7 +749,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DF_SO2", NC_FLOAT, 2, dimids, &DF_SO2); ERR
+    err = DEF_VAR(ncid, "DF_SO2", NC_FLOAT, 2, dimids, &DF_SO2); ERR
     err = nc_put_att_text(ncid, DF_SO2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DF_SO2, "long_name", 19, "dry deposition flux"); ERR
     err = nc_put_att_text(ncid, DF_SO2, "cell_methods", 10, "time: mean"); ERR
@@ -727,7 +757,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DF_SOAG", NC_FLOAT, 2, dimids, &DF_SOAG); ERR
+    err = DEF_VAR(ncid, "DF_SOAG", NC_FLOAT, 2, dimids, &DF_SOAG); ERR
     err = nc_put_att_text(ncid, DF_SOAG, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DF_SOAG, "long_name", 19, "dry deposition flux"); ERR
     err = nc_put_att_text(ncid, DF_SOAG, "cell_methods", 10, "time: mean"); ERR
@@ -735,7 +765,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DMS_SRF", NC_FLOAT, 2, dimids, &DMS_SRF); ERR
+    err = DEF_VAR(ncid, "DMS_SRF", NC_FLOAT, 2, dimids, &DMS_SRF); ERR
     err = nc_put_att_text(ncid, DMS_SRF, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, DMS_SRF, "long_name", 19, "DMS in bottom layer"); ERR
     err = nc_put_att_text(ncid, DMS_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -743,7 +773,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DP_KCLDBASE", NC_FLOAT, 2, dimids, &DP_KCLDBASE); ERR
+    err = DEF_VAR(ncid, "DP_KCLDBASE", NC_FLOAT, 2, dimids, &DP_KCLDBASE); ERR
     err = nc_put_att_text(ncid, DP_KCLDBASE, "units", 1, "1"); ERR
     err = nc_put_att_text(ncid, DP_KCLDBASE, "long_name", 32, "Deep conv. cloudbase level index"); ERR
     err = nc_put_att_text(ncid, DP_KCLDBASE, "cell_methods", 10, "time: mean"); ERR
@@ -751,7 +781,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DP_MFUP_MAX", NC_FLOAT, 2, dimids, &DP_MFUP_MAX); ERR
+    err = DEF_VAR(ncid, "DP_MFUP_MAX", NC_FLOAT, 2, dimids, &DP_MFUP_MAX); ERR
     err = nc_put_att_text(ncid, DP_MFUP_MAX, "units", 5, "kg/m2"); ERR
     err = nc_put_att_text(ncid, DP_MFUP_MAX, "long_name", 39, "Deep conv. column-max updraft mass flux"); ERR
     err = nc_put_att_text(ncid, DP_MFUP_MAX, "cell_methods", 10, "time: mean"); ERR
@@ -759,7 +789,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DP_WCLDBASE", NC_FLOAT, 2, dimids, &DP_WCLDBASE); ERR
+    err = DEF_VAR(ncid, "DP_WCLDBASE", NC_FLOAT, 2, dimids, &DP_WCLDBASE); ERR
     err = nc_put_att_text(ncid, DP_WCLDBASE, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, DP_WCLDBASE, "long_name", 38, "Deep conv. cloudbase vertical velocity"); ERR
     err = nc_put_att_text(ncid, DP_WCLDBASE, "cell_methods", 10, "time: mean"); ERR
@@ -767,7 +797,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DSTSFMBL", NC_FLOAT, 2, dimids, &DSTSFMBL); ERR
+    err = DEF_VAR(ncid, "DSTSFMBL", NC_FLOAT, 2, dimids, &DSTSFMBL); ERR
     err = nc_put_att_text(ncid, DSTSFMBL, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DSTSFMBL, "long_name", 28, "Mobilization flux at surface"); ERR
     err = nc_put_att_text(ncid, DSTSFMBL, "cell_methods", 10, "time: mean"); ERR
@@ -776,7 +806,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "DTCOND", NC_FLOAT, 3, dimids, &DTCOND); ERR
+    err = DEF_VAR(ncid, "DTCOND", NC_FLOAT, 3, dimids, &DTCOND); ERR
     err = nc_put_att_int(ncid, DTCOND, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, DTCOND, "units", 3, "K/s"); ERR
     err = nc_put_att_text(ncid, DTCOND, "long_name", 28, "T tendency - moist processes"); ERR
@@ -785,7 +815,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DTENDTH", NC_FLOAT, 2, dimids, &DTENDTH); ERR
+    err = DEF_VAR(ncid, "DTENDTH", NC_FLOAT, 2, dimids, &DTENDTH); ERR
     err = nc_put_att_text(ncid, DTENDTH, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, DTENDTH, "long_name", 69, "Dynamic Tendency of Total (vertically integrated) moist static energy"); ERR
     err = nc_put_att_text(ncid, DTENDTH, "cell_methods", 10, "time: mean"); ERR
@@ -793,7 +823,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "DTENDTQ", NC_FLOAT, 2, dimids, &DTENDTQ); ERR
+    err = DEF_VAR(ncid, "DTENDTQ", NC_FLOAT, 2, dimids, &DTENDTQ); ERR
     err = nc_put_att_text(ncid, DTENDTQ, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, DTENDTQ, "long_name", 67, "Dynamic Tendency of Total (vertically integrated) specific humidity"); ERR
     err = nc_put_att_text(ncid, DTENDTQ, "cell_methods", 10, "time: mean"); ERR
@@ -802,7 +832,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "EXTINCT", NC_FLOAT, 3, dimids, &EXTINCT); ERR
+    err = DEF_VAR(ncid, "EXTINCT", NC_FLOAT, 3, dimids, &EXTINCT); ERR
     err = nc_put_att_int(ncid, EXTINCT, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_float(ncid, EXTINCT, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, EXTINCT, "missing_value", NC_FLOAT, 1, &missv); ERR
@@ -814,7 +844,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "FICE", NC_FLOAT, 3, dimids, &FICE); ERR
+    err = DEF_VAR(ncid, "FICE", NC_FLOAT, 3, dimids, &FICE); ERR
     err = nc_put_att_int(ncid, FICE, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, FICE, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, FICE, "long_name", 35, "Fractional ice content within cloud"); ERR
@@ -823,7 +853,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLDS", NC_FLOAT, 2, dimids, &FLDS); ERR
+    err = DEF_VAR(ncid, "FLDS", NC_FLOAT, 2, dimids, &FLDS); ERR
     err = nc_put_att_text(ncid, FLDS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLDS, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLDS, "long_name", 36, "Downwelling longwave flux at surface"); ERR
@@ -832,7 +862,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLNS", NC_FLOAT, 2, dimids, &FLNS); ERR
+    err = DEF_VAR(ncid, "FLNS", NC_FLOAT, 2, dimids, &FLNS); ERR
     err = nc_put_att_text(ncid, FLNS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLNS, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLNS, "long_name", 28, "Net longwave flux at surface"); ERR
@@ -841,7 +871,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLNSC", NC_FLOAT, 2, dimids, &FLNSC); ERR
+    err = DEF_VAR(ncid, "FLNSC", NC_FLOAT, 2, dimids, &FLNSC); ERR
     err = nc_put_att_text(ncid, FLNSC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLNSC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLNSC, "long_name", 37, "Clearsky net longwave flux at surface"); ERR
@@ -850,7 +880,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLNT", NC_FLOAT, 2, dimids, &FLNT); ERR
+    err = DEF_VAR(ncid, "FLNT", NC_FLOAT, 2, dimids, &FLNT); ERR
     err = nc_put_att_text(ncid, FLNT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLNT, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLNT, "long_name", 33, "Net longwave flux at top of model"); ERR
@@ -859,7 +889,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLNTC", NC_FLOAT, 2, dimids, &FLNTC); ERR
+    err = DEF_VAR(ncid, "FLNTC", NC_FLOAT, 2, dimids, &FLNTC); ERR
     err = nc_put_att_text(ncid, FLNTC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLNTC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLNTC, "long_name", 42, "Clearsky net longwave flux at top of model"); ERR
@@ -868,7 +898,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLUT", NC_FLOAT, 2, dimids, &FLUT); ERR
+    err = DEF_VAR(ncid, "FLUT", NC_FLOAT, 2, dimids, &FLUT); ERR
     err = nc_put_att_text(ncid, FLUT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLUT, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLUT, "long_name", 39, "Upwelling longwave flux at top of model"); ERR
@@ -877,7 +907,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLUTC", NC_FLOAT, 2, dimids, &FLUTC); ERR
+    err = DEF_VAR(ncid, "FLUTC", NC_FLOAT, 2, dimids, &FLUTC); ERR
     err = nc_put_att_text(ncid, FLUTC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLUTC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLUTC, "long_name", 48, "Clearsky upwelling longwave flux at top of model"); ERR
@@ -887,7 +917,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "FREQI", NC_FLOAT, 3, dimids, &FREQI); ERR
+    err = DEF_VAR(ncid, "FREQI", NC_FLOAT, 3, dimids, &FREQI); ERR
     err = nc_put_att_int(ncid, FREQI, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, FREQI, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, FREQI, "long_name", 28, "Fractional occurrence of ice"); ERR
@@ -897,7 +927,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "FREQL", NC_FLOAT, 3, dimids, &FREQL); ERR
+    err = DEF_VAR(ncid, "FREQL", NC_FLOAT, 3, dimids, &FREQL); ERR
     err = nc_put_att_int(ncid, FREQL, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, FREQL, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, FREQL, "long_name", 31, "Fractional occurrence of liquid"); ERR
@@ -907,7 +937,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "FREQR", NC_FLOAT, 3, dimids, &FREQR); ERR
+    err = DEF_VAR(ncid, "FREQR", NC_FLOAT, 3, dimids, &FREQR); ERR
     err = nc_put_att_int(ncid, FREQR, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, FREQR, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, FREQR, "long_name", 29, "Fractional occurrence of rain"); ERR
@@ -917,7 +947,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "FREQS", NC_FLOAT, 3, dimids, &FREQS); ERR
+    err = DEF_VAR(ncid, "FREQS", NC_FLOAT, 3, dimids, &FREQS); ERR
     err = nc_put_att_int(ncid, FREQS, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, FREQS, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, FREQS, "long_name", 29, "Fractional occurrence of snow"); ERR
@@ -926,7 +956,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSDS", NC_FLOAT, 2, dimids, &FSDS); ERR
+    err = DEF_VAR(ncid, "FSDS", NC_FLOAT, 2, dimids, &FSDS); ERR
     err = nc_put_att_text(ncid, FSDS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSDS, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSDS, "long_name", 33, "Downwelling solar flux at surface"); ERR
@@ -935,7 +965,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSDSC", NC_FLOAT, 2, dimids, &FSDSC); ERR
+    err = DEF_VAR(ncid, "FSDSC", NC_FLOAT, 2, dimids, &FSDSC); ERR
     err = nc_put_att_text(ncid, FSDSC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSDSC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSDSC, "long_name", 42, "Clearsky downwelling solar flux at surface"); ERR
@@ -944,7 +974,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSNS", NC_FLOAT, 2, dimids, &FSNS); ERR
+    err = DEF_VAR(ncid, "FSNS", NC_FLOAT, 2, dimids, &FSNS); ERR
     err = nc_put_att_text(ncid, FSNS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSNS, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSNS, "long_name", 25, "Net solar flux at surface"); ERR
@@ -953,7 +983,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSNSC", NC_FLOAT, 2, dimids, &FSNSC); ERR
+    err = DEF_VAR(ncid, "FSNSC", NC_FLOAT, 2, dimids, &FSNSC); ERR
     err = nc_put_att_text(ncid, FSNSC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSNSC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSNSC, "long_name", 34, "Clearsky net solar flux at surface"); ERR
@@ -962,7 +992,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSNT", NC_FLOAT, 2, dimids, &FSNT); ERR
+    err = DEF_VAR(ncid, "FSNT", NC_FLOAT, 2, dimids, &FSNT); ERR
     err = nc_put_att_text(ncid, FSNT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSNT, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSNT, "long_name", 30, "Net solar flux at top of model"); ERR
@@ -971,7 +1001,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSNTC", NC_FLOAT, 2, dimids, &FSNTC); ERR
+    err = DEF_VAR(ncid, "FSNTC", NC_FLOAT, 2, dimids, &FSNTC); ERR
     err = nc_put_att_text(ncid, FSNTC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSNTC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSNTC, "long_name", 39, "Clearsky net solar flux at top of model"); ERR
@@ -980,7 +1010,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSNTOA", NC_FLOAT, 2, dimids, &FSNTOA); ERR
+    err = DEF_VAR(ncid, "FSNTOA", NC_FLOAT, 2, dimids, &FSNTOA); ERR
     err = nc_put_att_text(ncid, FSNTOA, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSNTOA, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSNTOA, "long_name", 35, "Net solar flux at top of atmosphere"); ERR
@@ -989,7 +1019,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSNTOAC", NC_FLOAT, 2, dimids, &FSNTOAC); ERR
+    err = DEF_VAR(ncid, "FSNTOAC", NC_FLOAT, 2, dimids, &FSNTOAC); ERR
     err = nc_put_att_text(ncid, FSNTOAC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSNTOAC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSNTOAC, "long_name", 44, "Clearsky net solar flux at top of atmosphere"); ERR
@@ -998,7 +1028,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSUTOA", NC_FLOAT, 2, dimids, &FSUTOA); ERR
+    err = DEF_VAR(ncid, "FSUTOA", NC_FLOAT, 2, dimids, &FSUTOA); ERR
     err = nc_put_att_text(ncid, FSUTOA, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSUTOA, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSUTOA, "long_name", 41, "Upwelling solar flux at top of atmosphere"); ERR
@@ -1007,7 +1037,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FSUTOAC", NC_FLOAT, 2, dimids, &FSUTOAC); ERR
+    err = DEF_VAR(ncid, "FSUTOAC", NC_FLOAT, 2, dimids, &FSUTOAC); ERR
     err = nc_put_att_text(ncid, FSUTOAC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FSUTOAC, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FSUTOAC, "long_name", 50, "Clearsky upwelling solar flux at top of atmosphere"); ERR
@@ -1016,7 +1046,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "F_eff", NC_FLOAT, 2, dimids, &F_eff); ERR
+    err = DEF_VAR(ncid, "F_eff", NC_FLOAT, 2, dimids, &F_eff); ERR
     err = nc_put_att_text(ncid, F_eff, "units", 1, "1"); ERR
     err = nc_put_att_text(ncid, F_eff, "long_name", 52, "Effective enrichment factor of marine organic matter"); ERR
     err = nc_put_att_text(ncid, F_eff, "cell_methods", 10, "time: mean"); ERR
@@ -1024,7 +1054,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "H2O2_SRF", NC_FLOAT, 2, dimids, &H2O2_SRF); ERR
+    err = DEF_VAR(ncid, "H2O2_SRF", NC_FLOAT, 2, dimids, &H2O2_SRF); ERR
     err = nc_put_att_text(ncid, H2O2_SRF, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, H2O2_SRF, "long_name", 20, "H2O2 in bottom layer"); ERR
     err = nc_put_att_text(ncid, H2O2_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -1032,7 +1062,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "H2SO4_SRF", NC_FLOAT, 2, dimids, &H2SO4_SRF); ERR
+    err = DEF_VAR(ncid, "H2SO4_SRF", NC_FLOAT, 2, dimids, &H2SO4_SRF); ERR
     err = nc_put_att_text(ncid, H2SO4_SRF, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, H2SO4_SRF, "long_name", 21, "H2SO4 in bottom layer"); ERR
     err = nc_put_att_text(ncid, H2SO4_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -1040,7 +1070,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "H2SO4_sfgaex1", NC_FLOAT, 2, dimids, &H2SO4_sfgaex1); ERR
+    err = DEF_VAR(ncid, "H2SO4_sfgaex1", NC_FLOAT, 2, dimids, &H2SO4_sfgaex1); ERR
     err = nc_put_att_text(ncid, H2SO4_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, H2SO4_sfgaex1, "long_name", 50, "H2SO4 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, H2SO4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -1048,7 +1078,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ICEFRAC", NC_FLOAT, 2, dimids, &ICEFRAC); ERR
+    err = DEF_VAR(ncid, "ICEFRAC", NC_FLOAT, 2, dimids, &ICEFRAC); ERR
     err = nc_put_att_text(ncid, ICEFRAC, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, ICEFRAC, "long_name", 39, "Fraction of sfc area covered by sea-ice"); ERR
     err = nc_put_att_text(ncid, ICEFRAC, "cell_methods", 10, "time: mean"); ERR
@@ -1057,7 +1087,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "ICIMR", NC_FLOAT, 3, dimids, &ICIMR); ERR
+    err = DEF_VAR(ncid, "ICIMR", NC_FLOAT, 3, dimids, &ICIMR); ERR
     err = nc_put_att_int(ncid, ICIMR, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, ICIMR, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, ICIMR, "long_name", 36, "Prognostic in-cloud ice mixing ratio"); ERR
@@ -1067,7 +1097,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "ICWMR", NC_FLOAT, 3, dimids, &ICWMR); ERR
+    err = DEF_VAR(ncid, "ICWMR", NC_FLOAT, 3, dimids, &ICWMR); ERR
     err = nc_put_att_int(ncid, ICWMR, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, ICWMR, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, ICWMR, "long_name", 38, "Prognostic in-cloud water mixing ratio"); ERR
@@ -1077,7 +1107,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "IWC", NC_FLOAT, 3, dimids, &IWC); ERR
+    err = DEF_VAR(ncid, "IWC", NC_FLOAT, 3, dimids, &IWC); ERR
     err = nc_put_att_int(ncid, IWC, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, IWC, "units", 5, "kg/m3"); ERR
     err = nc_put_att_text(ncid, IWC, "long_name", 34, "Grid box average ice water content"); ERR
@@ -1086,7 +1116,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "LANDFRAC", NC_FLOAT, 2, dimids, &LANDFRAC); ERR
+    err = DEF_VAR(ncid, "LANDFRAC", NC_FLOAT, 2, dimids, &LANDFRAC); ERR
     err = nc_put_att_text(ncid, LANDFRAC, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, LANDFRAC, "long_name", 36, "Fraction of sfc area covered by land"); ERR
     err = nc_put_att_text(ncid, LANDFRAC, "cell_methods", 10, "time: mean"); ERR
@@ -1094,7 +1124,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "LHFLX", NC_FLOAT, 2, dimids, &LHFLX); ERR
+    err = DEF_VAR(ncid, "LHFLX", NC_FLOAT, 2, dimids, &LHFLX); ERR
     err = nc_put_att_text(ncid, LHFLX, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, LHFLX, "long_name", 24, "Surface latent heat flux"); ERR
     err = nc_put_att_text(ncid, LHFLX, "cell_methods", 10, "time: mean"); ERR
@@ -1103,7 +1133,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "LINOZ_DO3", NC_FLOAT, 3, dimids, &LINOZ_DO3); ERR
+    err = DEF_VAR(ncid, "LINOZ_DO3", NC_FLOAT, 3, dimids, &LINOZ_DO3); ERR
     err = nc_put_att_int(ncid, LINOZ_DO3, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, LINOZ_DO3, "units", 2, "/s"); ERR
     err = nc_put_att_text(ncid, LINOZ_DO3, "long_name", 48, "ozone vmr tendency by linearized ozone chemistry"); ERR
@@ -1113,7 +1143,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "LINOZ_DO3_PSC", NC_FLOAT, 3, dimids, &LINOZ_DO3_PSC); ERR
+    err = DEF_VAR(ncid, "LINOZ_DO3_PSC", NC_FLOAT, 3, dimids, &LINOZ_DO3_PSC); ERR
     err = nc_put_att_int(ncid, LINOZ_DO3_PSC, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, LINOZ_DO3_PSC, "units", 2, "/s"); ERR
     err = nc_put_att_text(ncid, LINOZ_DO3_PSC, "long_name", 50, "ozone vmr loss by PSCs using Carille et al. (1990)"); ERR
@@ -1123,7 +1153,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "LINOZ_O3CLIM", NC_FLOAT, 3, dimids, &LINOZ_O3CLIM); ERR
+    err = DEF_VAR(ncid, "LINOZ_O3CLIM", NC_FLOAT, 3, dimids, &LINOZ_O3CLIM); ERR
     err = nc_put_att_int(ncid, LINOZ_O3CLIM, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, LINOZ_O3CLIM, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, LINOZ_O3CLIM, "long_name", 29, "climatology of ozone in LINOZ"); ERR
@@ -1133,7 +1163,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "LINOZ_O3COL", NC_FLOAT, 3, dimids, &LINOZ_O3COL); ERR
+    err = DEF_VAR(ncid, "LINOZ_O3COL", NC_FLOAT, 3, dimids, &LINOZ_O3COL); ERR
     err = nc_put_att_int(ncid, LINOZ_O3COL, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, LINOZ_O3COL, "units", 2, "DU"); ERR
     err = nc_put_att_text(ncid, LINOZ_O3COL, "long_name", 18, "ozone column above"); ERR
@@ -1143,7 +1173,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "LINOZ_SSO3", NC_FLOAT, 3, dimids, &LINOZ_SSO3); ERR
+    err = DEF_VAR(ncid, "LINOZ_SSO3", NC_FLOAT, 3, dimids, &LINOZ_SSO3); ERR
     err = nc_put_att_int(ncid, LINOZ_SSO3, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, LINOZ_SSO3, "units", 2, "kg"); ERR
     err = nc_put_att_text(ncid, LINOZ_SSO3, "long_name", 27, "steady state ozone in LINOZ"); ERR
@@ -1152,7 +1182,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "LINOZ_SZA", NC_FLOAT, 2, dimids, &LINOZ_SZA); ERR
+    err = DEF_VAR(ncid, "LINOZ_SZA", NC_FLOAT, 2, dimids, &LINOZ_SZA); ERR
     err = nc_put_att_text(ncid, LINOZ_SZA, "units", 7, "degrees"); ERR
     err = nc_put_att_text(ncid, LINOZ_SZA, "long_name", 27, "solar zenith angle in LINOZ"); ERR
     err = nc_put_att_text(ncid, LINOZ_SZA, "cell_methods", 10, "time: mean"); ERR
@@ -1160,7 +1190,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "LND_MBL", NC_FLOAT, 2, dimids, &LND_MBL); ERR
+    err = DEF_VAR(ncid, "LND_MBL", NC_FLOAT, 2, dimids, &LND_MBL); ERR
     err = nc_put_att_text(ncid, LND_MBL, "units", 4, "frac"); ERR
     err = nc_put_att_text(ncid, LND_MBL, "long_name", 23, "Soil erodibility factor"); ERR
     err = nc_put_att_text(ncid, LND_MBL, "cell_methods", 10, "time: mean"); ERR
@@ -1168,7 +1198,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "LWCF", NC_FLOAT, 2, dimids, &LWCF); ERR
+    err = DEF_VAR(ncid, "LWCF", NC_FLOAT, 2, dimids, &LWCF); ERR
     err = nc_put_att_text(ncid, LWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, LWCF, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, LWCF, "long_name", 22, "Longwave cloud forcing"); ERR
@@ -1178,7 +1208,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Mass_bc", NC_FLOAT, 3, dimids, &Mass_bc); ERR
+    err = DEF_VAR(ncid, "Mass_bc", NC_FLOAT, 3, dimids, &Mass_bc); ERR
     err = nc_put_att_int(ncid, Mass_bc, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Mass_bc, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Mass_bc, "long_name", 64, "sum of bc mass concentration bc_a1+bc_c1+bc_a3+bc_c3+bc_a4+bc_c4"); ERR
@@ -1188,7 +1218,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Mass_dst", NC_FLOAT, 3, dimids, &Mass_dst); ERR
+    err = DEF_VAR(ncid, "Mass_dst", NC_FLOAT, 3, dimids, &Mass_dst); ERR
     err = nc_put_att_int(ncid, Mass_dst, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Mass_dst, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Mass_dst, "long_name", 57, "sum of dst mass concentration dst_a1+dst_c1+dst_a3+dst_c3"); ERR
@@ -1198,7 +1228,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Mass_mom", NC_FLOAT, 3, dimids, &Mass_mom); ERR
+    err = DEF_VAR(ncid, "Mass_mom", NC_FLOAT, 3, dimids, &Mass_mom); ERR
     err = nc_put_att_int(ncid, Mass_mom, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Mass_mom, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Mass_mom, "long_name", 85, "sum of mom mass concentration mom_a1+mom_c1+mom_a2+mom_c2+mom_a3+mom_c3+mom_a4+mom_c4"); ERR
@@ -1208,7 +1238,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Mass_ncl", NC_FLOAT, 3, dimids, &Mass_ncl); ERR
+    err = DEF_VAR(ncid, "Mass_ncl", NC_FLOAT, 3, dimids, &Mass_ncl); ERR
     err = nc_put_att_int(ncid, Mass_ncl, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Mass_ncl, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Mass_ncl, "long_name", 71, "sum of ncl mass concentration ncl_a1+ncl_c1+ncl_a2+ncl_c2+ncl_a3+ncl_c3"); ERR
@@ -1218,7 +1248,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Mass_pom", NC_FLOAT, 3, dimids, &Mass_pom); ERR
+    err = DEF_VAR(ncid, "Mass_pom", NC_FLOAT, 3, dimids, &Mass_pom); ERR
     err = nc_put_att_int(ncid, Mass_pom, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Mass_pom, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Mass_pom, "long_name", 71, "sum of pom mass concentration pom_a1+pom_c1+pom_a3+pom_c3+pom_a4+pom_c4"); ERR
@@ -1228,7 +1258,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Mass_so4", NC_FLOAT, 3, dimids, &Mass_so4); ERR
+    err = DEF_VAR(ncid, "Mass_so4", NC_FLOAT, 3, dimids, &Mass_so4); ERR
     err = nc_put_att_int(ncid, Mass_so4, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Mass_so4, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Mass_so4, "long_name", 71, "sum of so4 mass concentration so4_a1+so4_c1+so4_a2+so4_c2+so4_a3+so4_c3"); ERR
@@ -1238,7 +1268,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Mass_soa", NC_FLOAT, 3, dimids, &Mass_soa); ERR
+    err = DEF_VAR(ncid, "Mass_soa", NC_FLOAT, 3, dimids, &Mass_soa); ERR
     err = nc_put_att_int(ncid, Mass_soa, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Mass_soa, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Mass_soa, "long_name", 71, "sum of soa mass concentration soa_a1+soa_c1+soa_a2+soa_c2+soa_a3+soa_c3"); ERR
@@ -1248,7 +1278,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "NUMICE", NC_FLOAT, 3, dimids, &NUMICE); ERR
+    err = DEF_VAR(ncid, "NUMICE", NC_FLOAT, 3, dimids, &NUMICE); ERR
     err = nc_put_att_int(ncid, NUMICE, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, NUMICE, "units", 4, "1/kg"); ERR
     err = nc_put_att_text(ncid, NUMICE, "long_name", 34, "Grid box averaged cloud ice number"); ERR
@@ -1258,7 +1288,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "NUMLIQ", NC_FLOAT, 3, dimids, &NUMLIQ); ERR
+    err = DEF_VAR(ncid, "NUMLIQ", NC_FLOAT, 3, dimids, &NUMLIQ); ERR
     err = nc_put_att_int(ncid, NUMLIQ, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, NUMLIQ, "units", 4, "1/kg"); ERR
     err = nc_put_att_text(ncid, NUMLIQ, "long_name", 37, "Grid box averaged cloud liquid number"); ERR
@@ -1268,7 +1298,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "NUMRAI", NC_FLOAT, 3, dimids, &NUMRAI); ERR
+    err = DEF_VAR(ncid, "NUMRAI", NC_FLOAT, 3, dimids, &NUMRAI); ERR
     err = nc_put_att_int(ncid, NUMRAI, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, NUMRAI, "units", 4, "1/kg"); ERR
     err = nc_put_att_text(ncid, NUMRAI, "long_name", 29, "Grid box averaged rain number"); ERR
@@ -1278,7 +1308,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "NUMSNO", NC_FLOAT, 3, dimids, &NUMSNO); ERR
+    err = DEF_VAR(ncid, "NUMSNO", NC_FLOAT, 3, dimids, &NUMSNO); ERR
     err = nc_put_att_int(ncid, NUMSNO, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, NUMSNO, "units", 4, "1/kg"); ERR
     err = nc_put_att_text(ncid, NUMSNO, "long_name", 29, "Grid box averaged snow number"); ERR
@@ -1288,7 +1318,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "O3", NC_FLOAT, 3, dimids, &O3); ERR
+    err = DEF_VAR(ncid, "O3", NC_FLOAT, 3, dimids, &O3); ERR
     err = nc_put_att_int(ncid, O3, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, O3, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, O3, "long_name", 16, "O3 concentration"); ERR
@@ -1297,7 +1327,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "O3_SRF", NC_FLOAT, 2, dimids, &O3_SRF); ERR
+    err = DEF_VAR(ncid, "O3_SRF", NC_FLOAT, 2, dimids, &O3_SRF); ERR
     err = nc_put_att_text(ncid, O3_SRF, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, O3_SRF, "long_name", 18, "O3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, O3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -1305,7 +1335,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "OCNFRAC", NC_FLOAT, 2, dimids, &OCNFRAC); ERR
+    err = DEF_VAR(ncid, "OCNFRAC", NC_FLOAT, 2, dimids, &OCNFRAC); ERR
     err = nc_put_att_text(ncid, OCNFRAC, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, OCNFRAC, "long_name", 37, "Fraction of sfc area covered by ocean"); ERR
     err = nc_put_att_text(ncid, OCNFRAC, "cell_methods", 10, "time: mean"); ERR
@@ -1314,7 +1344,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "OMEGA", NC_FLOAT, 3, dimids, &OMEGA); ERR
+    err = DEF_VAR(ncid, "OMEGA", NC_FLOAT, 3, dimids, &OMEGA); ERR
     err = nc_put_att_int(ncid, OMEGA, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, OMEGA, "units", 4, "Pa/s"); ERR
     err = nc_put_att_text(ncid, OMEGA, "long_name", 28, "Vertical velocity (pressure)"); ERR
@@ -1323,7 +1353,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "OMEGA500", NC_FLOAT, 2, dimids, &OMEGA500); ERR
+    err = DEF_VAR(ncid, "OMEGA500", NC_FLOAT, 2, dimids, &OMEGA500); ERR
     err = nc_put_att_text(ncid, OMEGA500, "units", 4, "Pa/s"); ERR
     err = nc_put_att_text(ncid, OMEGA500, "long_name", 46, "Vertical velocity at 500 mbar pressure surface"); ERR
     err = nc_put_att_text(ncid, OMEGA500, "cell_methods", 10, "time: mean"); ERR
@@ -1332,7 +1362,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "OMEGAT", NC_FLOAT, 3, dimids, &OMEGAT); ERR
+    err = DEF_VAR(ncid, "OMEGAT", NC_FLOAT, 3, dimids, &OMEGAT); ERR
     err = nc_put_att_int(ncid, OMEGAT, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, OMEGAT, "units", 6, "K Pa/s"); ERR
     err = nc_put_att_text(ncid, OMEGAT, "long_name", 18, "Vertical heat flux"); ERR
@@ -1341,7 +1371,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PBLH", NC_FLOAT, 2, dimids, &PBLH); ERR
+    err = DEF_VAR(ncid, "PBLH", NC_FLOAT, 2, dimids, &PBLH); ERR
     err = nc_put_att_text(ncid, PBLH, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, PBLH, "long_name", 10, "PBL height"); ERR
     err = nc_put_att_text(ncid, PBLH, "cell_methods", 10, "time: mean"); ERR
@@ -1349,14 +1379,14 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PHIS", NC_FLOAT, 2, dimids, &PHIS); ERR
+    err = DEF_VAR(ncid, "PHIS", NC_FLOAT, 2, dimids, &PHIS); ERR
     err = nc_put_att_text(ncid, PHIS, "units", 5, "m2/s2"); ERR
     err = nc_put_att_text(ncid, PHIS, "long_name", 20, "Surface geopotential"); ERR
     varids[i++] = PHIS;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PRECC", NC_FLOAT, 2, dimids, &PRECC); ERR
+    err = DEF_VAR(ncid, "PRECC", NC_FLOAT, 2, dimids, &PRECC); ERR
     err = nc_put_att_text(ncid, PRECC, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, PRECC, "long_name", 41, "Convective precipitation rate (liq + ice)"); ERR
     err = nc_put_att_text(ncid, PRECC, "cell_methods", 10, "time: mean"); ERR
@@ -1364,7 +1394,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PRECL", NC_FLOAT, 2, dimids, &PRECL); ERR
+    err = DEF_VAR(ncid, "PRECL", NC_FLOAT, 2, dimids, &PRECL); ERR
     err = nc_put_att_text(ncid, PRECL, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, PRECL, "long_name", 51, "Large-scale (stable) precipitation rate (liq + ice)"); ERR
     err = nc_put_att_text(ncid, PRECL, "cell_methods", 10, "time: mean"); ERR
@@ -1372,7 +1402,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PRECSC", NC_FLOAT, 2, dimids, &PRECSC); ERR
+    err = DEF_VAR(ncid, "PRECSC", NC_FLOAT, 2, dimids, &PRECSC); ERR
     err = nc_put_att_text(ncid, PRECSC, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, PRECSC, "long_name", 39, "Convective snow rate (water equivalent)"); ERR
     err = nc_put_att_text(ncid, PRECSC, "cell_methods", 10, "time: mean"); ERR
@@ -1380,7 +1410,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PRECSL", NC_FLOAT, 2, dimids, &PRECSL); ERR
+    err = DEF_VAR(ncid, "PRECSL", NC_FLOAT, 2, dimids, &PRECSL); ERR
     err = nc_put_att_text(ncid, PRECSL, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, PRECSL, "long_name", 49, "Large-scale (stable) snow rate (water equivalent)"); ERR
     err = nc_put_att_text(ncid, PRECSL, "cell_methods", 10, "time: mean"); ERR
@@ -1388,7 +1418,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PS", NC_FLOAT, 2, dimids, &PS); ERR
+    err = DEF_VAR(ncid, "PS", NC_FLOAT, 2, dimids, &PS); ERR
     err = nc_put_att_text(ncid, PS, "units", 2, "Pa"); ERR
     err = nc_put_att_text(ncid, PS, "long_name", 16, "Surface pressure"); ERR
     err = nc_put_att_text(ncid, PS, "cell_methods", 10, "time: mean"); ERR
@@ -1396,7 +1426,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PSL", NC_FLOAT, 2, dimids, &PSL); ERR
+    err = DEF_VAR(ncid, "PSL", NC_FLOAT, 2, dimids, &PSL); ERR
     err = nc_put_att_text(ncid, PSL, "units", 2, "Pa"); ERR
     err = nc_put_att_text(ncid, PSL, "long_name", 18, "Sea level pressure"); ERR
     err = nc_put_att_text(ncid, PSL, "cell_methods", 10, "time: mean"); ERR
@@ -1405,7 +1435,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Q", NC_FLOAT, 3, dimids, &Q); ERR
+    err = DEF_VAR(ncid, "Q", NC_FLOAT, 3, dimids, &Q); ERR
     err = nc_put_att_int(ncid, Q, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Q, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, Q, "long_name", 17, "Specific humidity"); ERR
@@ -1414,7 +1444,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "QFLX", NC_FLOAT, 2, dimids, &QFLX); ERR
+    err = DEF_VAR(ncid, "QFLX", NC_FLOAT, 2, dimids, &QFLX); ERR
     err = nc_put_att_text(ncid, QFLX, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, QFLX, "long_name", 18, "Surface water flux"); ERR
     err = nc_put_att_text(ncid, QFLX, "cell_methods", 10, "time: mean"); ERR
@@ -1422,7 +1452,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "QREFHT", NC_FLOAT, 2, dimids, &QREFHT); ERR
+    err = DEF_VAR(ncid, "QREFHT", NC_FLOAT, 2, dimids, &QREFHT); ERR
     err = nc_put_att_text(ncid, QREFHT, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, QREFHT, "long_name", 25, "Reference height humidity"); ERR
     err = nc_put_att_text(ncid, QREFHT, "cell_methods", 10, "time: mean"); ERR
@@ -1431,7 +1461,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "QRL", NC_FLOAT, 3, dimids, &QRL); ERR
+    err = DEF_VAR(ncid, "QRL", NC_FLOAT, 3, dimids, &QRL); ERR
     err = nc_put_att_int(ncid, QRL, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, QRL, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, QRL, "units", 3, "K/s"); ERR
@@ -1442,7 +1472,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "QRS", NC_FLOAT, 3, dimids, &QRS); ERR
+    err = DEF_VAR(ncid, "QRS", NC_FLOAT, 3, dimids, &QRS); ERR
     err = nc_put_att_int(ncid, QRS, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, QRS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, QRS, "units", 3, "K/s"); ERR
@@ -1453,7 +1483,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "RAINQM", NC_FLOAT, 3, dimids, &RAINQM); ERR
+    err = DEF_VAR(ncid, "RAINQM", NC_FLOAT, 3, dimids, &RAINQM); ERR
     err = nc_put_att_int(ncid, RAINQM, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, RAINQM, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, RAINQM, "long_name", 29, "Grid box averaged rain amount"); ERR
@@ -1462,7 +1492,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "RAM1", NC_FLOAT, 2, dimids, &RAM1); ERR
+    err = DEF_VAR(ncid, "RAM1", NC_FLOAT, 2, dimids, &RAM1); ERR
     err = nc_put_att_text(ncid, RAM1, "units", 4, "frac"); ERR
     err = nc_put_att_text(ncid, RAM1, "long_name", 4, "RAM1"); ERR
     err = nc_put_att_text(ncid, RAM1, "cell_methods", 10, "time: mean"); ERR
@@ -1471,7 +1501,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "RELHUM", NC_FLOAT, 3, dimids, &RELHUM); ERR
+    err = DEF_VAR(ncid, "RELHUM", NC_FLOAT, 3, dimids, &RELHUM); ERR
     err = nc_put_att_int(ncid, RELHUM, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, RELHUM, "units", 7, "percent"); ERR
     err = nc_put_att_text(ncid, RELHUM, "long_name", 17, "Relative humidity"); ERR
@@ -1480,7 +1510,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFDMS", NC_FLOAT, 2, dimids, &SFDMS); ERR
+    err = DEF_VAR(ncid, "SFDMS", NC_FLOAT, 2, dimids, &SFDMS); ERR
     err = nc_put_att_text(ncid, SFDMS, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFDMS, "long_name", 16, "DMS surface flux"); ERR
     err = nc_put_att_text(ncid, SFDMS, "cell_methods", 10, "time: mean"); ERR
@@ -1488,7 +1518,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFH2O2", NC_FLOAT, 2, dimids, &SFH2O2); ERR
+    err = DEF_VAR(ncid, "SFH2O2", NC_FLOAT, 2, dimids, &SFH2O2); ERR
     err = nc_put_att_text(ncid, SFH2O2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFH2O2, "long_name", 17, "H2O2 surface flux"); ERR
     err = nc_put_att_text(ncid, SFH2O2, "cell_methods", 10, "time: mean"); ERR
@@ -1496,7 +1526,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFH2SO4", NC_FLOAT, 2, dimids, &SFH2SO4); ERR
+    err = DEF_VAR(ncid, "SFH2SO4", NC_FLOAT, 2, dimids, &SFH2SO4); ERR
     err = nc_put_att_text(ncid, SFH2SO4, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFH2SO4, "long_name", 18, "H2SO4 surface flux"); ERR
     err = nc_put_att_text(ncid, SFH2SO4, "cell_methods", 10, "time: mean"); ERR
@@ -1504,7 +1534,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFO3", NC_FLOAT, 2, dimids, &SFO3); ERR
+    err = DEF_VAR(ncid, "SFO3", NC_FLOAT, 2, dimids, &SFO3); ERR
     err = nc_put_att_text(ncid, SFO3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFO3, "long_name", 15, "O3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFO3, "cell_methods", 10, "time: mean"); ERR
@@ -1512,7 +1542,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFSO2", NC_FLOAT, 2, dimids, &SFSO2); ERR
+    err = DEF_VAR(ncid, "SFSO2", NC_FLOAT, 2, dimids, &SFSO2); ERR
     err = nc_put_att_text(ncid, SFSO2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFSO2, "long_name", 16, "SO2 surface flux"); ERR
     err = nc_put_att_text(ncid, SFSO2, "cell_methods", 10, "time: mean"); ERR
@@ -1520,7 +1550,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFSOAG", NC_FLOAT, 2, dimids, &SFSOAG); ERR
+    err = DEF_VAR(ncid, "SFSOAG", NC_FLOAT, 2, dimids, &SFSOAG); ERR
     err = nc_put_att_text(ncid, SFSOAG, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFSOAG, "long_name", 17, "SOAG surface flux"); ERR
     err = nc_put_att_text(ncid, SFSOAG, "cell_methods", 10, "time: mean"); ERR
@@ -1528,7 +1558,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFbc_a1", NC_FLOAT, 2, dimids, &SFbc_a1); ERR
+    err = DEF_VAR(ncid, "SFbc_a1", NC_FLOAT, 2, dimids, &SFbc_a1); ERR
     err = nc_put_att_text(ncid, SFbc_a1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFbc_a1, "long_name", 18, "bc_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFbc_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1536,7 +1566,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFbc_a3", NC_FLOAT, 2, dimids, &SFbc_a3); ERR
+    err = DEF_VAR(ncid, "SFbc_a3", NC_FLOAT, 2, dimids, &SFbc_a3); ERR
     err = nc_put_att_text(ncid, SFbc_a3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFbc_a3, "long_name", 18, "bc_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFbc_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1544,7 +1574,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFbc_a4", NC_FLOAT, 2, dimids, &SFbc_a4); ERR
+    err = DEF_VAR(ncid, "SFbc_a4", NC_FLOAT, 2, dimids, &SFbc_a4); ERR
     err = nc_put_att_text(ncid, SFbc_a4, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFbc_a4, "long_name", 18, "bc_a4 surface flux"); ERR
     err = nc_put_att_text(ncid, SFbc_a4, "cell_methods", 10, "time: mean"); ERR
@@ -1552,7 +1582,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFdst_a1", NC_FLOAT, 2, dimids, &SFdst_a1); ERR
+    err = DEF_VAR(ncid, "SFdst_a1", NC_FLOAT, 2, dimids, &SFdst_a1); ERR
     err = nc_put_att_text(ncid, SFdst_a1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFdst_a1, "long_name", 19, "dst_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFdst_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1560,7 +1590,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFdst_a3", NC_FLOAT, 2, dimids, &SFdst_a3); ERR
+    err = DEF_VAR(ncid, "SFdst_a3", NC_FLOAT, 2, dimids, &SFdst_a3); ERR
     err = nc_put_att_text(ncid, SFdst_a3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFdst_a3, "long_name", 19, "dst_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFdst_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1568,7 +1598,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFmom_a1", NC_FLOAT, 2, dimids, &SFmom_a1); ERR
+    err = DEF_VAR(ncid, "SFmom_a1", NC_FLOAT, 2, dimids, &SFmom_a1); ERR
     err = nc_put_att_text(ncid, SFmom_a1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFmom_a1, "long_name", 19, "mom_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFmom_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1576,7 +1606,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFmom_a2", NC_FLOAT, 2, dimids, &SFmom_a2); ERR
+    err = DEF_VAR(ncid, "SFmom_a2", NC_FLOAT, 2, dimids, &SFmom_a2); ERR
     err = nc_put_att_text(ncid, SFmom_a2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFmom_a2, "long_name", 19, "mom_a2 surface flux"); ERR
     err = nc_put_att_text(ncid, SFmom_a2, "cell_methods", 10, "time: mean"); ERR
@@ -1584,7 +1614,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFmom_a3", NC_FLOAT, 2, dimids, &SFmom_a3); ERR
+    err = DEF_VAR(ncid, "SFmom_a3", NC_FLOAT, 2, dimids, &SFmom_a3); ERR
     err = nc_put_att_text(ncid, SFmom_a3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFmom_a3, "long_name", 19, "mom_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFmom_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1592,7 +1622,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFmom_a4", NC_FLOAT, 2, dimids, &SFmom_a4); ERR
+    err = DEF_VAR(ncid, "SFmom_a4", NC_FLOAT, 2, dimids, &SFmom_a4); ERR
     err = nc_put_att_text(ncid, SFmom_a4, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFmom_a4, "long_name", 19, "mom_a4 surface flux"); ERR
     err = nc_put_att_text(ncid, SFmom_a4, "cell_methods", 10, "time: mean"); ERR
@@ -1600,7 +1630,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFncl_a1", NC_FLOAT, 2, dimids, &SFncl_a1); ERR
+    err = DEF_VAR(ncid, "SFncl_a1", NC_FLOAT, 2, dimids, &SFncl_a1); ERR
     err = nc_put_att_text(ncid, SFncl_a1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFncl_a1, "long_name", 19, "ncl_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFncl_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1608,7 +1638,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFncl_a2", NC_FLOAT, 2, dimids, &SFncl_a2); ERR
+    err = DEF_VAR(ncid, "SFncl_a2", NC_FLOAT, 2, dimids, &SFncl_a2); ERR
     err = nc_put_att_text(ncid, SFncl_a2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFncl_a2, "long_name", 19, "ncl_a2 surface flux"); ERR
     err = nc_put_att_text(ncid, SFncl_a2, "cell_methods", 10, "time: mean"); ERR
@@ -1616,7 +1646,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFncl_a3", NC_FLOAT, 2, dimids, &SFncl_a3); ERR
+    err = DEF_VAR(ncid, "SFncl_a3", NC_FLOAT, 2, dimids, &SFncl_a3); ERR
     err = nc_put_att_text(ncid, SFncl_a3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFncl_a3, "long_name", 19, "ncl_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFncl_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1624,7 +1654,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFnum_a1", NC_FLOAT, 2, dimids, &SFnum_a1); ERR
+    err = DEF_VAR(ncid, "SFnum_a1", NC_FLOAT, 2, dimids, &SFnum_a1); ERR
     err = nc_put_att_text(ncid, SFnum_a1, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, SFnum_a1, "long_name", 19, "num_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFnum_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1632,7 +1662,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFnum_a2", NC_FLOAT, 2, dimids, &SFnum_a2); ERR
+    err = DEF_VAR(ncid, "SFnum_a2", NC_FLOAT, 2, dimids, &SFnum_a2); ERR
     err = nc_put_att_text(ncid, SFnum_a2, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, SFnum_a2, "long_name", 19, "num_a2 surface flux"); ERR
     err = nc_put_att_text(ncid, SFnum_a2, "cell_methods", 10, "time: mean"); ERR
@@ -1640,7 +1670,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFnum_a3", NC_FLOAT, 2, dimids, &SFnum_a3); ERR
+    err = DEF_VAR(ncid, "SFnum_a3", NC_FLOAT, 2, dimids, &SFnum_a3); ERR
     err = nc_put_att_text(ncid, SFnum_a3, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, SFnum_a3, "long_name", 19, "num_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFnum_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1648,7 +1678,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFnum_a4", NC_FLOAT, 2, dimids, &SFnum_a4); ERR
+    err = DEF_VAR(ncid, "SFnum_a4", NC_FLOAT, 2, dimids, &SFnum_a4); ERR
     err = nc_put_att_text(ncid, SFnum_a4, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, SFnum_a4, "long_name", 19, "num_a4 surface flux"); ERR
     err = nc_put_att_text(ncid, SFnum_a4, "cell_methods", 10, "time: mean"); ERR
@@ -1656,7 +1686,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFpom_a1", NC_FLOAT, 2, dimids, &SFpom_a1); ERR
+    err = DEF_VAR(ncid, "SFpom_a1", NC_FLOAT, 2, dimids, &SFpom_a1); ERR
     err = nc_put_att_text(ncid, SFpom_a1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFpom_a1, "long_name", 19, "pom_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFpom_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1664,7 +1694,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFpom_a3", NC_FLOAT, 2, dimids, &SFpom_a3); ERR
+    err = DEF_VAR(ncid, "SFpom_a3", NC_FLOAT, 2, dimids, &SFpom_a3); ERR
     err = nc_put_att_text(ncid, SFpom_a3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFpom_a3, "long_name", 19, "pom_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFpom_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1672,7 +1702,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFpom_a4", NC_FLOAT, 2, dimids, &SFpom_a4); ERR
+    err = DEF_VAR(ncid, "SFpom_a4", NC_FLOAT, 2, dimids, &SFpom_a4); ERR
     err = nc_put_att_text(ncid, SFpom_a4, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFpom_a4, "long_name", 19, "pom_a4 surface flux"); ERR
     err = nc_put_att_text(ncid, SFpom_a4, "cell_methods", 10, "time: mean"); ERR
@@ -1680,7 +1710,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFso4_a1", NC_FLOAT, 2, dimids, &SFso4_a1); ERR
+    err = DEF_VAR(ncid, "SFso4_a1", NC_FLOAT, 2, dimids, &SFso4_a1); ERR
     err = nc_put_att_text(ncid, SFso4_a1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFso4_a1, "long_name", 19, "so4_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFso4_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1688,7 +1718,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFso4_a2", NC_FLOAT, 2, dimids, &SFso4_a2); ERR
+    err = DEF_VAR(ncid, "SFso4_a2", NC_FLOAT, 2, dimids, &SFso4_a2); ERR
     err = nc_put_att_text(ncid, SFso4_a2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFso4_a2, "long_name", 19, "so4_a2 surface flux"); ERR
     err = nc_put_att_text(ncid, SFso4_a2, "cell_methods", 10, "time: mean"); ERR
@@ -1696,7 +1726,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFso4_a3", NC_FLOAT, 2, dimids, &SFso4_a3); ERR
+    err = DEF_VAR(ncid, "SFso4_a3", NC_FLOAT, 2, dimids, &SFso4_a3); ERR
     err = nc_put_att_text(ncid, SFso4_a3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFso4_a3, "long_name", 19, "so4_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFso4_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1704,7 +1734,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFsoa_a1", NC_FLOAT, 2, dimids, &SFsoa_a1); ERR
+    err = DEF_VAR(ncid, "SFsoa_a1", NC_FLOAT, 2, dimids, &SFsoa_a1); ERR
     err = nc_put_att_text(ncid, SFsoa_a1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFsoa_a1, "long_name", 19, "soa_a1 surface flux"); ERR
     err = nc_put_att_text(ncid, SFsoa_a1, "cell_methods", 10, "time: mean"); ERR
@@ -1712,7 +1742,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFsoa_a2", NC_FLOAT, 2, dimids, &SFsoa_a2); ERR
+    err = DEF_VAR(ncid, "SFsoa_a2", NC_FLOAT, 2, dimids, &SFsoa_a2); ERR
     err = nc_put_att_text(ncid, SFsoa_a2, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFsoa_a2, "long_name", 19, "soa_a2 surface flux"); ERR
     err = nc_put_att_text(ncid, SFsoa_a2, "cell_methods", 10, "time: mean"); ERR
@@ -1720,7 +1750,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SFsoa_a3", NC_FLOAT, 2, dimids, &SFsoa_a3); ERR
+    err = DEF_VAR(ncid, "SFsoa_a3", NC_FLOAT, 2, dimids, &SFsoa_a3); ERR
     err = nc_put_att_text(ncid, SFsoa_a3, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SFsoa_a3, "long_name", 19, "soa_a3 surface flux"); ERR
     err = nc_put_att_text(ncid, SFsoa_a3, "cell_methods", 10, "time: mean"); ERR
@@ -1728,7 +1758,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SHFLX", NC_FLOAT, 2, dimids, &SHFLX); ERR
+    err = DEF_VAR(ncid, "SHFLX", NC_FLOAT, 2, dimids, &SHFLX); ERR
     err = nc_put_att_text(ncid, SHFLX, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, SHFLX, "long_name", 26, "Surface sensible heat flux"); ERR
     err = nc_put_att_text(ncid, SHFLX, "cell_methods", 10, "time: mean"); ERR
@@ -1736,7 +1766,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SH_KCLDBASE", NC_FLOAT, 2, dimids, &SH_KCLDBASE); ERR
+    err = DEF_VAR(ncid, "SH_KCLDBASE", NC_FLOAT, 2, dimids, &SH_KCLDBASE); ERR
     err = nc_put_att_text(ncid, SH_KCLDBASE, "units", 1, "1"); ERR
     err = nc_put_att_text(ncid, SH_KCLDBASE, "long_name", 35, "Shallow conv. cloudbase level index"); ERR
     err = nc_put_att_text(ncid, SH_KCLDBASE, "cell_methods", 10, "time: mean"); ERR
@@ -1744,7 +1774,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SH_MFUP_MAX", NC_FLOAT, 2, dimids, &SH_MFUP_MAX); ERR
+    err = DEF_VAR(ncid, "SH_MFUP_MAX", NC_FLOAT, 2, dimids, &SH_MFUP_MAX); ERR
     err = nc_put_att_text(ncid, SH_MFUP_MAX, "units", 5, "kg/m2"); ERR
     err = nc_put_att_text(ncid, SH_MFUP_MAX, "long_name", 42, "Shallow conv. column-max updraft mass flux"); ERR
     err = nc_put_att_text(ncid, SH_MFUP_MAX, "cell_methods", 10, "time: mean"); ERR
@@ -1752,7 +1782,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SH_WCLDBASE", NC_FLOAT, 2, dimids, &SH_WCLDBASE); ERR
+    err = DEF_VAR(ncid, "SH_WCLDBASE", NC_FLOAT, 2, dimids, &SH_WCLDBASE); ERR
     err = nc_put_att_text(ncid, SH_WCLDBASE, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, SH_WCLDBASE, "long_name", 41, "Shallow conv. cloudbase vertical velocity"); ERR
     err = nc_put_att_text(ncid, SH_WCLDBASE, "cell_methods", 10, "time: mean"); ERR
@@ -1760,7 +1790,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SNOWHICE", NC_FLOAT, 2, dimids, &SNOWHICE); ERR
+    err = DEF_VAR(ncid, "SNOWHICE", NC_FLOAT, 2, dimids, &SNOWHICE); ERR
     err = nc_put_att_text(ncid, SNOWHICE, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, SNOWHICE, "long_name", 19, "Snow depth over ice"); ERR
     err = nc_put_att_text(ncid, SNOWHICE, "cell_methods", 10, "time: mean"); ERR
@@ -1768,7 +1798,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SNOWHLND", NC_FLOAT, 2, dimids, &SNOWHLND); ERR
+    err = DEF_VAR(ncid, "SNOWHLND", NC_FLOAT, 2, dimids, &SNOWHLND); ERR
     err = nc_put_att_text(ncid, SNOWHLND, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, SNOWHLND, "long_name", 27, "Water equivalent snow depth"); ERR
     err = nc_put_att_text(ncid, SNOWHLND, "cell_methods", 10, "time: mean"); ERR
@@ -1777,7 +1807,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "SNOWQM", NC_FLOAT, 3, dimids, &SNOWQM); ERR
+    err = DEF_VAR(ncid, "SNOWQM", NC_FLOAT, 3, dimids, &SNOWQM); ERR
     err = nc_put_att_int(ncid, SNOWQM, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, SNOWQM, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, SNOWQM, "long_name", 29, "Grid box averaged snow amount"); ERR
@@ -1787,7 +1817,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "SO2", NC_FLOAT, 3, dimids, &SO2); ERR
+    err = DEF_VAR(ncid, "SO2", NC_FLOAT, 3, dimids, &SO2); ERR
     err = nc_put_att_int(ncid, SO2, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, SO2, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, SO2, "long_name", 17, "SO2 concentration"); ERR
@@ -1796,7 +1826,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SO2_CLXF", NC_FLOAT, 2, dimids, &SO2_CLXF); ERR
+    err = DEF_VAR(ncid, "SO2_CLXF", NC_FLOAT, 2, dimids, &SO2_CLXF); ERR
     err = nc_put_att_text(ncid, SO2_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, SO2_CLXF, "long_name", 47, "vertically intergrated external forcing for SO2"); ERR
     err = nc_put_att_text(ncid, SO2_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -1804,7 +1834,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SO2_SRF", NC_FLOAT, 2, dimids, &SO2_SRF); ERR
+    err = DEF_VAR(ncid, "SO2_SRF", NC_FLOAT, 2, dimids, &SO2_SRF); ERR
     err = nc_put_att_text(ncid, SO2_SRF, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, SO2_SRF, "long_name", 19, "SO2 in bottom layer"); ERR
     err = nc_put_att_text(ncid, SO2_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -1812,7 +1842,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SOAG_CLXF", NC_FLOAT, 2, dimids, &SOAG_CLXF); ERR
+    err = DEF_VAR(ncid, "SOAG_CLXF", NC_FLOAT, 2, dimids, &SOAG_CLXF); ERR
     err = nc_put_att_text(ncid, SOAG_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, SOAG_CLXF, "long_name", 48, "vertically intergrated external forcing for SOAG"); ERR
     err = nc_put_att_text(ncid, SOAG_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -1820,7 +1850,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SOAG_SRF", NC_FLOAT, 2, dimids, &SOAG_SRF); ERR
+    err = DEF_VAR(ncid, "SOAG_SRF", NC_FLOAT, 2, dimids, &SOAG_SRF); ERR
     err = nc_put_att_text(ncid, SOAG_SRF, "units", 7, "mol/mol"); ERR
     err = nc_put_att_text(ncid, SOAG_SRF, "long_name", 20, "SOAG in bottom layer"); ERR
     err = nc_put_att_text(ncid, SOAG_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -1828,7 +1858,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SOAG_sfgaex1", NC_FLOAT, 2, dimids, &SOAG_sfgaex1); ERR
+    err = DEF_VAR(ncid, "SOAG_sfgaex1", NC_FLOAT, 2, dimids, &SOAG_sfgaex1); ERR
     err = nc_put_att_text(ncid, SOAG_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SOAG_sfgaex1, "long_name", 49, "SOAG gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, SOAG_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -1836,7 +1866,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SOLIN", NC_FLOAT, 2, dimids, &SOLIN); ERR
+    err = DEF_VAR(ncid, "SOLIN", NC_FLOAT, 2, dimids, &SOLIN); ERR
     err = nc_put_att_text(ncid, SOLIN, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, SOLIN, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, SOLIN, "long_name", 16, "Solar insolation"); ERR
@@ -1845,7 +1875,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SSAVIS", NC_FLOAT, 2, dimids, &SSAVIS); ERR
+    err = DEF_VAR(ncid, "SSAVIS", NC_FLOAT, 2, dimids, &SSAVIS); ERR
     err = nc_put_att_float(ncid, SSAVIS, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, SSAVIS, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, SSAVIS, "long_name", 29, "Aerosol singel-scatter albedo"); ERR
@@ -1854,7 +1884,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SSTSFMBL", NC_FLOAT, 2, dimids, &SSTSFMBL); ERR
+    err = DEF_VAR(ncid, "SSTSFMBL", NC_FLOAT, 2, dimids, &SSTSFMBL); ERR
     err = nc_put_att_text(ncid, SSTSFMBL, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SSTSFMBL, "long_name", 28, "Mobilization flux at surface"); ERR
     err = nc_put_att_text(ncid, SSTSFMBL, "cell_methods", 10, "time: mean"); ERR
@@ -1862,7 +1892,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SSTSFMBL_OM", NC_FLOAT, 2, dimids, &SSTSFMBL_OM); ERR
+    err = DEF_VAR(ncid, "SSTSFMBL_OM", NC_FLOAT, 2, dimids, &SSTSFMBL_OM); ERR
     err = nc_put_att_text(ncid, SSTSFMBL_OM, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, SSTSFMBL_OM, "long_name", 53, "Mobilization flux of marine organic matter at surface"); ERR
     err = nc_put_att_text(ncid, SSTSFMBL_OM, "cell_methods", 10, "time: mean"); ERR
@@ -1870,7 +1900,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SWCF", NC_FLOAT, 2, dimids, &SWCF); ERR
+    err = DEF_VAR(ncid, "SWCF", NC_FLOAT, 2, dimids, &SWCF); ERR
     err = nc_put_att_text(ncid, SWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, SWCF, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, SWCF, "long_name", 23, "Shortwave cloud forcing"); ERR
@@ -1880,7 +1910,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "T", NC_FLOAT, 3, dimids, &T); ERR
+    err = DEF_VAR(ncid, "T", NC_FLOAT, 3, dimids, &T); ERR
     err = nc_put_att_int(ncid, T, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, T, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, T, "long_name", 11, "Temperature"); ERR
@@ -1889,7 +1919,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TAUGWX", NC_FLOAT, 2, dimids, &TAUGWX); ERR
+    err = DEF_VAR(ncid, "TAUGWX", NC_FLOAT, 2, dimids, &TAUGWX); ERR
     err = nc_put_att_text(ncid, TAUGWX, "units", 4, "N/m2"); ERR
     err = nc_put_att_text(ncid, TAUGWX, "long_name", 33, "Zonal gravity wave surface stress"); ERR
     err = nc_put_att_text(ncid, TAUGWX, "cell_methods", 10, "time: mean"); ERR
@@ -1897,7 +1927,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TAUGWY", NC_FLOAT, 2, dimids, &TAUGWY); ERR
+    err = DEF_VAR(ncid, "TAUGWY", NC_FLOAT, 2, dimids, &TAUGWY); ERR
     err = nc_put_att_text(ncid, TAUGWY, "units", 4, "N/m2"); ERR
     err = nc_put_att_text(ncid, TAUGWY, "long_name", 38, "Meridional gravity wave surface stress"); ERR
     err = nc_put_att_text(ncid, TAUGWY, "cell_methods", 10, "time: mean"); ERR
@@ -1905,7 +1935,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TAUX", NC_FLOAT, 2, dimids, &TAUX); ERR
+    err = DEF_VAR(ncid, "TAUX", NC_FLOAT, 2, dimids, &TAUX); ERR
     err = nc_put_att_text(ncid, TAUX, "units", 4, "N/m2"); ERR
     err = nc_put_att_text(ncid, TAUX, "long_name", 20, "Zonal surface stress"); ERR
     err = nc_put_att_text(ncid, TAUX, "cell_methods", 10, "time: mean"); ERR
@@ -1913,7 +1943,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TAUY", NC_FLOAT, 2, dimids, &TAUY); ERR
+    err = DEF_VAR(ncid, "TAUY", NC_FLOAT, 2, dimids, &TAUY); ERR
     err = nc_put_att_text(ncid, TAUY, "units", 4, "N/m2"); ERR
     err = nc_put_att_text(ncid, TAUY, "long_name", 25, "Meridional surface stress"); ERR
     err = nc_put_att_text(ncid, TAUY, "cell_methods", 10, "time: mean"); ERR
@@ -1921,7 +1951,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TGCLDCWP", NC_FLOAT, 2, dimids, &TGCLDCWP); ERR
+    err = DEF_VAR(ncid, "TGCLDCWP", NC_FLOAT, 2, dimids, &TGCLDCWP); ERR
     err = nc_put_att_text(ncid, TGCLDCWP, "units", 5, "kg/m2"); ERR
     err = nc_put_att_text(ncid, TGCLDCWP, "long_name", 48, "Total grid-box cloud water path (liquid and ice)"); ERR
     err = nc_put_att_text(ncid, TGCLDCWP, "cell_methods", 10, "time: mean"); ERR
@@ -1929,7 +1959,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TGCLDIWP", NC_FLOAT, 2, dimids, &TGCLDIWP); ERR
+    err = DEF_VAR(ncid, "TGCLDIWP", NC_FLOAT, 2, dimids, &TGCLDIWP); ERR
     err = nc_put_att_text(ncid, TGCLDIWP, "units", 5, "kg/m2"); ERR
     err = nc_put_att_text(ncid, TGCLDIWP, "long_name", 35, "Total grid-box cloud ice water path"); ERR
     err = nc_put_att_text(ncid, TGCLDIWP, "cell_methods", 10, "time: mean"); ERR
@@ -1937,7 +1967,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TGCLDLWP", NC_FLOAT, 2, dimids, &TGCLDLWP); ERR
+    err = DEF_VAR(ncid, "TGCLDLWP", NC_FLOAT, 2, dimids, &TGCLDLWP); ERR
     err = nc_put_att_text(ncid, TGCLDLWP, "units", 5, "kg/m2"); ERR
     err = nc_put_att_text(ncid, TGCLDLWP, "long_name", 38, "Total grid-box cloud liquid water path"); ERR
     err = nc_put_att_text(ncid, TGCLDLWP, "cell_methods", 10, "time: mean"); ERR
@@ -1945,7 +1975,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TH7001000", NC_FLOAT, 2, dimids, &TH7001000); ERR
+    err = DEF_VAR(ncid, "TH7001000", NC_FLOAT, 2, dimids, &TH7001000); ERR
     err = nc_put_att_text(ncid, TH7001000, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, TH7001000, "long_name", 33, "Theta difference 700 mb - 1000 mb"); ERR
     err = nc_put_att_text(ncid, TH7001000, "cell_methods", 10, "time: mean"); ERR
@@ -1953,7 +1983,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TMQ", NC_FLOAT, 2, dimids, &TMQ); ERR
+    err = DEF_VAR(ncid, "TMQ", NC_FLOAT, 2, dimids, &TMQ); ERR
     err = nc_put_att_text(ncid, TMQ, "units", 5, "kg/m2"); ERR
     err = nc_put_att_text(ncid, TMQ, "long_name", 48, "Total (vertically integrated) precipitable water"); ERR
     err = nc_put_att_text(ncid, TMQ, "cell_methods", 10, "time: mean"); ERR
@@ -1961,7 +1991,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TREFHT", NC_FLOAT, 2, dimids, &TREFHT); ERR
+    err = DEF_VAR(ncid, "TREFHT", NC_FLOAT, 2, dimids, &TREFHT); ERR
     err = nc_put_att_text(ncid, TREFHT, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, TREFHT, "long_name", 28, "Reference height temperature"); ERR
     err = nc_put_att_text(ncid, TREFHT, "cell_methods", 10, "time: mean"); ERR
@@ -1969,7 +1999,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TROP_P", NC_FLOAT, 2, dimids, &TROP_P); ERR
+    err = DEF_VAR(ncid, "TROP_P", NC_FLOAT, 2, dimids, &TROP_P); ERR
     err = nc_put_att_float(ncid, TROP_P, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, TROP_P, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, TROP_P, "units", 2, "Pa"); ERR
@@ -1979,7 +2009,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TROP_T", NC_FLOAT, 2, dimids, &TROP_T); ERR
+    err = DEF_VAR(ncid, "TROP_T", NC_FLOAT, 2, dimids, &TROP_T); ERR
     err = nc_put_att_float(ncid, TROP_T, _FillValue, NC_FLOAT, 1, &fillv); ERR
     err = nc_put_att_float(ncid, TROP_T, "missing_value", NC_FLOAT, 1, &missv); ERR
     err = nc_put_att_text(ncid, TROP_T, "units", 1, "K"); ERR
@@ -1989,7 +2019,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TS", NC_FLOAT, 2, dimids, &TS); ERR
+    err = DEF_VAR(ncid, "TS", NC_FLOAT, 2, dimids, &TS); ERR
     err = nc_put_att_text(ncid, TS, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, TS, "long_name", 31, "Surface temperature (radiative)"); ERR
     err = nc_put_att_text(ncid, TS, "cell_methods", 10, "time: mean"); ERR
@@ -1997,7 +2027,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TSMN", NC_FLOAT, 2, dimids, &TSMN); ERR
+    err = DEF_VAR(ncid, "TSMN", NC_FLOAT, 2, dimids, &TSMN); ERR
     err = nc_put_att_text(ncid, TSMN, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, TSMN, "long_name", 46, "Minimum surface temperature over output period"); ERR
     err = nc_put_att_text(ncid, TSMN, "cell_methods", 13, "time: minimum"); ERR
@@ -2005,7 +2035,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TSMX", NC_FLOAT, 2, dimids, &TSMX); ERR
+    err = DEF_VAR(ncid, "TSMX", NC_FLOAT, 2, dimids, &TSMX); ERR
     err = nc_put_att_text(ncid, TSMX, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, TSMX, "long_name", 46, "Maximum surface temperature over output period"); ERR
     err = nc_put_att_text(ncid, TSMX, "cell_methods", 13, "time: maximum"); ERR
@@ -2013,7 +2043,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TUH", NC_FLOAT, 2, dimids, &TUH); ERR
+    err = DEF_VAR(ncid, "TUH", NC_FLOAT, 2, dimids, &TUH); ERR
     err = nc_put_att_text(ncid, TUH, "units", 3, "W/m"); ERR
     err = nc_put_att_text(ncid, TUH, "long_name", 44, "Total (vertically integrated) zonal MSE flux"); ERR
     err = nc_put_att_text(ncid, TUH, "cell_methods", 10, "time: mean"); ERR
@@ -2021,7 +2051,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TUQ", NC_FLOAT, 2, dimids, &TUQ); ERR
+    err = DEF_VAR(ncid, "TUQ", NC_FLOAT, 2, dimids, &TUQ); ERR
     err = nc_put_att_text(ncid, TUQ, "units", 6, "kg/m/s"); ERR
     err = nc_put_att_text(ncid, TUQ, "long_name", 46, "Total (vertically integrated) zonal water flux"); ERR
     err = nc_put_att_text(ncid, TUQ, "cell_methods", 10, "time: mean"); ERR
@@ -2029,7 +2059,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TVH", NC_FLOAT, 2, dimids, &TVH); ERR
+    err = DEF_VAR(ncid, "TVH", NC_FLOAT, 2, dimids, &TVH); ERR
     err = nc_put_att_text(ncid, TVH, "units", 3, "W/m"); ERR
     err = nc_put_att_text(ncid, TVH, "long_name", 49, "Total (vertically integrated) meridional MSE flux"); ERR
     err = nc_put_att_text(ncid, TVH, "cell_methods", 10, "time: mean"); ERR
@@ -2037,7 +2067,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TVQ", NC_FLOAT, 2, dimids, &TVQ); ERR
+    err = DEF_VAR(ncid, "TVQ", NC_FLOAT, 2, dimids, &TVQ); ERR
     err = nc_put_att_text(ncid, TVQ, "units", 6, "kg/m/s"); ERR
     err = nc_put_att_text(ncid, TVQ, "long_name", 51, "Total (vertically integrated) meridional water flux"); ERR
     err = nc_put_att_text(ncid, TVQ, "cell_methods", 10, "time: mean"); ERR
@@ -2046,7 +2076,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "U", NC_FLOAT, 3, dimids, &U); ERR
+    err = DEF_VAR(ncid, "U", NC_FLOAT, 3, dimids, &U); ERR
     err = nc_put_att_int(ncid, U, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, U, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, U, "long_name", 10, "Zonal wind"); ERR
@@ -2055,7 +2085,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "U10", NC_FLOAT, 2, dimids, &U10); ERR
+    err = DEF_VAR(ncid, "U10", NC_FLOAT, 2, dimids, &U10); ERR
     err = nc_put_att_text(ncid, U10, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, U10, "long_name", 14, "10m wind speed"); ERR
     err = nc_put_att_text(ncid, U10, "cell_methods", 10, "time: mean"); ERR
@@ -2064,7 +2094,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "UU", NC_FLOAT, 3, dimids, &UU); ERR
+    err = DEF_VAR(ncid, "UU", NC_FLOAT, 3, dimids, &UU); ERR
     err = nc_put_att_int(ncid, UU, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, UU, "units", 5, "m2/s2"); ERR
     err = nc_put_att_text(ncid, UU, "long_name", 22, "Zonal velocity squared"); ERR
@@ -2074,7 +2104,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "V", NC_FLOAT, 3, dimids, &V); ERR
+    err = DEF_VAR(ncid, "V", NC_FLOAT, 3, dimids, &V); ERR
     err = nc_put_att_int(ncid, V, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, V, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, V, "long_name", 15, "Meridional wind"); ERR
@@ -2084,7 +2114,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "VQ", NC_FLOAT, 3, dimids, &VQ); ERR
+    err = DEF_VAR(ncid, "VQ", NC_FLOAT, 3, dimids, &VQ); ERR
     err = nc_put_att_int(ncid, VQ, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, VQ, "units", 8, "m/skg/kg"); ERR
     err = nc_put_att_text(ncid, VQ, "long_name", 26, "Meridional water transport"); ERR
@@ -2094,7 +2124,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "VT", NC_FLOAT, 3, dimids, &VT); ERR
+    err = DEF_VAR(ncid, "VT", NC_FLOAT, 3, dimids, &VT); ERR
     err = nc_put_att_int(ncid, VT, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, VT, "units", 5, "K m/s"); ERR
     err = nc_put_att_text(ncid, VT, "long_name", 25, "Meridional heat transport"); ERR
@@ -2104,7 +2134,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "VU", NC_FLOAT, 3, dimids, &VU); ERR
+    err = DEF_VAR(ncid, "VU", NC_FLOAT, 3, dimids, &VU); ERR
     err = nc_put_att_int(ncid, VU, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, VU, "units", 5, "m2/s2"); ERR
     err = nc_put_att_text(ncid, VU, "long_name", 33, "Meridional flux of zonal momentum"); ERR
@@ -2114,7 +2144,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "VV", NC_FLOAT, 3, dimids, &VV); ERR
+    err = DEF_VAR(ncid, "VV", NC_FLOAT, 3, dimids, &VV); ERR
     err = nc_put_att_int(ncid, VV, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, VV, "units", 5, "m2/s2"); ERR
     err = nc_put_att_text(ncid, VV, "long_name", 27, "Meridional velocity squared"); ERR
@@ -2123,7 +2153,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "WD_H2O2", NC_FLOAT, 2, dimids, &WD_H2O2); ERR
+    err = DEF_VAR(ncid, "WD_H2O2", NC_FLOAT, 2, dimids, &WD_H2O2); ERR
     err = nc_put_att_text(ncid, WD_H2O2, "units", 4, "kg/s"); ERR
     err = nc_put_att_text(ncid, WD_H2O2, "long_name", 31, "H2O2             wet deposition"); ERR
     err = nc_put_att_text(ncid, WD_H2O2, "cell_methods", 10, "time: mean"); ERR
@@ -2131,7 +2161,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "WD_H2SO4", NC_FLOAT, 2, dimids, &WD_H2SO4); ERR
+    err = DEF_VAR(ncid, "WD_H2SO4", NC_FLOAT, 2, dimids, &WD_H2SO4); ERR
     err = nc_put_att_text(ncid, WD_H2SO4, "units", 4, "kg/s"); ERR
     err = nc_put_att_text(ncid, WD_H2SO4, "long_name", 31, "H2SO4            wet deposition"); ERR
     err = nc_put_att_text(ncid, WD_H2SO4, "cell_methods", 10, "time: mean"); ERR
@@ -2139,7 +2169,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "WD_SO2", NC_FLOAT, 2, dimids, &WD_SO2); ERR
+    err = DEF_VAR(ncid, "WD_SO2", NC_FLOAT, 2, dimids, &WD_SO2); ERR
     err = nc_put_att_text(ncid, WD_SO2, "units", 4, "kg/s"); ERR
     err = nc_put_att_text(ncid, WD_SO2, "long_name", 31, "SO2              wet deposition"); ERR
     err = nc_put_att_text(ncid, WD_SO2, "cell_methods", 10, "time: mean"); ERR
@@ -2148,7 +2178,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "WSUB", NC_FLOAT, 3, dimids, &WSUB); ERR
+    err = DEF_VAR(ncid, "WSUB", NC_FLOAT, 3, dimids, &WSUB); ERR
     err = nc_put_att_int(ncid, WSUB, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, WSUB, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, WSUB, "long_name", 37, "Diagnostic sub-grid vertical velocity"); ERR
@@ -2158,7 +2188,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "Z3", NC_FLOAT, 3, dimids, &Z3); ERR
+    err = DEF_VAR(ncid, "Z3", NC_FLOAT, 3, dimids, &Z3); ERR
     err = nc_put_att_int(ncid, Z3, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, Z3, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, Z3, "long_name", 37, "Geopotential Height (above sea level)"); ERR
@@ -2168,7 +2198,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "aero_water", NC_FLOAT, 3, dimids, &aero_water); ERR
+    err = DEF_VAR(ncid, "aero_water", NC_FLOAT, 3, dimids, &aero_water); ERR
     err = nc_put_att_int(ncid, aero_water, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, aero_water, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, aero_water, "long_name", 70, "sum of aerosol water of interstitial modes wat_a1+wat_a2+wat_a3+wat_a4"); ERR
@@ -2177,7 +2207,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "airFV", NC_FLOAT, 2, dimids, &airFV); ERR
+    err = DEF_VAR(ncid, "airFV", NC_FLOAT, 2, dimids, &airFV); ERR
     err = nc_put_att_text(ncid, airFV, "units", 4, "frac"); ERR
     err = nc_put_att_text(ncid, airFV, "long_name", 2, "FV"); ERR
     err = nc_put_att_text(ncid, airFV, "cell_methods", 10, "time: mean"); ERR
@@ -2185,7 +2215,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a1DDF", NC_FLOAT, 2, dimids, &bc_a1DDF); ERR
+    err = DEF_VAR(ncid, "bc_a1DDF", NC_FLOAT, 2, dimids, &bc_a1DDF); ERR
     err = nc_put_att_text(ncid, bc_a1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a1DDF, "long_name", 49, "bc_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, bc_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2193,7 +2223,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a1SFWET", NC_FLOAT, 2, dimids, &bc_a1SFWET); ERR
+    err = DEF_VAR(ncid, "bc_a1SFWET", NC_FLOAT, 2, dimids, &bc_a1SFWET); ERR
     err = nc_put_att_text(ncid, bc_a1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, bc_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2201,7 +2231,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a1_SRF", NC_FLOAT, 2, dimids, &bc_a1_SRF); ERR
+    err = DEF_VAR(ncid, "bc_a1_SRF", NC_FLOAT, 2, dimids, &bc_a1_SRF); ERR
     err = nc_put_att_text(ncid, bc_a1_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, bc_a1_SRF, "long_name", 21, "bc_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, bc_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2209,7 +2239,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a1_sfgaex1", NC_FLOAT, 2, dimids, &bc_a1_sfgaex1); ERR
+    err = DEF_VAR(ncid, "bc_a1_sfgaex1", NC_FLOAT, 2, dimids, &bc_a1_sfgaex1); ERR
     err = nc_put_att_text(ncid, bc_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a1_sfgaex1, "long_name", 50, "bc_a1 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, bc_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -2217,7 +2247,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a3DDF", NC_FLOAT, 2, dimids, &bc_a3DDF); ERR
+    err = DEF_VAR(ncid, "bc_a3DDF", NC_FLOAT, 2, dimids, &bc_a3DDF); ERR
     err = nc_put_att_text(ncid, bc_a3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a3DDF, "long_name", 49, "bc_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, bc_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2225,7 +2255,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a3SFWET", NC_FLOAT, 2, dimids, &bc_a3SFWET); ERR
+    err = DEF_VAR(ncid, "bc_a3SFWET", NC_FLOAT, 2, dimids, &bc_a3SFWET); ERR
     err = nc_put_att_text(ncid, bc_a3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, bc_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2233,7 +2263,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a3_SRF", NC_FLOAT, 2, dimids, &bc_a3_SRF); ERR
+    err = DEF_VAR(ncid, "bc_a3_SRF", NC_FLOAT, 2, dimids, &bc_a3_SRF); ERR
     err = nc_put_att_text(ncid, bc_a3_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, bc_a3_SRF, "long_name", 21, "bc_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, bc_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2241,7 +2271,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a4DDF", NC_FLOAT, 2, dimids, &bc_a4DDF); ERR
+    err = DEF_VAR(ncid, "bc_a4DDF", NC_FLOAT, 2, dimids, &bc_a4DDF); ERR
     err = nc_put_att_text(ncid, bc_a4DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a4DDF, "long_name", 49, "bc_a4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, bc_a4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2249,7 +2279,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a4SFWET", NC_FLOAT, 2, dimids, &bc_a4SFWET); ERR
+    err = DEF_VAR(ncid, "bc_a4SFWET", NC_FLOAT, 2, dimids, &bc_a4SFWET); ERR
     err = nc_put_att_text(ncid, bc_a4SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, bc_a4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2257,7 +2287,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a4_CLXF", NC_FLOAT, 2, dimids, &bc_a4_CLXF); ERR
+    err = DEF_VAR(ncid, "bc_a4_CLXF", NC_FLOAT, 2, dimids, &bc_a4_CLXF); ERR
     err = nc_put_att_text(ncid, bc_a4_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, bc_a4_CLXF, "long_name", 49, "vertically intergrated external forcing for bc_a4"); ERR
     err = nc_put_att_text(ncid, bc_a4_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -2265,7 +2295,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a4_SRF", NC_FLOAT, 2, dimids, &bc_a4_SRF); ERR
+    err = DEF_VAR(ncid, "bc_a4_SRF", NC_FLOAT, 2, dimids, &bc_a4_SRF); ERR
     err = nc_put_att_text(ncid, bc_a4_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, bc_a4_SRF, "long_name", 21, "bc_a4 in bottom layer"); ERR
     err = nc_put_att_text(ncid, bc_a4_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2273,7 +2303,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_a4_sfgaex1", NC_FLOAT, 2, dimids, &bc_a4_sfgaex1); ERR
+    err = DEF_VAR(ncid, "bc_a4_sfgaex1", NC_FLOAT, 2, dimids, &bc_a4_sfgaex1); ERR
     err = nc_put_att_text(ncid, bc_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_a4_sfgaex1, "long_name", 50, "bc_a4 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, bc_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -2281,7 +2311,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_c1DDF", NC_FLOAT, 2, dimids, &bc_c1DDF); ERR
+    err = DEF_VAR(ncid, "bc_c1DDF", NC_FLOAT, 2, dimids, &bc_c1DDF); ERR
     err = nc_put_att_text(ncid, bc_c1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_c1DDF, "long_name", 49, "bc_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, bc_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2289,7 +2319,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_c1SFWET", NC_FLOAT, 2, dimids, &bc_c1SFWET); ERR
+    err = DEF_VAR(ncid, "bc_c1SFWET", NC_FLOAT, 2, dimids, &bc_c1SFWET); ERR
     err = nc_put_att_text(ncid, bc_c1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_c1SFWET, "long_name", 36, "bc_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, bc_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2297,7 +2327,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_c3DDF", NC_FLOAT, 2, dimids, &bc_c3DDF); ERR
+    err = DEF_VAR(ncid, "bc_c3DDF", NC_FLOAT, 2, dimids, &bc_c3DDF); ERR
     err = nc_put_att_text(ncid, bc_c3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_c3DDF, "long_name", 49, "bc_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, bc_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2305,7 +2335,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_c3SFWET", NC_FLOAT, 2, dimids, &bc_c3SFWET); ERR
+    err = DEF_VAR(ncid, "bc_c3SFWET", NC_FLOAT, 2, dimids, &bc_c3SFWET); ERR
     err = nc_put_att_text(ncid, bc_c3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_c3SFWET, "long_name", 36, "bc_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, bc_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2313,7 +2343,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_c4DDF", NC_FLOAT, 2, dimids, &bc_c4DDF); ERR
+    err = DEF_VAR(ncid, "bc_c4DDF", NC_FLOAT, 2, dimids, &bc_c4DDF); ERR
     err = nc_put_att_text(ncid, bc_c4DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_c4DDF, "long_name", 49, "bc_c4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, bc_c4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2321,7 +2351,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "bc_c4SFWET", NC_FLOAT, 2, dimids, &bc_c4SFWET); ERR
+    err = DEF_VAR(ncid, "bc_c4SFWET", NC_FLOAT, 2, dimids, &bc_c4SFWET); ERR
     err = nc_put_att_text(ncid, bc_c4SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, bc_c4SFWET, "long_name", 36, "bc_c4 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, bc_c4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2329,7 +2359,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "chla", NC_FLOAT, 2, dimids, &chla); ERR
+    err = DEF_VAR(ncid, "chla", NC_FLOAT, 2, dimids, &chla); ERR
     err = nc_put_att_text(ncid, chla, "units", 6, "mg L-1"); ERR
     err = nc_put_att_text(ncid, chla, "long_name", 22, "ocean input data: chla"); ERR
     err = nc_put_att_text(ncid, chla, "cell_methods", 10, "time: mean"); ERR
@@ -2337,7 +2367,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a1DDF", NC_FLOAT, 2, dimids, &dst_a1DDF); ERR
+    err = DEF_VAR(ncid, "dst_a1DDF", NC_FLOAT, 2, dimids, &dst_a1DDF); ERR
     err = nc_put_att_text(ncid, dst_a1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_a1DDF, "long_name", 50, "dst_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, dst_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2345,7 +2375,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a1SF", NC_FLOAT, 2, dimids, &dst_a1SF); ERR
+    err = DEF_VAR(ncid, "dst_a1SF", NC_FLOAT, 2, dimids, &dst_a1SF); ERR
     err = nc_put_att_text(ncid, dst_a1SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_a1SF, "long_name", 28, "dst_a1 dust surface emission"); ERR
     err = nc_put_att_text(ncid, dst_a1SF, "cell_methods", 10, "time: mean"); ERR
@@ -2353,7 +2383,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a1SFWET", NC_FLOAT, 2, dimids, &dst_a1SFWET); ERR
+    err = DEF_VAR(ncid, "dst_a1SFWET", NC_FLOAT, 2, dimids, &dst_a1SFWET); ERR
     err = nc_put_att_text(ncid, dst_a1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, dst_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2361,7 +2391,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a1_SRF", NC_FLOAT, 2, dimids, &dst_a1_SRF); ERR
+    err = DEF_VAR(ncid, "dst_a1_SRF", NC_FLOAT, 2, dimids, &dst_a1_SRF); ERR
     err = nc_put_att_text(ncid, dst_a1_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, dst_a1_SRF, "long_name", 22, "dst_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, dst_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2369,7 +2399,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a3DDF", NC_FLOAT, 2, dimids, &dst_a3DDF); ERR
+    err = DEF_VAR(ncid, "dst_a3DDF", NC_FLOAT, 2, dimids, &dst_a3DDF); ERR
     err = nc_put_att_text(ncid, dst_a3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_a3DDF, "long_name", 50, "dst_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, dst_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2377,7 +2407,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a3SF", NC_FLOAT, 2, dimids, &dst_a3SF); ERR
+    err = DEF_VAR(ncid, "dst_a3SF", NC_FLOAT, 2, dimids, &dst_a3SF); ERR
     err = nc_put_att_text(ncid, dst_a3SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_a3SF, "long_name", 28, "dst_a3 dust surface emission"); ERR
     err = nc_put_att_text(ncid, dst_a3SF, "cell_methods", 10, "time: mean"); ERR
@@ -2385,7 +2415,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a3SFWET", NC_FLOAT, 2, dimids, &dst_a3SFWET); ERR
+    err = DEF_VAR(ncid, "dst_a3SFWET", NC_FLOAT, 2, dimids, &dst_a3SFWET); ERR
     err = nc_put_att_text(ncid, dst_a3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, dst_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2393,7 +2423,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_a3_SRF", NC_FLOAT, 2, dimids, &dst_a3_SRF); ERR
+    err = DEF_VAR(ncid, "dst_a3_SRF", NC_FLOAT, 2, dimids, &dst_a3_SRF); ERR
     err = nc_put_att_text(ncid, dst_a3_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, dst_a3_SRF, "long_name", 22, "dst_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, dst_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2401,7 +2431,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_c1DDF", NC_FLOAT, 2, dimids, &dst_c1DDF); ERR
+    err = DEF_VAR(ncid, "dst_c1DDF", NC_FLOAT, 2, dimids, &dst_c1DDF); ERR
     err = nc_put_att_text(ncid, dst_c1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_c1DDF, "long_name", 50, "dst_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, dst_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2409,7 +2439,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_c1SFWET", NC_FLOAT, 2, dimids, &dst_c1SFWET); ERR
+    err = DEF_VAR(ncid, "dst_c1SFWET", NC_FLOAT, 2, dimids, &dst_c1SFWET); ERR
     err = nc_put_att_text(ncid, dst_c1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_c1SFWET, "long_name", 37, "dst_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, dst_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2417,7 +2447,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_c3DDF", NC_FLOAT, 2, dimids, &dst_c3DDF); ERR
+    err = DEF_VAR(ncid, "dst_c3DDF", NC_FLOAT, 2, dimids, &dst_c3DDF); ERR
     err = nc_put_att_text(ncid, dst_c3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_c3DDF, "long_name", 50, "dst_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, dst_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2425,7 +2455,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "dst_c3SFWET", NC_FLOAT, 2, dimids, &dst_c3SFWET); ERR
+    err = DEF_VAR(ncid, "dst_c3SFWET", NC_FLOAT, 2, dimids, &dst_c3SFWET); ERR
     err = nc_put_att_text(ncid, dst_c3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, dst_c3SFWET, "long_name", 37, "dst_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, dst_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2434,7 +2464,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "hstobie_linoz", NC_FLOAT, 3, dimids, &hstobie_linoz); ERR
+    err = DEF_VAR(ncid, "hstobie_linoz", NC_FLOAT, 3, dimids, &hstobie_linoz); ERR
     err = nc_put_att_int(ncid, hstobie_linoz, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, hstobie_linoz, "units", 22, "fraction of model time"); ERR
     err = nc_put_att_text(ncid, hstobie_linoz, "long_name", 27, "Lowest possible Linoz level"); ERR
@@ -2442,7 +2472,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mlip", NC_FLOAT, 2, dimids, &mlip); ERR
+    err = DEF_VAR(ncid, "mlip", NC_FLOAT, 2, dimids, &mlip); ERR
     err = nc_put_att_text(ncid, mlip, "units", 4, "uM C"); ERR
     err = nc_put_att_text(ncid, mlip, "long_name", 22, "ocean input data: mlip"); ERR
     err = nc_put_att_text(ncid, mlip, "cell_methods", 10, "time: mean"); ERR
@@ -2450,7 +2480,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a1DDF", NC_FLOAT, 2, dimids, &mom_a1DDF); ERR
+    err = DEF_VAR(ncid, "mom_a1DDF", NC_FLOAT, 2, dimids, &mom_a1DDF); ERR
     err = nc_put_att_text(ncid, mom_a1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a1DDF, "long_name", 50, "mom_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2458,7 +2488,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a1SF", NC_FLOAT, 2, dimids, &mom_a1SF); ERR
+    err = DEF_VAR(ncid, "mom_a1SF", NC_FLOAT, 2, dimids, &mom_a1SF); ERR
     err = nc_put_att_text(ncid, mom_a1SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a1SF, "long_name", 31, "mom_a1 seasalt surface emission"); ERR
     err = nc_put_att_text(ncid, mom_a1SF, "cell_methods", 10, "time: mean"); ERR
@@ -2466,7 +2496,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a1SFWET", NC_FLOAT, 2, dimids, &mom_a1SFWET); ERR
+    err = DEF_VAR(ncid, "mom_a1SFWET", NC_FLOAT, 2, dimids, &mom_a1SFWET); ERR
     err = nc_put_att_text(ncid, mom_a1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2474,7 +2504,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a1_SRF", NC_FLOAT, 2, dimids, &mom_a1_SRF); ERR
+    err = DEF_VAR(ncid, "mom_a1_SRF", NC_FLOAT, 2, dimids, &mom_a1_SRF); ERR
     err = nc_put_att_text(ncid, mom_a1_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, mom_a1_SRF, "long_name", 22, "mom_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, mom_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2482,7 +2512,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a1_sfgaex1", NC_FLOAT, 2, dimids, &mom_a1_sfgaex1); ERR
+    err = DEF_VAR(ncid, "mom_a1_sfgaex1", NC_FLOAT, 2, dimids, &mom_a1_sfgaex1); ERR
     err = nc_put_att_text(ncid, mom_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a1_sfgaex1, "long_name", 51, "mom_a1 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, mom_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -2490,7 +2520,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a2DDF", NC_FLOAT, 2, dimids, &mom_a2DDF); ERR
+    err = DEF_VAR(ncid, "mom_a2DDF", NC_FLOAT, 2, dimids, &mom_a2DDF); ERR
     err = nc_put_att_text(ncid, mom_a2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a2DDF, "long_name", 50, "mom_a2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_a2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2498,7 +2528,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a2SF", NC_FLOAT, 2, dimids, &mom_a2SF); ERR
+    err = DEF_VAR(ncid, "mom_a2SF", NC_FLOAT, 2, dimids, &mom_a2SF); ERR
     err = nc_put_att_text(ncid, mom_a2SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a2SF, "long_name", 31, "mom_a2 seasalt surface emission"); ERR
     err = nc_put_att_text(ncid, mom_a2SF, "cell_methods", 10, "time: mean"); ERR
@@ -2506,7 +2536,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a2SFWET", NC_FLOAT, 2, dimids, &mom_a2SFWET); ERR
+    err = DEF_VAR(ncid, "mom_a2SFWET", NC_FLOAT, 2, dimids, &mom_a2SFWET); ERR
     err = nc_put_att_text(ncid, mom_a2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_a2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2514,7 +2544,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a2_SRF", NC_FLOAT, 2, dimids, &mom_a2_SRF); ERR
+    err = DEF_VAR(ncid, "mom_a2_SRF", NC_FLOAT, 2, dimids, &mom_a2_SRF); ERR
     err = nc_put_att_text(ncid, mom_a2_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, mom_a2_SRF, "long_name", 22, "mom_a2 in bottom layer"); ERR
     err = nc_put_att_text(ncid, mom_a2_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2522,7 +2552,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a3DDF", NC_FLOAT, 2, dimids, &mom_a3DDF); ERR
+    err = DEF_VAR(ncid, "mom_a3DDF", NC_FLOAT, 2, dimids, &mom_a3DDF); ERR
     err = nc_put_att_text(ncid, mom_a3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a3DDF, "long_name", 50, "mom_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2530,7 +2560,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a3SFWET", NC_FLOAT, 2, dimids, &mom_a3SFWET); ERR
+    err = DEF_VAR(ncid, "mom_a3SFWET", NC_FLOAT, 2, dimids, &mom_a3SFWET); ERR
     err = nc_put_att_text(ncid, mom_a3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2538,7 +2568,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a3_SRF", NC_FLOAT, 2, dimids, &mom_a3_SRF); ERR
+    err = DEF_VAR(ncid, "mom_a3_SRF", NC_FLOAT, 2, dimids, &mom_a3_SRF); ERR
     err = nc_put_att_text(ncid, mom_a3_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, mom_a3_SRF, "long_name", 22, "mom_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, mom_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2546,7 +2576,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a4DDF", NC_FLOAT, 2, dimids, &mom_a4DDF); ERR
+    err = DEF_VAR(ncid, "mom_a4DDF", NC_FLOAT, 2, dimids, &mom_a4DDF); ERR
     err = nc_put_att_text(ncid, mom_a4DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a4DDF, "long_name", 50, "mom_a4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_a4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2554,7 +2584,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a4SF", NC_FLOAT, 2, dimids, &mom_a4SF); ERR
+    err = DEF_VAR(ncid, "mom_a4SF", NC_FLOAT, 2, dimids, &mom_a4SF); ERR
     err = nc_put_att_text(ncid, mom_a4SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a4SF, "long_name", 31, "mom_a4 seasalt surface emission"); ERR
     err = nc_put_att_text(ncid, mom_a4SF, "cell_methods", 10, "time: mean"); ERR
@@ -2562,7 +2592,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a4SFWET", NC_FLOAT, 2, dimids, &mom_a4SFWET); ERR
+    err = DEF_VAR(ncid, "mom_a4SFWET", NC_FLOAT, 2, dimids, &mom_a4SFWET); ERR
     err = nc_put_att_text(ncid, mom_a4SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_a4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2570,7 +2600,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a4_SRF", NC_FLOAT, 2, dimids, &mom_a4_SRF); ERR
+    err = DEF_VAR(ncid, "mom_a4_SRF", NC_FLOAT, 2, dimids, &mom_a4_SRF); ERR
     err = nc_put_att_text(ncid, mom_a4_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, mom_a4_SRF, "long_name", 22, "mom_a4 in bottom layer"); ERR
     err = nc_put_att_text(ncid, mom_a4_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2578,7 +2608,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_a4_sfgaex1", NC_FLOAT, 2, dimids, &mom_a4_sfgaex1); ERR
+    err = DEF_VAR(ncid, "mom_a4_sfgaex1", NC_FLOAT, 2, dimids, &mom_a4_sfgaex1); ERR
     err = nc_put_att_text(ncid, mom_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_a4_sfgaex1, "long_name", 51, "mom_a4 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, mom_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -2586,7 +2616,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c1DDF", NC_FLOAT, 2, dimids, &mom_c1DDF); ERR
+    err = DEF_VAR(ncid, "mom_c1DDF", NC_FLOAT, 2, dimids, &mom_c1DDF); ERR
     err = nc_put_att_text(ncid, mom_c1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c1DDF, "long_name", 50, "mom_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2594,7 +2624,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c1SFWET", NC_FLOAT, 2, dimids, &mom_c1SFWET); ERR
+    err = DEF_VAR(ncid, "mom_c1SFWET", NC_FLOAT, 2, dimids, &mom_c1SFWET); ERR
     err = nc_put_att_text(ncid, mom_c1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c1SFWET, "long_name", 37, "mom_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2602,7 +2632,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c2DDF", NC_FLOAT, 2, dimids, &mom_c2DDF); ERR
+    err = DEF_VAR(ncid, "mom_c2DDF", NC_FLOAT, 2, dimids, &mom_c2DDF); ERR
     err = nc_put_att_text(ncid, mom_c2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c2DDF, "long_name", 50, "mom_c2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_c2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2610,7 +2640,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c2SFWET", NC_FLOAT, 2, dimids, &mom_c2SFWET); ERR
+    err = DEF_VAR(ncid, "mom_c2SFWET", NC_FLOAT, 2, dimids, &mom_c2SFWET); ERR
     err = nc_put_att_text(ncid, mom_c2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c2SFWET, "long_name", 37, "mom_c2 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_c2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2618,7 +2648,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c3DDF", NC_FLOAT, 2, dimids, &mom_c3DDF); ERR
+    err = DEF_VAR(ncid, "mom_c3DDF", NC_FLOAT, 2, dimids, &mom_c3DDF); ERR
     err = nc_put_att_text(ncid, mom_c3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c3DDF, "long_name", 50, "mom_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2626,7 +2656,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c3SFWET", NC_FLOAT, 2, dimids, &mom_c3SFWET); ERR
+    err = DEF_VAR(ncid, "mom_c3SFWET", NC_FLOAT, 2, dimids, &mom_c3SFWET); ERR
     err = nc_put_att_text(ncid, mom_c3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c3SFWET, "long_name", 37, "mom_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2634,7 +2664,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c4DDF", NC_FLOAT, 2, dimids, &mom_c4DDF); ERR
+    err = DEF_VAR(ncid, "mom_c4DDF", NC_FLOAT, 2, dimids, &mom_c4DDF); ERR
     err = nc_put_att_text(ncid, mom_c4DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c4DDF, "long_name", 50, "mom_c4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, mom_c4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2642,7 +2672,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mom_c4SFWET", NC_FLOAT, 2, dimids, &mom_c4SFWET); ERR
+    err = DEF_VAR(ncid, "mom_c4SFWET", NC_FLOAT, 2, dimids, &mom_c4SFWET); ERR
     err = nc_put_att_text(ncid, mom_c4SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, mom_c4SFWET, "long_name", 37, "mom_c4 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, mom_c4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2650,7 +2680,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mpoly", NC_FLOAT, 2, dimids, &mpoly); ERR
+    err = DEF_VAR(ncid, "mpoly", NC_FLOAT, 2, dimids, &mpoly); ERR
     err = nc_put_att_text(ncid, mpoly, "units", 4, "uM C"); ERR
     err = nc_put_att_text(ncid, mpoly, "long_name", 23, "ocean input data: mpoly"); ERR
     err = nc_put_att_text(ncid, mpoly, "cell_methods", 10, "time: mean"); ERR
@@ -2658,7 +2688,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "mprot", NC_FLOAT, 2, dimids, &mprot); ERR
+    err = DEF_VAR(ncid, "mprot", NC_FLOAT, 2, dimids, &mprot); ERR
     err = nc_put_att_text(ncid, mprot, "units", 4, "uM C"); ERR
     err = nc_put_att_text(ncid, mprot, "long_name", 23, "ocean input data: mprot"); ERR
     err = nc_put_att_text(ncid, mprot, "cell_methods", 10, "time: mean"); ERR
@@ -2666,7 +2696,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a1DDF", NC_FLOAT, 2, dimids, &ncl_a1DDF); ERR
+    err = DEF_VAR(ncid, "ncl_a1DDF", NC_FLOAT, 2, dimids, &ncl_a1DDF); ERR
     err = nc_put_att_text(ncid, ncl_a1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a1DDF, "long_name", 50, "ncl_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, ncl_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2674,7 +2704,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a1SF", NC_FLOAT, 2, dimids, &ncl_a1SF); ERR
+    err = DEF_VAR(ncid, "ncl_a1SF", NC_FLOAT, 2, dimids, &ncl_a1SF); ERR
     err = nc_put_att_text(ncid, ncl_a1SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a1SF, "long_name", 31, "ncl_a1 seasalt surface emission"); ERR
     err = nc_put_att_text(ncid, ncl_a1SF, "cell_methods", 10, "time: mean"); ERR
@@ -2682,7 +2712,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a1SFWET", NC_FLOAT, 2, dimids, &ncl_a1SFWET); ERR
+    err = DEF_VAR(ncid, "ncl_a1SFWET", NC_FLOAT, 2, dimids, &ncl_a1SFWET); ERR
     err = nc_put_att_text(ncid, ncl_a1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, ncl_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2690,7 +2720,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a1_SRF", NC_FLOAT, 2, dimids, &ncl_a1_SRF); ERR
+    err = DEF_VAR(ncid, "ncl_a1_SRF", NC_FLOAT, 2, dimids, &ncl_a1_SRF); ERR
     err = nc_put_att_text(ncid, ncl_a1_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, ncl_a1_SRF, "long_name", 22, "ncl_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, ncl_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2698,7 +2728,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a2DDF", NC_FLOAT, 2, dimids, &ncl_a2DDF); ERR
+    err = DEF_VAR(ncid, "ncl_a2DDF", NC_FLOAT, 2, dimids, &ncl_a2DDF); ERR
     err = nc_put_att_text(ncid, ncl_a2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a2DDF, "long_name", 50, "ncl_a2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, ncl_a2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2706,7 +2736,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a2SF", NC_FLOAT, 2, dimids, &ncl_a2SF); ERR
+    err = DEF_VAR(ncid, "ncl_a2SF", NC_FLOAT, 2, dimids, &ncl_a2SF); ERR
     err = nc_put_att_text(ncid, ncl_a2SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a2SF, "long_name", 31, "ncl_a2 seasalt surface emission"); ERR
     err = nc_put_att_text(ncid, ncl_a2SF, "cell_methods", 10, "time: mean"); ERR
@@ -2714,7 +2744,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a2SFWET", NC_FLOAT, 2, dimids, &ncl_a2SFWET); ERR
+    err = DEF_VAR(ncid, "ncl_a2SFWET", NC_FLOAT, 2, dimids, &ncl_a2SFWET); ERR
     err = nc_put_att_text(ncid, ncl_a2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, ncl_a2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2722,7 +2752,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a2_SRF", NC_FLOAT, 2, dimids, &ncl_a2_SRF); ERR
+    err = DEF_VAR(ncid, "ncl_a2_SRF", NC_FLOAT, 2, dimids, &ncl_a2_SRF); ERR
     err = nc_put_att_text(ncid, ncl_a2_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, ncl_a2_SRF, "long_name", 22, "ncl_a2 in bottom layer"); ERR
     err = nc_put_att_text(ncid, ncl_a2_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2730,7 +2760,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a3DDF", NC_FLOAT, 2, dimids, &ncl_a3DDF); ERR
+    err = DEF_VAR(ncid, "ncl_a3DDF", NC_FLOAT, 2, dimids, &ncl_a3DDF); ERR
     err = nc_put_att_text(ncid, ncl_a3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a3DDF, "long_name", 50, "ncl_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, ncl_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2738,7 +2768,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a3SF", NC_FLOAT, 2, dimids, &ncl_a3SF); ERR
+    err = DEF_VAR(ncid, "ncl_a3SF", NC_FLOAT, 2, dimids, &ncl_a3SF); ERR
     err = nc_put_att_text(ncid, ncl_a3SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a3SF, "long_name", 31, "ncl_a3 seasalt surface emission"); ERR
     err = nc_put_att_text(ncid, ncl_a3SF, "cell_methods", 10, "time: mean"); ERR
@@ -2746,7 +2776,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a3SFWET", NC_FLOAT, 2, dimids, &ncl_a3SFWET); ERR
+    err = DEF_VAR(ncid, "ncl_a3SFWET", NC_FLOAT, 2, dimids, &ncl_a3SFWET); ERR
     err = nc_put_att_text(ncid, ncl_a3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, ncl_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2754,7 +2784,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_a3_SRF", NC_FLOAT, 2, dimids, &ncl_a3_SRF); ERR
+    err = DEF_VAR(ncid, "ncl_a3_SRF", NC_FLOAT, 2, dimids, &ncl_a3_SRF); ERR
     err = nc_put_att_text(ncid, ncl_a3_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, ncl_a3_SRF, "long_name", 22, "ncl_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, ncl_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2762,7 +2792,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_c1DDF", NC_FLOAT, 2, dimids, &ncl_c1DDF); ERR
+    err = DEF_VAR(ncid, "ncl_c1DDF", NC_FLOAT, 2, dimids, &ncl_c1DDF); ERR
     err = nc_put_att_text(ncid, ncl_c1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_c1DDF, "long_name", 50, "ncl_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, ncl_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2770,7 +2800,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_c1SFWET", NC_FLOAT, 2, dimids, &ncl_c1SFWET); ERR
+    err = DEF_VAR(ncid, "ncl_c1SFWET", NC_FLOAT, 2, dimids, &ncl_c1SFWET); ERR
     err = nc_put_att_text(ncid, ncl_c1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_c1SFWET, "long_name", 37, "ncl_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, ncl_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2778,7 +2808,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_c2DDF", NC_FLOAT, 2, dimids, &ncl_c2DDF); ERR
+    err = DEF_VAR(ncid, "ncl_c2DDF", NC_FLOAT, 2, dimids, &ncl_c2DDF); ERR
     err = nc_put_att_text(ncid, ncl_c2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_c2DDF, "long_name", 50, "ncl_c2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, ncl_c2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2786,7 +2816,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_c2SFWET", NC_FLOAT, 2, dimids, &ncl_c2SFWET); ERR
+    err = DEF_VAR(ncid, "ncl_c2SFWET", NC_FLOAT, 2, dimids, &ncl_c2SFWET); ERR
     err = nc_put_att_text(ncid, ncl_c2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_c2SFWET, "long_name", 37, "ncl_c2 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, ncl_c2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2794,7 +2824,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_c3DDF", NC_FLOAT, 2, dimids, &ncl_c3DDF); ERR
+    err = DEF_VAR(ncid, "ncl_c3DDF", NC_FLOAT, 2, dimids, &ncl_c3DDF); ERR
     err = nc_put_att_text(ncid, ncl_c3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_c3DDF, "long_name", 50, "ncl_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, ncl_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2802,7 +2832,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "ncl_c3SFWET", NC_FLOAT, 2, dimids, &ncl_c3SFWET); ERR
+    err = DEF_VAR(ncid, "ncl_c3SFWET", NC_FLOAT, 2, dimids, &ncl_c3SFWET); ERR
     err = nc_put_att_text(ncid, ncl_c3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, ncl_c3SFWET, "long_name", 37, "ncl_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, ncl_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2810,7 +2840,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a1DDF", NC_FLOAT, 2, dimids, &num_a1DDF); ERR
+    err = DEF_VAR(ncid, "num_a1DDF", NC_FLOAT, 2, dimids, &num_a1DDF); ERR
     err = nc_put_att_text(ncid, num_a1DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a1DDF, "long_name", 50, "num_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2818,7 +2848,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a1SF", NC_FLOAT, 2, dimids, &num_a1SF); ERR
+    err = DEF_VAR(ncid, "num_a1SF", NC_FLOAT, 2, dimids, &num_a1SF); ERR
     err = nc_put_att_text(ncid, num_a1SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a1SF, "long_name", 28, "num_a1 dust surface emission"); ERR
     err = nc_put_att_text(ncid, num_a1SF, "cell_methods", 10, "time: mean"); ERR
@@ -2826,7 +2856,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a1SFWET", NC_FLOAT, 2, dimids, &num_a1SFWET); ERR
+    err = DEF_VAR(ncid, "num_a1SFWET", NC_FLOAT, 2, dimids, &num_a1SFWET); ERR
     err = nc_put_att_text(ncid, num_a1SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2834,7 +2864,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a1_CLXF", NC_FLOAT, 2, dimids, &num_a1_CLXF); ERR
+    err = DEF_VAR(ncid, "num_a1_CLXF", NC_FLOAT, 2, dimids, &num_a1_CLXF); ERR
     err = nc_put_att_text(ncid, num_a1_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, num_a1_CLXF, "long_name", 50, "vertically intergrated external forcing for num_a1"); ERR
     err = nc_put_att_text(ncid, num_a1_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -2842,7 +2872,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a1_SRF", NC_FLOAT, 2, dimids, &num_a1_SRF); ERR
+    err = DEF_VAR(ncid, "num_a1_SRF", NC_FLOAT, 2, dimids, &num_a1_SRF); ERR
     err = nc_put_att_text(ncid, num_a1_SRF, "units", 5, " 1/kg"); ERR
     err = nc_put_att_text(ncid, num_a1_SRF, "long_name", 22, "num_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, num_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2850,7 +2880,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a1_sfgaex1", NC_FLOAT, 2, dimids, &num_a1_sfgaex1); ERR
+    err = DEF_VAR(ncid, "num_a1_sfgaex1", NC_FLOAT, 2, dimids, &num_a1_sfgaex1); ERR
     err = nc_put_att_text(ncid, num_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a1_sfgaex1, "long_name", 51, "num_a1 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, num_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -2858,7 +2888,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a2DDF", NC_FLOAT, 2, dimids, &num_a2DDF); ERR
+    err = DEF_VAR(ncid, "num_a2DDF", NC_FLOAT, 2, dimids, &num_a2DDF); ERR
     err = nc_put_att_text(ncid, num_a2DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a2DDF, "long_name", 50, "num_a2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_a2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2866,7 +2896,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a2SFWET", NC_FLOAT, 2, dimids, &num_a2SFWET); ERR
+    err = DEF_VAR(ncid, "num_a2SFWET", NC_FLOAT, 2, dimids, &num_a2SFWET); ERR
     err = nc_put_att_text(ncid, num_a2SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_a2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2874,7 +2904,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a2_CLXF", NC_FLOAT, 2, dimids, &num_a2_CLXF); ERR
+    err = DEF_VAR(ncid, "num_a2_CLXF", NC_FLOAT, 2, dimids, &num_a2_CLXF); ERR
     err = nc_put_att_text(ncid, num_a2_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, num_a2_CLXF, "long_name", 50, "vertically intergrated external forcing for num_a2"); ERR
     err = nc_put_att_text(ncid, num_a2_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -2882,7 +2912,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a2_SRF", NC_FLOAT, 2, dimids, &num_a2_SRF); ERR
+    err = DEF_VAR(ncid, "num_a2_SRF", NC_FLOAT, 2, dimids, &num_a2_SRF); ERR
     err = nc_put_att_text(ncid, num_a2_SRF, "units", 5, " 1/kg"); ERR
     err = nc_put_att_text(ncid, num_a2_SRF, "long_name", 22, "num_a2 in bottom layer"); ERR
     err = nc_put_att_text(ncid, num_a2_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2890,7 +2920,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a3DDF", NC_FLOAT, 2, dimids, &num_a3DDF); ERR
+    err = DEF_VAR(ncid, "num_a3DDF", NC_FLOAT, 2, dimids, &num_a3DDF); ERR
     err = nc_put_att_text(ncid, num_a3DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a3DDF, "long_name", 50, "num_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2898,7 +2928,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a3SF", NC_FLOAT, 2, dimids, &num_a3SF); ERR
+    err = DEF_VAR(ncid, "num_a3SF", NC_FLOAT, 2, dimids, &num_a3SF); ERR
     err = nc_put_att_text(ncid, num_a3SF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a3SF, "long_name", 28, "num_a3 dust surface emission"); ERR
     err = nc_put_att_text(ncid, num_a3SF, "cell_methods", 10, "time: mean"); ERR
@@ -2906,7 +2936,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a3SFWET", NC_FLOAT, 2, dimids, &num_a3SFWET); ERR
+    err = DEF_VAR(ncid, "num_a3SFWET", NC_FLOAT, 2, dimids, &num_a3SFWET); ERR
     err = nc_put_att_text(ncid, num_a3SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2914,7 +2944,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a3_SRF", NC_FLOAT, 2, dimids, &num_a3_SRF); ERR
+    err = DEF_VAR(ncid, "num_a3_SRF", NC_FLOAT, 2, dimids, &num_a3_SRF); ERR
     err = nc_put_att_text(ncid, num_a3_SRF, "units", 5, " 1/kg"); ERR
     err = nc_put_att_text(ncid, num_a3_SRF, "long_name", 22, "num_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, num_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2922,7 +2952,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a4DDF", NC_FLOAT, 2, dimids, &num_a4DDF); ERR
+    err = DEF_VAR(ncid, "num_a4DDF", NC_FLOAT, 2, dimids, &num_a4DDF); ERR
     err = nc_put_att_text(ncid, num_a4DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a4DDF, "long_name", 50, "num_a4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_a4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2930,7 +2960,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a4SFWET", NC_FLOAT, 2, dimids, &num_a4SFWET); ERR
+    err = DEF_VAR(ncid, "num_a4SFWET", NC_FLOAT, 2, dimids, &num_a4SFWET); ERR
     err = nc_put_att_text(ncid, num_a4SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_a4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2938,7 +2968,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a4_CLXF", NC_FLOAT, 2, dimids, &num_a4_CLXF); ERR
+    err = DEF_VAR(ncid, "num_a4_CLXF", NC_FLOAT, 2, dimids, &num_a4_CLXF); ERR
     err = nc_put_att_text(ncid, num_a4_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, num_a4_CLXF, "long_name", 50, "vertically intergrated external forcing for num_a4"); ERR
     err = nc_put_att_text(ncid, num_a4_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -2946,7 +2976,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a4_SRF", NC_FLOAT, 2, dimids, &num_a4_SRF); ERR
+    err = DEF_VAR(ncid, "num_a4_SRF", NC_FLOAT, 2, dimids, &num_a4_SRF); ERR
     err = nc_put_att_text(ncid, num_a4_SRF, "units", 5, " 1/kg"); ERR
     err = nc_put_att_text(ncid, num_a4_SRF, "long_name", 22, "num_a4 in bottom layer"); ERR
     err = nc_put_att_text(ncid, num_a4_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -2954,7 +2984,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_a4_sfgaex1", NC_FLOAT, 2, dimids, &num_a4_sfgaex1); ERR
+    err = DEF_VAR(ncid, "num_a4_sfgaex1", NC_FLOAT, 2, dimids, &num_a4_sfgaex1); ERR
     err = nc_put_att_text(ncid, num_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, num_a4_sfgaex1, "long_name", 51, "num_a4 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, num_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -2962,7 +2992,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c1DDF", NC_FLOAT, 2, dimids, &num_c1DDF); ERR
+    err = DEF_VAR(ncid, "num_c1DDF", NC_FLOAT, 2, dimids, &num_c1DDF); ERR
     err = nc_put_att_text(ncid, num_c1DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c1DDF, "long_name", 50, "num_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2970,7 +3000,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c1SFWET", NC_FLOAT, 2, dimids, &num_c1SFWET); ERR
+    err = DEF_VAR(ncid, "num_c1SFWET", NC_FLOAT, 2, dimids, &num_c1SFWET); ERR
     err = nc_put_att_text(ncid, num_c1SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c1SFWET, "long_name", 37, "num_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2978,7 +3008,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c2DDF", NC_FLOAT, 2, dimids, &num_c2DDF); ERR
+    err = DEF_VAR(ncid, "num_c2DDF", NC_FLOAT, 2, dimids, &num_c2DDF); ERR
     err = nc_put_att_text(ncid, num_c2DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c2DDF, "long_name", 50, "num_c2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_c2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -2986,7 +3016,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c2SFWET", NC_FLOAT, 2, dimids, &num_c2SFWET); ERR
+    err = DEF_VAR(ncid, "num_c2SFWET", NC_FLOAT, 2, dimids, &num_c2SFWET); ERR
     err = nc_put_att_text(ncid, num_c2SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c2SFWET, "long_name", 37, "num_c2 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_c2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -2994,7 +3024,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c3DDF", NC_FLOAT, 2, dimids, &num_c3DDF); ERR
+    err = DEF_VAR(ncid, "num_c3DDF", NC_FLOAT, 2, dimids, &num_c3DDF); ERR
     err = nc_put_att_text(ncid, num_c3DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c3DDF, "long_name", 50, "num_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3002,7 +3032,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c3SFWET", NC_FLOAT, 2, dimids, &num_c3SFWET); ERR
+    err = DEF_VAR(ncid, "num_c3SFWET", NC_FLOAT, 2, dimids, &num_c3SFWET); ERR
     err = nc_put_att_text(ncid, num_c3SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c3SFWET, "long_name", 37, "num_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3010,7 +3040,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c4DDF", NC_FLOAT, 2, dimids, &num_c4DDF); ERR
+    err = DEF_VAR(ncid, "num_c4DDF", NC_FLOAT, 2, dimids, &num_c4DDF); ERR
     err = nc_put_att_text(ncid, num_c4DDF, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c4DDF, "long_name", 50, "num_c4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, num_c4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3018,7 +3048,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "num_c4SFWET", NC_FLOAT, 2, dimids, &num_c4SFWET); ERR
+    err = DEF_VAR(ncid, "num_c4SFWET", NC_FLOAT, 2, dimids, &num_c4SFWET); ERR
     err = nc_put_att_text(ncid, num_c4SFWET, "units", 7, " 1/m2/s"); ERR
     err = nc_put_att_text(ncid, num_c4SFWET, "long_name", 37, "num_c4 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, num_c4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3026,7 +3056,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a1DDF", NC_FLOAT, 2, dimids, &pom_a1DDF); ERR
+    err = DEF_VAR(ncid, "pom_a1DDF", NC_FLOAT, 2, dimids, &pom_a1DDF); ERR
     err = nc_put_att_text(ncid, pom_a1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a1DDF, "long_name", 50, "pom_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, pom_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3034,7 +3064,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a1SFWET", NC_FLOAT, 2, dimids, &pom_a1SFWET); ERR
+    err = DEF_VAR(ncid, "pom_a1SFWET", NC_FLOAT, 2, dimids, &pom_a1SFWET); ERR
     err = nc_put_att_text(ncid, pom_a1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, pom_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3042,7 +3072,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a1_SRF", NC_FLOAT, 2, dimids, &pom_a1_SRF); ERR
+    err = DEF_VAR(ncid, "pom_a1_SRF", NC_FLOAT, 2, dimids, &pom_a1_SRF); ERR
     err = nc_put_att_text(ncid, pom_a1_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, pom_a1_SRF, "long_name", 22, "pom_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, pom_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3050,7 +3080,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a1_sfgaex1", NC_FLOAT, 2, dimids, &pom_a1_sfgaex1); ERR
+    err = DEF_VAR(ncid, "pom_a1_sfgaex1", NC_FLOAT, 2, dimids, &pom_a1_sfgaex1); ERR
     err = nc_put_att_text(ncid, pom_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a1_sfgaex1, "long_name", 51, "pom_a1 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, pom_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3058,7 +3088,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a3DDF", NC_FLOAT, 2, dimids, &pom_a3DDF); ERR
+    err = DEF_VAR(ncid, "pom_a3DDF", NC_FLOAT, 2, dimids, &pom_a3DDF); ERR
     err = nc_put_att_text(ncid, pom_a3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a3DDF, "long_name", 50, "pom_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, pom_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3066,7 +3096,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a3SFWET", NC_FLOAT, 2, dimids, &pom_a3SFWET); ERR
+    err = DEF_VAR(ncid, "pom_a3SFWET", NC_FLOAT, 2, dimids, &pom_a3SFWET); ERR
     err = nc_put_att_text(ncid, pom_a3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, pom_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3074,7 +3104,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a3_SRF", NC_FLOAT, 2, dimids, &pom_a3_SRF); ERR
+    err = DEF_VAR(ncid, "pom_a3_SRF", NC_FLOAT, 2, dimids, &pom_a3_SRF); ERR
     err = nc_put_att_text(ncid, pom_a3_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, pom_a3_SRF, "long_name", 22, "pom_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, pom_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3082,7 +3112,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a4DDF", NC_FLOAT, 2, dimids, &pom_a4DDF); ERR
+    err = DEF_VAR(ncid, "pom_a4DDF", NC_FLOAT, 2, dimids, &pom_a4DDF); ERR
     err = nc_put_att_text(ncid, pom_a4DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a4DDF, "long_name", 50, "pom_a4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, pom_a4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3090,7 +3120,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a4SFWET", NC_FLOAT, 2, dimids, &pom_a4SFWET); ERR
+    err = DEF_VAR(ncid, "pom_a4SFWET", NC_FLOAT, 2, dimids, &pom_a4SFWET); ERR
     err = nc_put_att_text(ncid, pom_a4SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, pom_a4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3098,7 +3128,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a4_CLXF", NC_FLOAT, 2, dimids, &pom_a4_CLXF); ERR
+    err = DEF_VAR(ncid, "pom_a4_CLXF", NC_FLOAT, 2, dimids, &pom_a4_CLXF); ERR
     err = nc_put_att_text(ncid, pom_a4_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, pom_a4_CLXF, "long_name", 50, "vertically intergrated external forcing for pom_a4"); ERR
     err = nc_put_att_text(ncid, pom_a4_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -3106,7 +3136,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a4_SRF", NC_FLOAT, 2, dimids, &pom_a4_SRF); ERR
+    err = DEF_VAR(ncid, "pom_a4_SRF", NC_FLOAT, 2, dimids, &pom_a4_SRF); ERR
     err = nc_put_att_text(ncid, pom_a4_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, pom_a4_SRF, "long_name", 22, "pom_a4 in bottom layer"); ERR
     err = nc_put_att_text(ncid, pom_a4_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3114,7 +3144,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_a4_sfgaex1", NC_FLOAT, 2, dimids, &pom_a4_sfgaex1); ERR
+    err = DEF_VAR(ncid, "pom_a4_sfgaex1", NC_FLOAT, 2, dimids, &pom_a4_sfgaex1); ERR
     err = nc_put_att_text(ncid, pom_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_a4_sfgaex1, "long_name", 51, "pom_a4 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, pom_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3122,7 +3152,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_c1DDF", NC_FLOAT, 2, dimids, &pom_c1DDF); ERR
+    err = DEF_VAR(ncid, "pom_c1DDF", NC_FLOAT, 2, dimids, &pom_c1DDF); ERR
     err = nc_put_att_text(ncid, pom_c1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_c1DDF, "long_name", 50, "pom_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, pom_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3130,7 +3160,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_c1SFWET", NC_FLOAT, 2, dimids, &pom_c1SFWET); ERR
+    err = DEF_VAR(ncid, "pom_c1SFWET", NC_FLOAT, 2, dimids, &pom_c1SFWET); ERR
     err = nc_put_att_text(ncid, pom_c1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_c1SFWET, "long_name", 37, "pom_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, pom_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3138,7 +3168,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_c3DDF", NC_FLOAT, 2, dimids, &pom_c3DDF); ERR
+    err = DEF_VAR(ncid, "pom_c3DDF", NC_FLOAT, 2, dimids, &pom_c3DDF); ERR
     err = nc_put_att_text(ncid, pom_c3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_c3DDF, "long_name", 50, "pom_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, pom_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3146,7 +3176,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_c3SFWET", NC_FLOAT, 2, dimids, &pom_c3SFWET); ERR
+    err = DEF_VAR(ncid, "pom_c3SFWET", NC_FLOAT, 2, dimids, &pom_c3SFWET); ERR
     err = nc_put_att_text(ncid, pom_c3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_c3SFWET, "long_name", 37, "pom_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, pom_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3154,7 +3184,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_c4DDF", NC_FLOAT, 2, dimids, &pom_c4DDF); ERR
+    err = DEF_VAR(ncid, "pom_c4DDF", NC_FLOAT, 2, dimids, &pom_c4DDF); ERR
     err = nc_put_att_text(ncid, pom_c4DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_c4DDF, "long_name", 50, "pom_c4 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, pom_c4DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3162,7 +3192,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "pom_c4SFWET", NC_FLOAT, 2, dimids, &pom_c4SFWET); ERR
+    err = DEF_VAR(ncid, "pom_c4SFWET", NC_FLOAT, 2, dimids, &pom_c4SFWET); ERR
     err = nc_put_att_text(ncid, pom_c4SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, pom_c4SFWET, "long_name", 37, "pom_c4 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, pom_c4SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3170,7 +3200,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a1DDF", NC_FLOAT, 2, dimids, &so4_a1DDF); ERR
+    err = DEF_VAR(ncid, "so4_a1DDF", NC_FLOAT, 2, dimids, &so4_a1DDF); ERR
     err = nc_put_att_text(ncid, so4_a1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a1DDF, "long_name", 50, "so4_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, so4_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3178,7 +3208,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a1SFWET", NC_FLOAT, 2, dimids, &so4_a1SFWET); ERR
+    err = DEF_VAR(ncid, "so4_a1SFWET", NC_FLOAT, 2, dimids, &so4_a1SFWET); ERR
     err = nc_put_att_text(ncid, so4_a1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, so4_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3186,7 +3216,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a1_CLXF", NC_FLOAT, 2, dimids, &so4_a1_CLXF); ERR
+    err = DEF_VAR(ncid, "so4_a1_CLXF", NC_FLOAT, 2, dimids, &so4_a1_CLXF); ERR
     err = nc_put_att_text(ncid, so4_a1_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, so4_a1_CLXF, "long_name", 50, "vertically intergrated external forcing for so4_a1"); ERR
     err = nc_put_att_text(ncid, so4_a1_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -3194,7 +3224,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a1_SRF", NC_FLOAT, 2, dimids, &so4_a1_SRF); ERR
+    err = DEF_VAR(ncid, "so4_a1_SRF", NC_FLOAT, 2, dimids, &so4_a1_SRF); ERR
     err = nc_put_att_text(ncid, so4_a1_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, so4_a1_SRF, "long_name", 22, "so4_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, so4_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3202,7 +3232,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a1_sfgaex1", NC_FLOAT, 2, dimids, &so4_a1_sfgaex1); ERR
+    err = DEF_VAR(ncid, "so4_a1_sfgaex1", NC_FLOAT, 2, dimids, &so4_a1_sfgaex1); ERR
     err = nc_put_att_text(ncid, so4_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a1_sfgaex1, "long_name", 51, "so4_a1 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, so4_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3210,7 +3240,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a2DDF", NC_FLOAT, 2, dimids, &so4_a2DDF); ERR
+    err = DEF_VAR(ncid, "so4_a2DDF", NC_FLOAT, 2, dimids, &so4_a2DDF); ERR
     err = nc_put_att_text(ncid, so4_a2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a2DDF, "long_name", 50, "so4_a2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, so4_a2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3218,7 +3248,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a2SFWET", NC_FLOAT, 2, dimids, &so4_a2SFWET); ERR
+    err = DEF_VAR(ncid, "so4_a2SFWET", NC_FLOAT, 2, dimids, &so4_a2SFWET); ERR
     err = nc_put_att_text(ncid, so4_a2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, so4_a2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3226,7 +3256,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a2_CLXF", NC_FLOAT, 2, dimids, &so4_a2_CLXF); ERR
+    err = DEF_VAR(ncid, "so4_a2_CLXF", NC_FLOAT, 2, dimids, &so4_a2_CLXF); ERR
     err = nc_put_att_text(ncid, so4_a2_CLXF, "units", 11, "molec/cm2/s"); ERR
     err = nc_put_att_text(ncid, so4_a2_CLXF, "long_name", 50, "vertically intergrated external forcing for so4_a2"); ERR
     err = nc_put_att_text(ncid, so4_a2_CLXF, "cell_methods", 10, "time: mean"); ERR
@@ -3234,7 +3264,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a2_SRF", NC_FLOAT, 2, dimids, &so4_a2_SRF); ERR
+    err = DEF_VAR(ncid, "so4_a2_SRF", NC_FLOAT, 2, dimids, &so4_a2_SRF); ERR
     err = nc_put_att_text(ncid, so4_a2_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, so4_a2_SRF, "long_name", 22, "so4_a2 in bottom layer"); ERR
     err = nc_put_att_text(ncid, so4_a2_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3242,7 +3272,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a2_sfgaex1", NC_FLOAT, 2, dimids, &so4_a2_sfgaex1); ERR
+    err = DEF_VAR(ncid, "so4_a2_sfgaex1", NC_FLOAT, 2, dimids, &so4_a2_sfgaex1); ERR
     err = nc_put_att_text(ncid, so4_a2_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a2_sfgaex1, "long_name", 51, "so4_a2 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, so4_a2_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3250,7 +3280,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a3DDF", NC_FLOAT, 2, dimids, &so4_a3DDF); ERR
+    err = DEF_VAR(ncid, "so4_a3DDF", NC_FLOAT, 2, dimids, &so4_a3DDF); ERR
     err = nc_put_att_text(ncid, so4_a3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a3DDF, "long_name", 50, "so4_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, so4_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3258,7 +3288,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a3SFWET", NC_FLOAT, 2, dimids, &so4_a3SFWET); ERR
+    err = DEF_VAR(ncid, "so4_a3SFWET", NC_FLOAT, 2, dimids, &so4_a3SFWET); ERR
     err = nc_put_att_text(ncid, so4_a3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, so4_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3266,7 +3296,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a3_SRF", NC_FLOAT, 2, dimids, &so4_a3_SRF); ERR
+    err = DEF_VAR(ncid, "so4_a3_SRF", NC_FLOAT, 2, dimids, &so4_a3_SRF); ERR
     err = nc_put_att_text(ncid, so4_a3_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, so4_a3_SRF, "long_name", 22, "so4_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, so4_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3274,7 +3304,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_a3_sfgaex1", NC_FLOAT, 2, dimids, &so4_a3_sfgaex1); ERR
+    err = DEF_VAR(ncid, "so4_a3_sfgaex1", NC_FLOAT, 2, dimids, &so4_a3_sfgaex1); ERR
     err = nc_put_att_text(ncid, so4_a3_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_a3_sfgaex1, "long_name", 51, "so4_a3 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, so4_a3_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3282,7 +3312,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_c1DDF", NC_FLOAT, 2, dimids, &so4_c1DDF); ERR
+    err = DEF_VAR(ncid, "so4_c1DDF", NC_FLOAT, 2, dimids, &so4_c1DDF); ERR
     err = nc_put_att_text(ncid, so4_c1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_c1DDF, "long_name", 50, "so4_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, so4_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3290,7 +3320,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_c1SFWET", NC_FLOAT, 2, dimids, &so4_c1SFWET); ERR
+    err = DEF_VAR(ncid, "so4_c1SFWET", NC_FLOAT, 2, dimids, &so4_c1SFWET); ERR
     err = nc_put_att_text(ncid, so4_c1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_c1SFWET, "long_name", 37, "so4_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, so4_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3298,7 +3328,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_c2DDF", NC_FLOAT, 2, dimids, &so4_c2DDF); ERR
+    err = DEF_VAR(ncid, "so4_c2DDF", NC_FLOAT, 2, dimids, &so4_c2DDF); ERR
     err = nc_put_att_text(ncid, so4_c2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_c2DDF, "long_name", 50, "so4_c2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, so4_c2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3306,7 +3336,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_c2SFWET", NC_FLOAT, 2, dimids, &so4_c2SFWET); ERR
+    err = DEF_VAR(ncid, "so4_c2SFWET", NC_FLOAT, 2, dimids, &so4_c2SFWET); ERR
     err = nc_put_att_text(ncid, so4_c2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_c2SFWET, "long_name", 37, "so4_c2 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, so4_c2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3314,7 +3344,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_c3DDF", NC_FLOAT, 2, dimids, &so4_c3DDF); ERR
+    err = DEF_VAR(ncid, "so4_c3DDF", NC_FLOAT, 2, dimids, &so4_c3DDF); ERR
     err = nc_put_att_text(ncid, so4_c3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_c3DDF, "long_name", 50, "so4_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, so4_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3322,7 +3352,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "so4_c3SFWET", NC_FLOAT, 2, dimids, &so4_c3SFWET); ERR
+    err = DEF_VAR(ncid, "so4_c3SFWET", NC_FLOAT, 2, dimids, &so4_c3SFWET); ERR
     err = nc_put_att_text(ncid, so4_c3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, so4_c3SFWET, "long_name", 37, "so4_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, so4_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3330,7 +3360,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a1DDF", NC_FLOAT, 2, dimids, &soa_a1DDF); ERR
+    err = DEF_VAR(ncid, "soa_a1DDF", NC_FLOAT, 2, dimids, &soa_a1DDF); ERR
     err = nc_put_att_text(ncid, soa_a1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a1DDF, "long_name", 50, "soa_a1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, soa_a1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3338,7 +3368,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a1SFWET", NC_FLOAT, 2, dimids, &soa_a1SFWET); ERR
+    err = DEF_VAR(ncid, "soa_a1SFWET", NC_FLOAT, 2, dimids, &soa_a1SFWET); ERR
     err = nc_put_att_text(ncid, soa_a1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, soa_a1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3346,7 +3376,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a1_SRF", NC_FLOAT, 2, dimids, &soa_a1_SRF); ERR
+    err = DEF_VAR(ncid, "soa_a1_SRF", NC_FLOAT, 2, dimids, &soa_a1_SRF); ERR
     err = nc_put_att_text(ncid, soa_a1_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, soa_a1_SRF, "long_name", 22, "soa_a1 in bottom layer"); ERR
     err = nc_put_att_text(ncid, soa_a1_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3354,7 +3384,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a1_sfgaex1", NC_FLOAT, 2, dimids, &soa_a1_sfgaex1); ERR
+    err = DEF_VAR(ncid, "soa_a1_sfgaex1", NC_FLOAT, 2, dimids, &soa_a1_sfgaex1); ERR
     err = nc_put_att_text(ncid, soa_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a1_sfgaex1, "long_name", 51, "soa_a1 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, soa_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3362,7 +3392,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a2DDF", NC_FLOAT, 2, dimids, &soa_a2DDF); ERR
+    err = DEF_VAR(ncid, "soa_a2DDF", NC_FLOAT, 2, dimids, &soa_a2DDF); ERR
     err = nc_put_att_text(ncid, soa_a2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a2DDF, "long_name", 50, "soa_a2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, soa_a2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3370,7 +3400,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a2SFWET", NC_FLOAT, 2, dimids, &soa_a2SFWET); ERR
+    err = DEF_VAR(ncid, "soa_a2SFWET", NC_FLOAT, 2, dimids, &soa_a2SFWET); ERR
     err = nc_put_att_text(ncid, soa_a2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, soa_a2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3378,7 +3408,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a2_SRF", NC_FLOAT, 2, dimids, &soa_a2_SRF); ERR
+    err = DEF_VAR(ncid, "soa_a2_SRF", NC_FLOAT, 2, dimids, &soa_a2_SRF); ERR
     err = nc_put_att_text(ncid, soa_a2_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, soa_a2_SRF, "long_name", 22, "soa_a2 in bottom layer"); ERR
     err = nc_put_att_text(ncid, soa_a2_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3386,7 +3416,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a2_sfgaex1", NC_FLOAT, 2, dimids, &soa_a2_sfgaex1); ERR
+    err = DEF_VAR(ncid, "soa_a2_sfgaex1", NC_FLOAT, 2, dimids, &soa_a2_sfgaex1); ERR
     err = nc_put_att_text(ncid, soa_a2_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a2_sfgaex1, "long_name", 51, "soa_a2 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, soa_a2_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3394,7 +3424,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a3DDF", NC_FLOAT, 2, dimids, &soa_a3DDF); ERR
+    err = DEF_VAR(ncid, "soa_a3DDF", NC_FLOAT, 2, dimids, &soa_a3DDF); ERR
     err = nc_put_att_text(ncid, soa_a3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a3DDF, "long_name", 50, "soa_a3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, soa_a3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3402,7 +3432,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a3SFWET", NC_FLOAT, 2, dimids, &soa_a3SFWET); ERR
+    err = DEF_VAR(ncid, "soa_a3SFWET", NC_FLOAT, 2, dimids, &soa_a3SFWET); ERR
     err = nc_put_att_text(ncid, soa_a3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, soa_a3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3410,7 +3440,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a3_SRF", NC_FLOAT, 2, dimids, &soa_a3_SRF); ERR
+    err = DEF_VAR(ncid, "soa_a3_SRF", NC_FLOAT, 2, dimids, &soa_a3_SRF); ERR
     err = nc_put_att_text(ncid, soa_a3_SRF, "units", 5, "kg/kg"); ERR
     err = nc_put_att_text(ncid, soa_a3_SRF, "long_name", 22, "soa_a3 in bottom layer"); ERR
     err = nc_put_att_text(ncid, soa_a3_SRF, "cell_methods", 10, "time: mean"); ERR
@@ -3418,7 +3448,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_a3_sfgaex1", NC_FLOAT, 2, dimids, &soa_a3_sfgaex1); ERR
+    err = DEF_VAR(ncid, "soa_a3_sfgaex1", NC_FLOAT, 2, dimids, &soa_a3_sfgaex1); ERR
     err = nc_put_att_text(ncid, soa_a3_sfgaex1, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_a3_sfgaex1, "long_name", 51, "soa_a3 gas-aerosol-exchange primary column tendency"); ERR
     err = nc_put_att_text(ncid, soa_a3_sfgaex1, "cell_methods", 10, "time: mean"); ERR
@@ -3426,7 +3456,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_c1DDF", NC_FLOAT, 2, dimids, &soa_c1DDF); ERR
+    err = DEF_VAR(ncid, "soa_c1DDF", NC_FLOAT, 2, dimids, &soa_c1DDF); ERR
     err = nc_put_att_text(ncid, soa_c1DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_c1DDF, "long_name", 50, "soa_c1 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, soa_c1DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3434,7 +3464,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_c1SFWET", NC_FLOAT, 2, dimids, &soa_c1SFWET); ERR
+    err = DEF_VAR(ncid, "soa_c1SFWET", NC_FLOAT, 2, dimids, &soa_c1SFWET); ERR
     err = nc_put_att_text(ncid, soa_c1SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_c1SFWET, "long_name", 37, "soa_c1 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, soa_c1SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3442,7 +3472,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_c2DDF", NC_FLOAT, 2, dimids, &soa_c2DDF); ERR
+    err = DEF_VAR(ncid, "soa_c2DDF", NC_FLOAT, 2, dimids, &soa_c2DDF); ERR
     err = nc_put_att_text(ncid, soa_c2DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_c2DDF, "long_name", 50, "soa_c2 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, soa_c2DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3450,7 +3480,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_c2SFWET", NC_FLOAT, 2, dimids, &soa_c2SFWET); ERR
+    err = DEF_VAR(ncid, "soa_c2SFWET", NC_FLOAT, 2, dimids, &soa_c2SFWET); ERR
     err = nc_put_att_text(ncid, soa_c2SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_c2SFWET, "long_name", 37, "soa_c2 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, soa_c2SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3458,7 +3488,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_c3DDF", NC_FLOAT, 2, dimids, &soa_c3DDF); ERR
+    err = DEF_VAR(ncid, "soa_c3DDF", NC_FLOAT, 2, dimids, &soa_c3DDF); ERR
     err = nc_put_att_text(ncid, soa_c3DDF, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_c3DDF, "long_name", 50, "soa_c3 dry deposition flux at bottom (grav + turb)"); ERR
     err = nc_put_att_text(ncid, soa_c3DDF, "cell_methods", 10, "time: mean"); ERR
@@ -3466,7 +3496,7 @@ int def_F_case_h0(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "soa_c3SFWET", NC_FLOAT, 2, dimids, &soa_c3SFWET); ERR
+    err = DEF_VAR(ncid, "soa_c3SFWET", NC_FLOAT, 2, dimids, &soa_c3SFWET); ERR
     err = nc_put_att_text(ncid, soa_c3SFWET, "units", 7, "kg/m2/s"); ERR
     err = nc_put_att_text(ncid, soa_c3SFWET, "long_name", 37, "soa_c3 wet deposition flux at surface"); ERR
     err = nc_put_att_text(ncid, soa_c3SFWET, "cell_methods", 10, "time: mean"); ERR
@@ -3525,24 +3555,24 @@ int def_F_case_h1(int               ncid,    /* file ID */
 
     /* define variables */
     dimids[0] = dim_ncol;
-    err = nc_def_var(ncid, "lat", NC_DOUBLE, 1, dimids, &lat); ERR
+    err = DEF_VAR(ncid, "lat", NC_DOUBLE, 1, dimids, &lat); ERR
     err = nc_put_att_text(ncid, lat, "long_name", 8, "latitude"); ERR
     err = nc_put_att_text(ncid, lat, "units", 13, "degrees_north"); ERR
     varids[i++] = lat;
 
     dimids[0] = dim_ncol;
-    err = nc_def_var(ncid, "lon", NC_DOUBLE, 1, dimids, &lon); ERR
+    err = DEF_VAR(ncid, "lon", NC_DOUBLE, 1, dimids, &lon); ERR
     err = nc_put_att_text(ncid, lon, "long_name", 9, "longitude"); ERR
     err = nc_put_att_text(ncid, lon, "units", 12, "degrees_east"); ERR
     varids[i++] = lon;
 
     dimids[0] = dim_ncol;
-    err = nc_def_var(ncid, "area", NC_DOUBLE, 1, dimids, &area); ERR
+    err = DEF_VAR(ncid, "area", NC_DOUBLE, 1, dimids, &area); ERR
     err = nc_put_att_text(ncid, area, "long_name", 14, "gll grid areas"); ERR
     varids[i++] = area;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "lev", NC_DOUBLE, 1, dimids, &lev); ERR
+    err = DEF_VAR(ncid, "lev", NC_DOUBLE, 1, dimids, &lev); ERR
     err = nc_put_att_text(ncid, lev, "long_name", 38, "hybrid level at midpoints (1000*(A+B))"); ERR
     err = nc_put_att_text(ncid, lev, "units", 3, "hPa"); ERR
     err = nc_put_att_text(ncid, lev, "positive", 4, "down"); ERR
@@ -3551,23 +3581,23 @@ int def_F_case_h1(int               ncid,    /* file ID */
     varids[i++] = lev;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "hyam", NC_DOUBLE, 1, dimids, &hyam); ERR
+    err = DEF_VAR(ncid, "hyam", NC_DOUBLE, 1, dimids, &hyam); ERR
     err = nc_put_att_text(ncid, hyam, "long_name", 39, "hybrid A coefficient at layer midpoints"); ERR
     varids[i++] = hyam;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "hybm", NC_DOUBLE, 1, dimids, &hybm); ERR
+    err = DEF_VAR(ncid, "hybm", NC_DOUBLE, 1, dimids, &hybm); ERR
     err = nc_put_att_text(ncid, hybm, "long_name", 39, "hybrid B coefficient at layer midpoints"); ERR
     varids[i++] = hybm;
 
     dimids[0] = dim_lev;
-    err = nc_def_var(ncid, "P0", NC_DOUBLE, 0, NULL, &P0); ERR
+    err = DEF_VAR(ncid, "P0", NC_DOUBLE, 0, NULL, &P0); ERR
     err = nc_put_att_text(ncid, P0, "long_name", 18, "reference pressure"); ERR
     err = nc_put_att_text(ncid, P0, "units", 2, "Pa"); ERR
     varids[i++] = P0;
 
     dimids[0] = dim_ilev;
-    err = nc_def_var(ncid, "ilev", NC_DOUBLE, 1, dimids, &ilev); ERR
+    err = DEF_VAR(ncid, "ilev", NC_DOUBLE, 1, dimids, &ilev); ERR
     err = nc_put_att_text(ncid, ilev, "long_name", 39, "hybrid level at interfaces (1000*(A+B))"); ERR
     err = nc_put_att_text(ncid, ilev, "units", 3, "hPa"); ERR
     err = nc_put_att_text(ncid, ilev, "positive", 4, "down"); ERR
@@ -3576,17 +3606,17 @@ int def_F_case_h1(int               ncid,    /* file ID */
     varids[i++] = ilev;
 
     dimids[0] = dim_ilev;
-    err = nc_def_var(ncid, "hyai", NC_DOUBLE, 1, dimids, &hyai); ERR
+    err = DEF_VAR(ncid, "hyai", NC_DOUBLE, 1, dimids, &hyai); ERR
     err = nc_put_att_text(ncid, hyai, "long_name", 40, "hybrid A coefficient at layer interfaces"); ERR
     varids[i++] = hyai;
 
     dimids[0] = dim_ilev;
-    err = nc_def_var(ncid, "hybi", NC_DOUBLE, 1, dimids, &hybi); ERR
+    err = DEF_VAR(ncid, "hybi", NC_DOUBLE, 1, dimids, &hybi); ERR
     err = nc_put_att_text(ncid, hybi, "long_name", 40, "hybrid B coefficient at layer interfaces"); ERR
     varids[i++] = hybi;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "time", NC_DOUBLE, 1, dimids, &time); ERR
+    err = DEF_VAR(ncid, "time", NC_DOUBLE, 1, dimids, &time); ERR
     err = nc_put_att_text(ncid, time, "long_name", 4, "time"); ERR
     err = nc_put_att_text(ncid, time, "units", 30, "days since 0001-01-01 00:00:00"); ERR
     err = nc_put_att_text(ncid, time, "calendar", 6, "noleap"); ERR
@@ -3594,121 +3624,121 @@ int def_F_case_h1(int               ncid,    /* file ID */
     varids[i++] = time;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "date", NC_INT, 1, dimids, &date); ERR
+    err = DEF_VAR(ncid, "date", NC_INT, 1, dimids, &date); ERR
     err = nc_put_att_text(ncid, date, "long_name", 23, "current date (YYYYMMDD)"); ERR
     varids[i++] = date;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "datesec", NC_INT, 1, dimids, &datesec); ERR
+    err = DEF_VAR(ncid, "datesec", NC_INT, 1, dimids, &datesec); ERR
     err = nc_put_att_text(ncid, datesec, "long_name", 31, "current seconds of current date"); ERR
     varids[i++] = datesec;
 
     dimids[0] = dim_time;
     dimids[1] = dim_nbnd;
-    err = nc_def_var(ncid, "time_bnds", NC_DOUBLE, 2, dimids, &time_bnds); ERR
+    err = DEF_VAR(ncid, "time_bnds", NC_DOUBLE, 2, dimids, &time_bnds); ERR
     err = nc_put_att_text(ncid, time_bnds, "long_name", 23, "time interval endpoints"); ERR
     varids[i++] = time_bnds;
 
     dimids[0] = dim_time;
     dimids[1] = dim_chars;
-    err = nc_def_var(ncid, "date_written", NC_CHAR, 2, dimids, &date_written); ERR
+    err = DEF_VAR(ncid, "date_written", NC_CHAR, 2, dimids, &date_written); ERR
     varids[i++] = date_written;
 
     dimids[0] = dim_time;
     dimids[1] = dim_chars;
-    err = nc_def_var(ncid, "time_written", NC_CHAR, 2, dimids, &time_written); ERR
+    err = DEF_VAR(ncid, "time_written", NC_CHAR, 2, dimids, &time_written); ERR
     varids[i++] = time_written;
 
-    err = nc_def_var(ncid, "ndbase", NC_INT, 0, NULL, &ndbase); ERR
+    err = DEF_VAR(ncid, "ndbase", NC_INT, 0, NULL, &ndbase); ERR
     err = nc_put_att_text(ncid, ndbase, "long_name", 8, "base day"); ERR
     varids[i++] = ndbase;
-    err = nc_def_var(ncid, "nsbase", NC_INT, 0, NULL, &nsbase); ERR
+    err = DEF_VAR(ncid, "nsbase", NC_INT, 0, NULL, &nsbase); ERR
     err = nc_put_att_text(ncid, nsbase, "long_name", 19, "seconds of base day"); ERR
     varids[i++] = nsbase;
 
-    err = nc_def_var(ncid, "nbdate", NC_INT, 0, NULL, &nbdate); ERR
+    err = DEF_VAR(ncid, "nbdate", NC_INT, 0, NULL, &nbdate); ERR
     err = nc_put_att_text(ncid, nbdate, "long_name", 20, "base date (YYYYMMDD)"); ERR
     varids[i++] = nbdate;
 
-    err = nc_def_var(ncid, "nbsec", NC_INT, 0, NULL, &nbsec); ERR
+    err = DEF_VAR(ncid, "nbsec", NC_INT, 0, NULL, &nbsec); ERR
     err = nc_put_att_text(ncid, nbsec, "long_name", 20, "seconds of base date"); ERR
     varids[i++] = nbsec;
 
-    err = nc_def_var(ncid, "mdt", NC_INT, 0, NULL, &mdt); ERR
+    err = DEF_VAR(ncid, "mdt", NC_INT, 0, NULL, &mdt); ERR
     err = nc_put_att_text(ncid, mdt, "long_name", 8, "timestep"); ERR
     err = nc_put_att_text(ncid, mdt, "units", 1, "s"); ERR
     varids[i++] = mdt;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "ndcur", NC_INT, 1, dimids, &ndcur); ERR
+    err = DEF_VAR(ncid, "ndcur", NC_INT, 1, dimids, &ndcur); ERR
     err = nc_put_att_text(ncid, ndcur, "long_name", 27, "current day (from base day)"); ERR
     varids[i++] = ndcur;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "nscur", NC_INT, 1, dimids, &nscur); ERR
+    err = DEF_VAR(ncid, "nscur", NC_INT, 1, dimids, &nscur); ERR
     err = nc_put_att_text(ncid, nscur, "long_name", 30, "current seconds of current day"); ERR
     varids[i++] = nscur;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "co2vmr", NC_DOUBLE, 1, dimids, &co2vmr); ERR
+    err = DEF_VAR(ncid, "co2vmr", NC_DOUBLE, 1, dimids, &co2vmr); ERR
     err = nc_put_att_text(ncid, co2vmr, "long_name", 23, "co2 volume mixing ratio"); ERR
     varids[i++] = co2vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "ch4vmr", NC_DOUBLE, 1, dimids, &ch4vmr); ERR
+    err = DEF_VAR(ncid, "ch4vmr", NC_DOUBLE, 1, dimids, &ch4vmr); ERR
     err = nc_put_att_text(ncid, ch4vmr, "long_name", 23, "ch4 volume mixing ratio"); ERR
     varids[i++] = ch4vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "n2ovmr", NC_DOUBLE, 1, dimids, &n2ovmr); ERR
+    err = DEF_VAR(ncid, "n2ovmr", NC_DOUBLE, 1, dimids, &n2ovmr); ERR
     err = nc_put_att_text(ncid, n2ovmr, "long_name", 23, "n2o volume mixing ratio"); ERR
     varids[i++] = n2ovmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "f11vmr", NC_DOUBLE, 1, dimids, &f11vmr); ERR
+    err = DEF_VAR(ncid, "f11vmr", NC_DOUBLE, 1, dimids, &f11vmr); ERR
     err = nc_put_att_text(ncid, f11vmr, "long_name", 23, "f11 volume mixing ratio"); ERR
     varids[i++] = f11vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "f12vmr", NC_DOUBLE, 1, dimids, &f12vmr); ERR
+    err = DEF_VAR(ncid, "f12vmr", NC_DOUBLE, 1, dimids, &f12vmr); ERR
     err = nc_put_att_text(ncid, f12vmr, "long_name", 23, "f12 volume mixing ratio"); ERR
     varids[i++] = f12vmr;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "sol_tsi", NC_DOUBLE, 1, dimids, &sol_tsi); ERR
+    err = DEF_VAR(ncid, "sol_tsi", NC_DOUBLE, 1, dimids, &sol_tsi); ERR
     err = nc_put_att_text(ncid, sol_tsi, "long_name", 22, "total solar irradiance"); ERR
     err = nc_put_att_text(ncid, sol_tsi, "units", 4, "W/m2"); ERR
     varids[i++] = sol_tsi;
 
     dimids[0] = dim_time;
-    err = nc_def_var(ncid, "nsteph", NC_INT, 1, dimids, &nsteph); ERR
+    err = DEF_VAR(ncid, "nsteph", NC_INT, 1, dimids, &nsteph); ERR
     err = nc_put_att_text(ncid, nsteph, "long_name", 16, "current timestep"); ERR
     varids[i++] = nsteph;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CLDHGH", NC_FLOAT, 2, dimids, &CLDHGH); ERR
+    err = DEF_VAR(ncid, "CLDHGH", NC_FLOAT, 2, dimids, &CLDHGH); ERR
     err = nc_put_att_text(ncid, CLDHGH, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLDHGH, "long_name", 32, "Vertically-integrated high cloud"); ERR
     varids[i++] = CLDHGH;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CLDLOW", NC_FLOAT, 2, dimids, &CLDLOW); ERR
+    err = DEF_VAR(ncid, "CLDLOW", NC_FLOAT, 2, dimids, &CLDLOW); ERR
     err = nc_put_att_text(ncid, CLDLOW, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLDLOW, "long_name", 31, "Vertically-integrated low cloud"); ERR
     varids[i++] = CLDLOW;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "CLDMED", NC_FLOAT, 2, dimids, &CLDMED); ERR
+    err = DEF_VAR(ncid, "CLDMED", NC_FLOAT, 2, dimids, &CLDMED); ERR
     err = nc_put_att_text(ncid, CLDMED, "units", 8, "fraction"); ERR
     err = nc_put_att_text(ncid, CLDMED, "long_name", 37, "Vertically-integrated mid-level cloud"); ERR
     varids[i++] = CLDMED;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "FLNT", NC_FLOAT, 2, dimids, &FLNT); ERR
+    err = DEF_VAR(ncid, "FLNT", NC_FLOAT, 2, dimids, &FLNT); ERR
     err = nc_put_att_text(ncid, FLNT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, FLNT, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, FLNT, "long_name", 33, "Net longwave flux at top of model"); ERR
@@ -3716,7 +3746,7 @@ int def_F_case_h1(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "LWCF", NC_FLOAT, 2, dimids, &LWCF); ERR
+    err = DEF_VAR(ncid, "LWCF", NC_FLOAT, 2, dimids, &LWCF); ERR
     err = nc_put_att_text(ncid, LWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, LWCF, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, LWCF, "long_name", 22, "Longwave cloud forcing"); ERR
@@ -3724,35 +3754,35 @@ int def_F_case_h1(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "OMEGA500", NC_FLOAT, 2, dimids, &OMEGA500); ERR
+    err = DEF_VAR(ncid, "OMEGA500", NC_FLOAT, 2, dimids, &OMEGA500); ERR
     err = nc_put_att_text(ncid, OMEGA500, "units", 4, "Pa/s"); ERR
     err = nc_put_att_text(ncid, OMEGA500, "long_name", 46, "Vertical velocity at 500 mbar pressure surface"); ERR
     varids[i++] = OMEGA500;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "OMEGA850", NC_FLOAT, 2, dimids, &OMEGA850); ERR
+    err = DEF_VAR(ncid, "OMEGA850", NC_FLOAT, 2, dimids, &OMEGA850); ERR
     err = nc_put_att_text(ncid, OMEGA850, "units", 4, "Pa/s"); ERR
     err = nc_put_att_text(ncid, OMEGA850, "long_name", 46, "Vertical velocity at 850 mbar pressure surface"); ERR
     varids[i++] = OMEGA850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PRECT", NC_FLOAT, 2, dimids, &PRECT); ERR
+    err = DEF_VAR(ncid, "PRECT", NC_FLOAT, 2, dimids, &PRECT); ERR
     err = nc_put_att_text(ncid, PRECT, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, PRECT, "long_name", 65, "Total (convective and large-scale) precipitation rate (liq + ice)"); ERR
     varids[i++] = PRECT;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "PS", NC_FLOAT, 2, dimids, &PS); ERR
+    err = DEF_VAR(ncid, "PS", NC_FLOAT, 2, dimids, &PS); ERR
     err = nc_put_att_text(ncid, PS, "units", 2, "Pa"); ERR
     err = nc_put_att_text(ncid, PS, "long_name", 16, "Surface pressure"); ERR
     varids[i++] = PS;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "SWCF", NC_FLOAT, 2, dimids, &SWCF); ERR
+    err = DEF_VAR(ncid, "SWCF", NC_FLOAT, 2, dimids, &SWCF); ERR
     err = nc_put_att_text(ncid, SWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
     err = nc_put_att_text(ncid, SWCF, "units", 4, "W/m2"); ERR
     err = nc_put_att_text(ncid, SWCF, "long_name", 23, "Shortwave cloud forcing"); ERR
@@ -3760,21 +3790,21 @@ int def_F_case_h1(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "T850", NC_FLOAT, 2, dimids, &T850); ERR
+    err = DEF_VAR(ncid, "T850", NC_FLOAT, 2, dimids, &T850); ERR
     err = nc_put_att_text(ncid, T850, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, T850, "long_name", 40, "Temperature at 850 mbar pressure surface"); ERR
     varids[i++] = T850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TMQ", NC_FLOAT, 2, dimids, &TMQ); ERR
+    err = DEF_VAR(ncid, "TMQ", NC_FLOAT, 2, dimids, &TMQ); ERR
     err = nc_put_att_text(ncid, TMQ, "units", 5, "kg/m2"); ERR
     err = nc_put_att_text(ncid, TMQ, "long_name", 48, "Total (vertically integrated) precipitable water"); ERR
     varids[i++] = TMQ;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "TS", NC_FLOAT, 2, dimids, &TS); ERR
+    err = DEF_VAR(ncid, "TS", NC_FLOAT, 2, dimids, &TS); ERR
     err = nc_put_att_text(ncid, TS, "units", 1, "K"); ERR
     err = nc_put_att_text(ncid, TS, "long_name", 31, "Surface temperature (radiative)"); ERR
     varids[i++] = TS;
@@ -3782,7 +3812,7 @@ int def_F_case_h1(int               ncid,    /* file ID */
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = nc_def_var(ncid, "U", NC_FLOAT, 3, dimids, &U); ERR
+    err = DEF_VAR(ncid, "U", NC_FLOAT, 3, dimids, &U); ERR
     err = nc_put_att_int(ncid, U, "mdims", NC_INT, 1, &mdims); ERR
     err = nc_put_att_text(ncid, U, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, U, "long_name", 10, "Zonal wind"); ERR
@@ -3790,49 +3820,49 @@ int def_F_case_h1(int               ncid,    /* file ID */
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "U250", NC_FLOAT, 2, dimids, &U250); ERR
+    err = DEF_VAR(ncid, "U250", NC_FLOAT, 2, dimids, &U250); ERR
     err = nc_put_att_text(ncid, U250, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, U250, "long_name", 39, "Zonal wind at 250 mbar pressure surface"); ERR
     varids[i++] = U250;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "U850", NC_FLOAT, 2, dimids, &U850); ERR
+    err = DEF_VAR(ncid, "U850", NC_FLOAT, 2, dimids, &U850); ERR
     err = nc_put_att_text(ncid, U850, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, U850, "long_name", 39, "Zonal wind at 850 mbar pressure surface"); ERR
     varids[i++] = U850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "UBOT", NC_FLOAT, 2, dimids, &UBOT); ERR
+    err = DEF_VAR(ncid, "UBOT", NC_FLOAT, 2, dimids, &UBOT); ERR
     err = nc_put_att_text(ncid, UBOT, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, UBOT, "long_name", 29, "Lowest model level zonal wind"); ERR
     varids[i++] = UBOT;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "V250", NC_FLOAT, 2, dimids, &V250); ERR
+    err = DEF_VAR(ncid, "V250", NC_FLOAT, 2, dimids, &V250); ERR
     err = nc_put_att_text(ncid, V250, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, V250, "long_name", 44, "Meridional wind at 250 mbar pressure surface"); ERR
     varids[i++] = V250;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "V850", NC_FLOAT, 2, dimids, &V850); ERR
+    err = DEF_VAR(ncid, "V850", NC_FLOAT, 2, dimids, &V850); ERR
     err = nc_put_att_text(ncid, V850, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, V850, "long_name", 44, "Meridional wind at 850 mbar pressure surface"); ERR
     varids[i++] = V850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "VBOT", NC_FLOAT, 2, dimids, &VBOT); ERR
+    err = DEF_VAR(ncid, "VBOT", NC_FLOAT, 2, dimids, &VBOT); ERR
     err = nc_put_att_text(ncid, VBOT, "units", 3, "m/s"); ERR
     err = nc_put_att_text(ncid, VBOT, "long_name", 34, "Lowest model level meridional wind"); ERR
     varids[i++] = VBOT;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = nc_def_var(ncid, "Z500", NC_FLOAT, 2, dimids, &Z500); ERR
+    err = DEF_VAR(ncid, "Z500", NC_FLOAT, 2, dimids, &Z500); ERR
     err = nc_put_att_text(ncid, Z500, "units", 1, "m"); ERR
     err = nc_put_att_text(ncid, Z500, "long_name", 43, "Geopotential Z at 500 mbar pressure surface"); ERR
     varids[i++] = Z500;

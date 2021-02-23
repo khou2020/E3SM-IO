@@ -390,7 +390,7 @@ int hdf5_put_varn (int vid,
     for (i = 0; i < cnt; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
-        memspace_size /= esize;
+        memspace_size = rsize / esize;
 
         if (rsize) {
             // err = hdf5_put_vara (vid, mtype, dxplid, mstarts[i], mcounts[i], bufp);

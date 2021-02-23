@@ -684,9 +684,11 @@ int run_varn_F_case_hdf5 (
         if (rank == 0) {
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
+/*
             err = write_small_vars_F_case_hdf5 (ncid, i, varids, rec_no, gap, dims[2][0],
                                                 dims[2][0] + 1, 2, 8, &int_buf_ptr, &txt_buf_ptr,
                                                 &dbl_buf_ptr);
+*/
             ERR
         }
         printf("checkpoint 2\n");

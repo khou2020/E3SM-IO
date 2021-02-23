@@ -1129,15 +1129,17 @@ int run_varn_F_case_rd_hdf5 (
         txt_buf_ptr = txt_buf;
 
         /* next 27 small variables are written by rank 0 only */
-        if (rank == -1) {
+        if (rank == 0) {
+            printf("checkpoint 0\n");
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
             err = read_small_vars_F_case_hdf5 (ncid, i, varids, rec_no, gap, dims[2][0],
                                                dims[2][0] + 1, 2, 8, &int_buf_ptr, &txt_buf_ptr,
                                                &dbl_buf_ptr);
             ERR
+            printf("checkpoint 1\n");
         }
-        //i += 27;
+        i += 27;
 
         post_timing += MPI_Wtime () - timing;
 

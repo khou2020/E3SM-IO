@@ -134,7 +134,6 @@ int hdf5_put_vara (
     hid_t did;
     hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
     hsize_t dims[H5S_MAX_RANK];
-    return 0;
 
     did = f_dids[vid];
 
@@ -155,7 +154,7 @@ int hdf5_put_vara (
         dims[0] = start[0] + block[0];
 
         H5Sclose (dsid);
-        printf("put vara checkpoint 0\n");
+        printf("put vara checkpoint 0, ndim = %d, dims[0]\n", ndim, dims[0]);
         herr = H5Dset_extent (did, dims);
         printf("put vara checkpoint 1\n");
         CHECK_HERR

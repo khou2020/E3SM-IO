@@ -344,7 +344,7 @@ int hdf5_put_varn (int vid,
     herr_t herr = 0;
     int i, j;
     double ts, te;
-    hsize_t esize, rsize, rsize_old = 0;
+    hsize_t esize, rsize, rsize_old = 0, memspace_size;
     int ndim;
     hid_t dsid = -1, msid = -1;
     hid_t mtype;
@@ -390,6 +390,7 @@ int hdf5_put_varn (int vid,
     for (i = 0; i < cnt; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
+        memspace_size /= esize;
 
         if (rsize) {
             // err = hdf5_put_vara (vid, mtype, dxplid, mstarts[i], mcounts[i], bufp);
@@ -404,7 +405,7 @@ int hdf5_put_varn (int vid,
             // Recreate only when size mismatch
             if (rsize != rsize_old) {
                 if (msid >= 0) H5Sclose (msid);
-                msid = H5Screate_simple (1, &rsize, &rsize);
+                msid = H5Screate_simple (1, &memspace_size, &memspace_size);
                 CHECK_HID (msid)
 
                 rsize_old = rsize;

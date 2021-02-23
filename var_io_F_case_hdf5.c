@@ -139,16 +139,19 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
         i += 5;
 
     /* ndcur */
+    printf("small vars f case checkpoint 0\n");
     start[0] = rec_no;
     err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
     ERR
     *int_buf += 1;
     /* nscur */
+    printf("small vars f case checkpoint 1\n");
     start[0] = rec_no;
     err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
     ERR
     *int_buf += 1;
     /* co2vmr */
+    printf("small vars f case checkpoint 2\n");
     start[0] = rec_no;
     err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
     ERR
@@ -202,7 +205,6 @@ static int read_small_vars_F_case_hdf5 (hid_t ncid,
                                         double **dbl_buf) {
     int i, err, nerrs = 0;
     hsize_t start[2], count[2];
-    printf("entered small vars f case\n");
     /* scalar and small variables are written by rank 0 only */
     i = vid;
 
@@ -239,19 +241,16 @@ static int read_small_vars_F_case_hdf5 (hid_t ncid,
         i += 7;
 
     /* time */
-    printf("small vars f case checkpoint 0\n");
     start[0] = rec_no;
     err      = HDF5_IGET_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
     ERR
     *dbl_buf += 1 + gap;
     /* date */
-    printf("small vars f case checkpoint 1\n");
     start[0] = rec_no;
     err      = HDF5_IGET_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
     ERR
     *int_buf += 1;
     /* datesec */
-    printf("small vars f case checkpoint 2\n");
     start[0] = rec_no;
     err      = HDF5_IGET_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
     ERR

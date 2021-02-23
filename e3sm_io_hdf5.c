@@ -674,7 +674,7 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
     }
 
     //sid = H5Screate_simple (ndim, dims, mdims);
-    sid = H5Screate_simple (ndim, dims, NULL);
+    sid = H5Screate_simple (ndim, dims, mdims);
     CHECK_HID (sid);
 
     if (f_nd == 10) {

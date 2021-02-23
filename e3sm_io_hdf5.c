@@ -142,6 +142,9 @@ int hdf5_put_vara (
 
     ndim = H5Sget_simple_extent_dims (dsid, dims, NULL);
     CHECK_HID (ndim)
+    for ( i = 0; i < ndim; ++i ) {
+        printf("ndim = %d, dims[%d] = %lld\n", ndim, i,(long long int) dims[i]);
+    }
 
     for (i = 0; i < ndim; i++) {
         start[i] = (hsize_t)mstart[i];

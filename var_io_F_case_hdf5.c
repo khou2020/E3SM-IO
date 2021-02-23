@@ -77,13 +77,13 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     /* time */
     printf("small vars f case checkpoint 0\n");
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    //err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
     ERR
     *dbl_buf += 1 + gap;
     /* date */
     printf("small vars f case checkpoint 1\n");
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    //err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
     ERR
     *int_buf += 1;
     /* datesec */

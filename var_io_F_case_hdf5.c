@@ -679,7 +679,6 @@ int run_varn_F_case_hdf5 (
         txt_buf_ptr = txt_buf;
 
         /* next 27 small variables are written by rank 0 only */
-#if 1==0
         if (rank == 0) {
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
@@ -689,7 +688,6 @@ int run_varn_F_case_hdf5 (
             ERR
         }
         i += 27;
-#endif
         post_timing += MPI_Wtime () - timing;
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/

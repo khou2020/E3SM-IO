@@ -676,11 +676,12 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
     //sid = H5Screate_simple (ndim, dims, mdims);
     sid = H5Screate_simple (ndim, dims, mdims);
     CHECK_HID (sid);
+/*
     printf("------------------ %d\n", f_nd);
         for ( i = 0; i < ndim; ++i ){
             printf("creating dataset with dims[%d]=%lld, mdims[%d]=%lld , f_dims[dimids[%d]] = %lld\n",i,(long long int)dims[i], i, (long long int)mdims[i], i, (long long int) f_dims[dimids[i]]);
         }
-
+*/
     did = H5Dcreate2 (fid, name, nc_type_to_hdf5_type (nctype), sid, H5P_DEFAULT, dcplid,
                       H5P_DEFAULT);
     CHECK_HID (did)

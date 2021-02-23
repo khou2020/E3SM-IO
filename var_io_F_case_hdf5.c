@@ -202,7 +202,7 @@ static int read_small_vars_F_case_hdf5 (hid_t ncid,
                                         double **dbl_buf) {
     int i, err, nerrs = 0;
     hsize_t start[2], count[2];
-
+    printf("entered small vars f case\n");
     /* scalar and small variables are written by rank 0 only */
     i = vid;
 

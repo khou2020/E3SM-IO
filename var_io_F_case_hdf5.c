@@ -679,7 +679,7 @@ int run_varn_F_case_hdf5 (
         dbl_buf_ptr = dbl_buf + nelems[1] * 2 + nelems[0] + gap * 3;
         int_buf_ptr = int_buf;
         txt_buf_ptr = txt_buf;
-
+        printf("checkpoint 1\n");
         /* next 27 small variables are written by rank 0 only */
         if (rank == 0) {
             my_nreqs += 27;
@@ -689,6 +689,7 @@ int run_varn_F_case_hdf5 (
                                                 &dbl_buf_ptr);
             ERR
         }
+        printf("checkpoint 2\n");
         i += 27;
         post_timing += MPI_Wtime () - timing;
 

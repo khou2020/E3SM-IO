@@ -506,6 +506,7 @@ int run_varn_F_case_hdf5 (
     MPI_Offset **starts_D3 = NULL, **counts_D3 = NULL;
     MPI_Info info_used = MPI_INFO_NULL;
     struct stat file_stat;
+    printf("entered f case function\n");
 
     MPI_Barrier (io_comm); /*-----------------------------------------*/
     total_timing = pre_timing = MPI_Wtime ();
@@ -582,6 +583,7 @@ int run_varn_F_case_hdf5 (
     CHECK_HID (ncid)
 
     /* define dimensions, variables, and attributes */
+    printf("checkpoint 0\n");
     if (nvars == 414) {
         /* for h0 file */
         err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);

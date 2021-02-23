@@ -134,6 +134,7 @@ int hdf5_put_vara (
     hid_t did;
     hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
     hsize_t dims[H5S_MAX_RANK];
+    return 0;
 
     did = f_dids[vid];
 
@@ -154,9 +155,9 @@ int hdf5_put_vara (
         dims[0] = start[0] + block[0];
 
         H5Sclose (dsid);
-        printf("put vars checkpoint 0\n");
+        printf("put vara checkpoint 0\n");
         herr = H5Dset_extent (did, dims);
-        printf("put vars checkpoint 1\n");
+        printf("put vara checkpoint 1\n");
         CHECK_HERR
         dsid = H5Dget_space (did);
         CHECK_HID (dsid)
@@ -261,8 +262,7 @@ fn_exit:;
 }
 
 int hdf5_put_var1 (int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, void *buf) {
-    return 0;
-    //return hdf5_put_vara (vid, mtype, dxplid, mstart, mone, buf);
+    return hdf5_put_vara (vid, mtype, dxplid, mstart, mone, buf);
 }
 
 #ifdef ENABLE_LOGVOL

@@ -684,11 +684,11 @@ int run_varn_F_case_hdf5 (
         if (rank == 0) {
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
-/*
+
             err = write_small_vars_F_case_hdf5 (ncid, i, varids, rec_no, gap, dims[2][0],
                                                 dims[2][0] + 1, 2, 8, &int_buf_ptr, &txt_buf_ptr,
                                                 &dbl_buf_ptr);
-*/
+
             ERR
         }
         printf("checkpoint 2\n");
@@ -711,7 +711,7 @@ int run_varn_F_case_hdf5 (
 
         for (j = 0; j < xnreqs[1]; j++) starts_D2[j][0] = rec_no;
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
-
+        printf("checkpoint 3\n");
         if (nvars == 414) {
             if (two_buf) {
                 /* write 2D variables */
@@ -830,7 +830,6 @@ int run_varn_F_case_hdf5 (
                 POST_VARN (2, 7, 44)  /* U250 ... Z500 */
             }
         }
-
         post_timing += MPI_Wtime () - timing;
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/

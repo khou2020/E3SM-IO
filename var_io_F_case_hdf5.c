@@ -582,7 +582,6 @@ int run_varn_F_case_hdf5 (
     CHECK_HID (ncid)
 
     /* define dimensions, variables, and attributes */
-    printf("checkpoint 0\n");
     if (nvars == 414) {
         /* for h0 file */
         err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);
@@ -708,7 +707,6 @@ int run_varn_F_case_hdf5 (
 
         for (j = 0; j < xnreqs[1]; j++) starts_D2[j][0] = rec_no;
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
-        printf("checkpoint 3\n");
         if (nvars == 414) {
             if (two_buf) {
                 /* write 2D variables */

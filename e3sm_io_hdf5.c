@@ -340,7 +340,7 @@ fn_exit:;
 }
 
 int hdf5_put_var1 (int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, void *buf) {
-    return hdf5_put_vara (vid, mtype, dxplid, mstart, mone, buf, 0);
+    return hdf5_put_vara (vid, mtype, dxplid, mstart, mone, buf);
 }
 
 int hdf5_put_var1_mpi (int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, void *buf, int rank) {

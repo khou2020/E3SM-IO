@@ -25,6 +25,7 @@
 
 /*----< write_small_vars_F_case_hdf5() >------------------------------------------*/
 static int write_small_vars_F_case_hdf5 (hid_t ncid,
+                                         int rank,
                                          int vid, /* starting variable ID */
                                          int *varids,
                                          hsize_t rec_no,
@@ -77,19 +78,19 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     /* time */
     printf("small vars f case checkpoint 0\n");
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* date */
     printf("small vars f case checkpoint 1\n");
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* datesec */
     printf("small vars f case checkpoint 2\n");
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* time_bnds */
@@ -97,7 +98,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     start[1] = 0;
     count[0] = 1;
     count[1] = nbnd;
-    err      = HDF5_IPUT_VARA_DOUBLE (ncid, varids[i++], start, count, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VARA_DOUBLE_MPI (ncid, varids[i++], start, count, *dbl_buf, rank);
     ERR
     *dbl_buf += nbnd + gap;
     /* date_written */
@@ -105,7 +106,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     start[1] = 0;
     count[0] = 1;
     count[1] = nchars;
-    err      = HDF5_IPUT_VARA_TEXT (ncid, varids[i++], start, count, *txt_buf, NULL);
+    err      = HDF5_IPUT_VARA_TEXT_MPI (ncid, varids[i++], start, count, *txt_buf, rank);
     ERR
     *txt_buf += nchars;
     /* time_written */
@@ -113,7 +114,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     start[1] = 0;
     count[0] = 1;
     count[1] = nchars;
-    err      = HDF5_IPUT_VARA_TEXT (ncid, varids[i++], start, count, *txt_buf, NULL);
+    err      = HDF5_IPUT_VARA_TEXT_MPI (ncid, varids[i++], start, count, *txt_buf, rank);
     ERR
     *txt_buf += nchars;
 
@@ -143,47 +144,47 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
 
     /* ndcur */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* nscur */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* co2vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* ch4vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* n2ovmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* f11vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* f12vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* sol_tsi */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* nsteph */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
 fn_exit:
@@ -687,7 +688,7 @@ int run_varn_F_case_hdf5 (
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
 
-            err = write_small_vars_F_case_hdf5 (ncid, i, varids, rec_no, gap, dims[2][0],
+            err = write_small_vars_F_case_hdf5 (ncid, rank, i, varids, rec_no, gap, dims[2][0],
                                                 dims[2][0] + 1, 2, 8, &int_buf_ptr, &txt_buf_ptr,
                                                 &dbl_buf_ptr);
 

@@ -235,9 +235,6 @@ int hdf5_put_vara_mpi (
         CHECK_HID (dsid)
     }
     text = MPI_Wtime () - ts;
-    if (rank != 0) {
-        goto fn_exit;
-    }
 #ifndef ENABLE_LOGVOL
     msid = H5Screate_simple (ndim, block, block);
     CHECK_HID (msid)

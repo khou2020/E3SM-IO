@@ -249,15 +249,12 @@ int hdf5_put_vara_mpi (
     te = MPI_Wtime ();
     tsel += te - ts;
 
-    if (rank != 0) {
-        goto fn_exit;
-    }
 #ifdef ENABLE_LOGVOL
     herr = H5Dwrite (did, mtype, H5S_CONTIG, dsid, dxplid, buf);
     CHECK_HERR
 #else
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
-    herr = H5Dwrite (did, mtype, msid, dsid, H5P_DEFAULT, buf);
+    herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
     CHECK_HERR
 #endif
     twrite += MPI_Wtime () - te;

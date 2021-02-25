@@ -219,6 +219,7 @@ int hdf5_put_vara_mpi (
     for (i = 0; i < ndim; i++) {
         start[i] = (hsize_t)mstart[i];
         block[i] = (hsize_t)mcount[i];
+        printf("rank %d, start[%d] = %lld\n", rank, i, (long long int)start[i]);
     }
 
     // Extend rec dim

@@ -611,7 +611,7 @@ int run_varn_F_case_hdf5 (
 
     i           = 0;
     dbl_buf_ptr = dbl_buf;
-
+    printf("rank %d has xnreqs[0]=%d, xnreqs[1]=%d\n", rank, xnreqs[0], xnreqs[1]);
     if (xnreqs[1] > 0) {
         /* lat */
         MPI_Offset **fix_starts_D2, **fix_counts_D2;

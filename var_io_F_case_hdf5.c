@@ -678,6 +678,7 @@ int run_varn_F_case_hdf5 (
         int_buf_ptr = int_buf;
         txt_buf_ptr = txt_buf;
         /* next 27 small variables are written by rank 0 only */
+        printf("rank %d is before write small varn\n", rank);
         //if (rank == 0) {
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
@@ -688,6 +689,7 @@ int run_varn_F_case_hdf5 (
 
             ERR
         //}
+        printf("rank %d is before post varn\n", rank);
         i += 27;
         post_timing += MPI_Wtime () - timing;
 
@@ -707,7 +709,6 @@ int run_varn_F_case_hdf5 (
 
         for (j = 0; j < xnreqs[1]; j++) starts_D2[j][0] = rec_no;
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
-        printf("rank %d is before post varn\n", rank);
         if (nvars == 414) {
             if (two_buf) {
                 /* write 2D variables */

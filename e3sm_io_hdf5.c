@@ -474,6 +474,9 @@ int hdf5_put_varn (int vid,
     text += MPI_Wtime () - ts;
 
     // Call H5DWrite
+    int rank;
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+    printf("rank %d has cnt = %d\n", rank, cnt);
     for (i = 0; i < cnt; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }

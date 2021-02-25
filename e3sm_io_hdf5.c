@@ -235,7 +235,8 @@ int hdf5_put_vara_mpi (
     }
     text = MPI_Wtime () - ts;
 #ifndef ENABLE_LOGVOL
-    msid = H5Screate_simple (ndim, block, block);
+    msid = H5Screate_simple (ndim, dims, dims);
+    herr = H5Sselect_hyperslab (msid, H5S_SELECT_SET, start, NULL, one, block);
     CHECK_HID (msid)
 #endif
 

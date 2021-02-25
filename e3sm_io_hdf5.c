@@ -224,11 +224,7 @@ int hdf5_put_vara_mpi (
     // Extend rec dim
     ts = MPI_Wtime ();
     if (dims[0] < start[0] + block[0]) {
-        if (rank ==0) {
-            dims[0] = start[0] + block[0];
-        } else {
-            dims[0] = 0;
-        }
+        dims[0] = start[0] + block[0];
         H5Sclose (dsid);
         //printf("rank %d put vara checkpoint 0, ndim = %d, dims[0] = %lld, sizeof(dims) = %d, vid = %d\n", rank, ndim, (long long int) dims[0], H5S_MAX_RANK, vid);
         herr = H5Dset_extent (did, dims);
@@ -239,12 +235,19 @@ int hdf5_put_vara_mpi (
     }
     text = MPI_Wtime () - ts;
 #ifndef ENABLE_LOGVOL
-    msid = H5Screate_simple (ndim, dims, dims);
+    msid = H5Screate_simple (ndim, block, block);
+    if (rank != 0) {
+        hsize_t *zero_dim = (hsize_t*) calloc(ndim,sizeof(hsize_t));
+        herr = H5Sselect_hyperslab (msid, H5S_SELECT_SET, start, NULL, NULL, zero_dim);
+    }
     CHECK_HID (msid)
 #endif
 
     ts   = MPI_Wtime ();
-    herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
+    if (rank != 0) {
+        herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, NULL, block);
+        free(block);
+    }
     CHECK_HERR
     te = MPI_Wtime ();
     tsel += te - ts;

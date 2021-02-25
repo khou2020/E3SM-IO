@@ -471,12 +471,15 @@ fn_exit:
         }                                                                                          \
         nreqs = k + 1;                                                                             \
     }
+/*
+        err = HDF5_IPUT_VARN (ncid, vid + j, xnreqs[k - 1], starts_D##k, counts_D##k, rec_buf_ptr, \
+                              -1, REC_ITYPE, NULL);                                                \
+*/
 
 #define POST_VARN(k, num, vid)                                                            \
     for (j = 0; j < num; j++) {                                                                    \
         MPI_Allreduce(&xnreqs[k - 1], &max_cnt, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);              \
-        err = HDF5_IPUT_VARN (ncid, vid + j, xnreqs[k - 1], starts_D##k, counts_D##k, rec_buf_ptr, \
-                              -1, REC_ITYPE, NULL);                                                \
+        hdf5_put_varn_mpi (vid + j, REC_ITYPE, dxplid_coll, xnreqs[k - 1], max_cnt, starts_D##k, counts_D##k, rec_buf_ptr);\
         ERR                                                                                        \
         rec_buf_ptr += nelems[k - 1] + gap;                                                        \
         my_nreqs += xnreqs[k - 1];                                                                 \

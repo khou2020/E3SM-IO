@@ -256,7 +256,8 @@ int hdf5_put_vara_mpi (
     herr = H5Dwrite (did, mtype, H5S_CONTIG, dsid, dxplid, buf);
     CHECK_HERR
 #else
-    herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
+    //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
+    herr = H5Dwrite (did, mtype, msid, dsid, H5P_DEFAULT, buf);
     CHECK_HERR
 #endif
     twrite += MPI_Wtime () - te;

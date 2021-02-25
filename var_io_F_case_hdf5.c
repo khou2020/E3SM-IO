@@ -699,7 +699,6 @@ int run_varn_F_case_hdf5 (
         free (fix_starts_D1);
     } else
         i++;
-    printf("rank %d checkpoint\n", rank);
     /* construct varn API arguments starts[][] and counts[][] */
     if (xnreqs[2] > 0)
         REC_3D_VAR_STARTS_COUNTS (0, starts_D3, counts_D3, xnreqs[2], disps[2], blocklens[2],
@@ -717,6 +716,7 @@ int run_varn_F_case_hdf5 (
         txt_buf_ptr = txt_buf;
         /* next 27 small variables are written by rank 0 only */
         //if (rank == 0) {
+    printf("rank %d checkpoint 0\n", rank);
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
 
@@ -745,6 +745,7 @@ int run_varn_F_case_hdf5 (
 
         for (j = 0; j < xnreqs[1]; j++) starts_D2[j][0] = rec_no;
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
+    printf("rank %d checkpoint 1\n", rank);
         if (nvars == 414) {
             if (two_buf) {
                 /* write 2D variables */

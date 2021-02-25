@@ -236,22 +236,12 @@ int hdf5_put_vara_mpi (
     text = MPI_Wtime () - ts;
 #ifndef ENABLE_LOGVOL
     msid = H5Screate_simple (ndim, block, block);
-    hsize_t *zero_dim;
-    if (rank != 0) {
-        zero_dim = (hsize_t*) calloc(ndim,sizeof(hsize_t));
-        herr = H5Sselect_hyperslab (msid, H5S_SELECT_SET, start, NULL, NULL, zero_dim);
-    }
     CHECK_HID (msid)
 #endif
 
     ts   = MPI_Wtime ();
 #ifndef ENABLE_LOGVOL
-    if (rank != 0) {
-        herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, NULL, zero_dim);
-        free(zero_dim);
-    } else {
-        herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
-    }
+    herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
 #endif
     CHECK_HERR
     te = MPI_Wtime ();

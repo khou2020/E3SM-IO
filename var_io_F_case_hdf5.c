@@ -23,6 +23,15 @@
 #endif
 #include <sys/stat.h>
 
+int hdf5_put_varn_mpi (int vid,
+                   MPI_Datatype mpitype,
+                   hid_t dxplid,
+                   int cnt,
+                   int max_cnt,
+                   MPI_Offset **mstarts,
+                   MPI_Offset **mcounts,
+                   void *buf);
+
 /*----< write_small_vars_F_case_hdf5() >------------------------------------------*/
 static int write_small_vars_F_case_hdf5 (hid_t ncid,
                                          int rank,
@@ -494,7 +503,7 @@ int run_varn_F_case_hdf5 (
     char outfname[512], *txt_buf_ptr;
     herr_t herr;
     hid_t ncid, faplid;
-    int i, j, k, err, nerrs = 0, rank, cmode, *varids, nvars_D[3];
+    int i, j, k, err, nerrs = 0, rank, cmode, *varids, nvars_D[3], max_cnt;
     int rec_no, gap = 0, my_nreqs, *int_buf_ptr, xnreqs[3];
     size_t dbl_buflen, rec_buflen, nelems[3];
     itype *rec_buf  = NULL, *rec_buf_ptr;
@@ -620,17 +629,38 @@ int run_varn_F_case_hdf5 (
         FIX_1D_VAR_STARTS_COUNTS (fix_starts_D2, fix_counts_D2, num, disps[1], blocklens[1])
 
         REC_2D_VAR_STARTS_COUNTS (0, starts_D2, counts_D2, xnreqs[1], disps[1], blocklens[1])
-
+/*
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
                               dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL);
+*/
+        MPI_Allreduce(&xnreqs[1], &max_cnt, 1, MPI_INT, MPI_MAX, io_comm);
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   xnreqs[1],
+                   max_cnt,
+                   fix_starts_D2,
+                   fix_counts_D2,
+                   dbl_buf_ptr);
+
         ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
         nvars_D[1]++;
 
         /* lon */
+/*
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
                               dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL);
+*/
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   xnreqs[1],
+                   max_cnt,
+                   fix_starts_D2,
+                   fix_counts_D2,
+                   dbl_buf_ptr);
         ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
@@ -647,9 +677,19 @@ int run_varn_F_case_hdf5 (
         /* construct varn API arguments starts[][] and counts[][] */
         FIX_1D_VAR_STARTS_COUNTS (fix_starts_D1, fix_counts_D1, xnreqs[0], disps[0], blocklens[0])
         nvars_D[0]++;
-
+/*
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[0], fix_starts_D1, fix_counts_D1,
                               dbl_buf_ptr, nelems[0], MPI_DOUBLE, NULL);
+*/
+        MPI_Allreduce(&xnreqs[0], &max_cnt, 1, MPI_INT, MPI_MAX, io_comm);
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   xnreqs[0],
+                   max_cnt,
+                   fix_starts_D1,
+                   fix_counts_D1,
+                   dbl_buf_ptr);
         ERR
         dbl_buf_ptr += nelems[0] + gap;
         my_nreqs += xnreqs[0];
@@ -659,7 +699,7 @@ int run_varn_F_case_hdf5 (
         free (fix_starts_D1);
     } else
         i++;
-
+    printf("rank %d checkpoint\n", rank);
     /* construct varn API arguments starts[][] and counts[][] */
     if (xnreqs[2] > 0)
         REC_3D_VAR_STARTS_COUNTS (0, starts_D3, counts_D3, xnreqs[2], disps[2], blocklens[2],
@@ -676,7 +716,6 @@ int run_varn_F_case_hdf5 (
         int_buf_ptr = int_buf;
         txt_buf_ptr = txt_buf;
         /* next 27 small variables are written by rank 0 only */
-        printf("rank %d is before write small varn\n", rank);
         //if (rank == 0) {
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
@@ -687,7 +726,6 @@ int run_varn_F_case_hdf5 (
 
             ERR
         //}
-        printf("rank %d is before post varn\n", rank);
         i += 27;
         post_timing += MPI_Wtime () - timing;
 

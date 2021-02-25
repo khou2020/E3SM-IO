@@ -476,7 +476,6 @@ int hdf5_put_varn (int vid,
     // Call H5DWrite
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-    printf("rank %d has cnt = %d\n", rank, cnt);
     for (i = 0; i < cnt; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
@@ -514,6 +513,113 @@ int hdf5_put_varn (int vid,
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, bufp);
 
+            CHECK_HERR
+#endif
+            twrite += MPI_Wtime () - te;
+            bufp += rsize;
+        }
+    }
+fn_exit:;
+    if (dsid >= 0) H5Sclose (dsid);
+#ifndef ENABLE_LOGVOL
+    if (msid >= 0) H5Sclose (msid);
+#endif
+    return (int)herr;
+}
+
+int hdf5_put_varn_mpi (int vid,
+                   MPI_Datatype mpitype,
+                   hid_t dxplid,
+                   int cnt,
+                   int max_cnt,
+                   MPI_Offset **mstarts,
+                   MPI_Offset **mcounts,
+                   void *buf) {
+    int err;
+    herr_t herr = 0;
+    int i, j;
+    double ts, te;
+    hsize_t esize, rsize, rsize_old = 0, memspace_size;
+    int ndim;
+    hid_t dsid = -1, msid = -1;
+    hid_t mtype;
+    char *bufp = buf;
+    hid_t did;
+    hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
+    hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
+
+    did = f_dids[vid];
+
+    mtype = mpi_type_to_hdf5_type (mpitype);
+    esize = (hsize_t)H5Tget_size (mtype);
+    CHECK_HID (esize)
+
+    dsid = H5Dget_space (did);
+    CHECK_HID (dsid)
+
+    ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
+    CHECK_HID (ndim)
+
+    // Extend rec dim if needed
+    ts = MPI_Wtime ();
+    if (ndim && mdims[0] == H5S_UNLIMITED) {
+        MPI_Offset max_rec = 0;
+        for (i = 0; i < cnt; i++) {
+            if (max_rec < mstarts[i][0] + mcounts[i][0]) {
+                max_rec = mstarts[i][0] + mcounts[i][0];
+            }
+        }
+        if (dims[0] < (hsize_t)max_rec) {
+            dims[0] = (hsize_t)max_rec;
+
+            H5Sclose (dsid);
+            herr = H5Dset_extent (did, dims);
+            CHECK_HERR
+            dsid = H5Dget_space (did);
+            CHECK_HID (dsid)
+        }
+
+    }
+    text += MPI_Wtime () - ts;
+
+    // Call H5DWrite
+    int rank;
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+    for (i = 0; i < cnt; i++) {
+        rsize = esize;
+        for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
+        memspace_size = rsize / esize;
+
+        if (rsize) {
+            // err = hdf5_put_vara (vid, mtype, dxplid, mstarts[i], mcounts[i], bufp);
+            // CHECK_ERR
+
+            for (j = 0; j < ndim; j++) {
+                start[j] = (hsize_t)mstarts[i][j];
+                block[j] = (hsize_t)mcounts[i][j];
+            }
+
+#ifndef ENABLE_LOGVOL
+            // Recreate only when size mismatch
+            if (rsize != rsize_old) {
+                if (msid >= 0) H5Sclose (msid);
+                msid = H5Screate_simple (1, &memspace_size, &memspace_size);
+                CHECK_HID (msid)
+
+                rsize_old = rsize;
+            }
+#endif
+
+            ts = MPI_Wtime ();
+            herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
+            CHECK_HERR
+            te = MPI_Wtime ();
+            tsel += te - ts;
+#ifdef ENABLE_LOGVOL
+            herr = H5Dwrite (did, mtype, H5S_CONTIG, dsid, dxplid, bufp);
+            CHECK_HERR
+#else
+            herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             CHECK_HERR
 #endif
             twrite += MPI_Wtime () - te;

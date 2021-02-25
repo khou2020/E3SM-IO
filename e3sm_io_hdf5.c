@@ -1,5 +1,5 @@
 #include "e3sm_io_hdf5.h"
-
+#include <stdlib.h>
 #include <string.h>
 
 // hid_t dxplid_nb  = -1;

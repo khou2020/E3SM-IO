@@ -472,7 +472,7 @@ fn_exit:
         nreqs = k + 1;                                                                             \
     }
 
-#define POST_VARN(k, num, vid, max_cnt)                                                            \
+#define POST_VARN(k, num, vid)                                                            \
     for (j = 0; j < num; j++) {                                                                    \
         MPI_Allreduce(&xnreqs[k - 1], &max_cnt, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);              \
         err = HDF5_IPUT_VARN (ncid, vid + j, xnreqs[k - 1], starts_D##k, counts_D##k, rec_buf_ptr, \

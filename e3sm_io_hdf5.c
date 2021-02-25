@@ -626,6 +626,19 @@ int hdf5_put_varn_mpi (int vid,
             bufp += rsize;
         }
     }
+    if (msid >= 0) H5Sclose (msid);
+    memspace_size = 0;
+    msid = H5Screate_simple (1, &memspace_size, &memspace_size);
+    CHECK_HID (msid)
+    for (j = 0; j < ndim; j++) {
+        block[j] = 0;
+    }
+    herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
+    CHECK_HERR
+    for ( i = cnt; i < max_cnt; ++i ) {
+        herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+        CHECK_HERR
+    }
 fn_exit:;
     if (dsid >= 0) H5Sclose (dsid);
 #ifndef ENABLE_LOGVOL

@@ -247,8 +247,10 @@ int hdf5_put_vara_mpi (
     ts   = MPI_Wtime ();
 #ifndef ENABLE_LOGVOL
     if (rank != 0) {
-        herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, NULL, block);
+        herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, NULL, zero_dim);
         free(zero_dim);
+    } else {
+        herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     }
 #endif
     CHECK_HERR

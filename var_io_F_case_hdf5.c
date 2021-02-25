@@ -472,8 +472,9 @@ fn_exit:
         nreqs = k + 1;                                                                             \
     }
 
-#define POST_VARN(k, num, vid)                                                                     \
+#define POST_VARN(k, num, vid, max_cnt)                                                            \
     for (j = 0; j < num; j++) {                                                                    \
+        MPI_Allreduce(&xnreqs[k - 1], &max_cnt, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);              \
         err = HDF5_IPUT_VARN (ncid, vid + j, xnreqs[k - 1], starts_D##k, counts_D##k, rec_buf_ptr, \
                               -1, REC_ITYPE, NULL);                                                \
         ERR                                                                                        \
@@ -716,7 +717,6 @@ int run_varn_F_case_hdf5 (
         txt_buf_ptr = txt_buf;
         /* next 27 small variables are written by rank 0 only */
         //if (rank == 0) {
-    printf("rank %d checkpoint 0\n", rank);
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
 
@@ -745,7 +745,6 @@ int run_varn_F_case_hdf5 (
 
         for (j = 0; j < xnreqs[1]; j++) starts_D2[j][0] = rec_no;
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
-    printf("rank %d checkpoint 1\n", rank);
         if (nvars == 414) {
             if (two_buf) {
                 /* write 2D variables */

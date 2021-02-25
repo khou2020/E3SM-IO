@@ -509,7 +509,11 @@ int hdf5_put_varn (int vid,
             CHECK_HERR
 #else
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+            int rank;
+            MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+            printf("rank %d before H5Dwrite\n", rank);
             herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, bufp);
+            printf("rank %d after H5Dwrite\n", rank);
             CHECK_HERR
 #endif
             twrite += MPI_Wtime () - te;

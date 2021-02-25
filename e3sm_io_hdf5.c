@@ -439,9 +439,6 @@ int hdf5_put_varn (int vid,
     hid_t did;
     hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
     hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
-            int rank;
-            MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-            printf("rank %d before H5Dwrite\n", rank);
 
     did = f_dids[vid];
 
@@ -520,7 +517,6 @@ int hdf5_put_varn (int vid,
             bufp += rsize;
         }
     }
-            printf("rank %d after H5Dwrite\n", rank);
 fn_exit:;
     if (dsid >= 0) H5Sclose (dsid);
 #ifndef ENABLE_LOGVOL

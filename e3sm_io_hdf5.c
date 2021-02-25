@@ -508,8 +508,8 @@ int hdf5_put_varn (int vid,
             herr = H5Dwrite (did, mtype, H5S_CONTIG, dsid, dxplid, bufp);
             CHECK_HERR
 #else
-            herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-            //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, bufp);
+            //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+            herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, bufp);
 
             CHECK_HERR
 #endif

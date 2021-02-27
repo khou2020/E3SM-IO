@@ -866,7 +866,6 @@ int run_varn_F_case_hdf5 (
                 POST_VARN (2, 7, 44)  /* U250 ... Z500 */
             }
         }
-        printf("rank %d is after post varn\n", rank);
         post_timing += MPI_Wtime () - timing;
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/

@@ -627,6 +627,7 @@ int hdf5_put_varn_mpi (int vid,
             bufp += rsize;
         }
     }
+    /* The folowing code is to place dummy H5Dwrite for collective call.*/
     if (msid >= 0) H5Sclose (msid);
     memspace_size = 0;
     msid = H5Screate_simple (1, &memspace_size, &memspace_size);

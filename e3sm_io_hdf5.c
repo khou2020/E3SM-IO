@@ -258,7 +258,7 @@ int hdf5_put_vara_mpi (
     CHECK_HERR
 #else
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
-    herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
+    //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
     CHECK_HERR
 #endif
     twrite += MPI_Wtime () - te;
@@ -620,8 +620,8 @@ int hdf5_put_varn_mpi (int vid,
             herr = H5Dwrite (did, mtype, H5S_CONTIG, dsid, dxplid, bufp);
             CHECK_HERR
 #else
-            herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-            CHECK_HERR
+            //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+            //CHECK_HERR
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;
@@ -638,8 +638,8 @@ int hdf5_put_varn_mpi (int vid,
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     CHECK_HERR
     for ( i = cnt; i < max_cnt; ++i ) {
-        herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-        CHECK_HERR
+        //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+        //CHECK_HERR
     }
 fn_exit:;
     if (dsid >= 0) H5Sclose (dsid);

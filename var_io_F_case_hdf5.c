@@ -34,7 +34,7 @@ int hdf5_put_varn_mpi (int vid,
 
 int flush_multidatasets();
 int dataspace_recycle_all();
-int memspace_recycle_all()
+int memspace_recycle_all();
 
 
 /*----< write_small_vars_F_case_hdf5() >------------------------------------------*/

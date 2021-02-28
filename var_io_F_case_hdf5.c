@@ -33,6 +33,9 @@ int hdf5_put_varn_mpi (int vid,
                    void *buf);
 
 int flush_multidatasets();
+int dataspace_recycle_all();
+int memspace_recycle_all()
+
 
 /*----< write_small_vars_F_case_hdf5() >------------------------------------------*/
 static int write_small_vars_F_case_hdf5 (hid_t ncid,
@@ -872,6 +875,8 @@ int run_varn_F_case_hdf5 (
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/
         flush_multidatasets();
+        dataspace_recycle();
+        memspace_recycle();
 
         timing = MPI_Wtime ();
 

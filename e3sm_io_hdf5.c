@@ -105,7 +105,7 @@ int hdf5_wrap_init () {
     dataset_size_limit = 0;
 
     memspace_recycle_size = 0;
-    memspaee_recycle_size_limit = 0;
+    memspace_recycle_size_limit = 0;
 
     dataspace_recycle_size = 0;
     dataspaee_recycle_size_limit = 0;
@@ -162,7 +162,7 @@ int register_memspace_recycle(hid_t msid) {
     if (memspace_recycle_size == memspace_recycle_size_limit) {
         if ( memspace_recycle_size_limit > 0 ) {
             memspace_recycle_size_limit *= 2;
-            temp = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
+            hit_t *temp = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
             memcpy(temp, memspace_recycle, sizeof(hid_t) * memspace_recycle_size);
             free(memspace_recycle);
             memspace_recycle = temp;
@@ -208,7 +208,7 @@ int flush_multidatasets(){
     free(multi_datasets);
 }
 
-int dataspace_recycle() {
+int dataspace_recycle_all() {
     int i;
     for ( i = 0; i < dataspace_recycle_size; ++i ) {
         H5Pclose(dataspace_recycle[i]);
@@ -216,7 +216,7 @@ int dataspace_recycle() {
     free(dataspace_recycle);
 }
 
-int memspace_recycle() {
+int memspace_recycle_all() {
     int i;
     for ( i = 0; i < memspace_recycle_size; ++i ) {
         H5Pclose(memspace_recycle[i]);

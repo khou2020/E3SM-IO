@@ -145,14 +145,14 @@ int register_dataspace_recycle(hid_t dsid) {
     if (dataspace_recycle_size == dataspace_recycle_size_limit) {
         if ( dataspace_recycle_size_limit > 0 ) {
             dataspace_recycle_size_limit *= 2;
+            hid_t *temp = (hid_t*) malloc(dataspace_recycle_size_limit*sizeof(hid_t));
+            memcpy(temp, dataspace_recycle, sizeof(hid_t) * dataspace_recycle_size);
+            free(dataspace_recycle);
+            dataspace_recycle = temp;
         } else {
             dataspace_recycle_size_limit = 1048576;
+            dataspace_recycle = (hid_t*) malloc(dataspace_recycle_size_limit*sizeof(hid_t));
         }
-
-        hid_t *temp = (hid_t*) malloc(dataspace_recycle_size_limit*sizeof(hid_t));
-        memcpy(temp, dataspace_recycle, sizeof(hid_t) * dataspace_recycle_size);
-        free(dataspace_recycle);
-        dataspace_recycle = temp;
     }
     dataspace_recycle[dataspace_recycle_size] = dsid;
     dataspace_recycle_size++;
@@ -162,13 +162,14 @@ int register_memspace_recycle(hid_t msid) {
     if (memspace_recycle_size == memspace_recycle_size_limit) {
         if ( memspace_recycle_size_limit > 0 ) {
             memspace_recycle_size_limit *= 2;
+            temp = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
+            memcpy(temp, memspace_recycle, sizeof(hid_t) * memspace_recycle_size);
+            free(memspace_recycle);
+            memspace_recycle = temp;
         } else {
             memspace_recycle_size_limit = 1048576;
+            memspace_recycle = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
         }
-        temp = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
-        memcpy(temp, memspace_recycle, sizeof(hid_t) * memspace_recycle_size);
-        free(memspace_recycle);
-        memspace_recycle = temp;
     }
     memspace_recycle[memspace_recycle_size] = msid;
     memspace_recycle_size++;
@@ -178,13 +179,14 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
     if (dataset_size == dataset_size_limit) {
         if ( dataset_size_limit > 0 ) {
             dataset_size_limit *= 2;
+            H5D_rw_multi_t *temp = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
+            memcpy(temp, multi_datasets, sizeof(H5D_rw_multi_t) * dataset_size);
+            free(multi_datasets);
+            multi_datasets = temp;
         } else {
             dataset_size_limit = 1048576;
+            multi_datasets = (hid_t*) malloc(dataset_size_limit*sizeof(hid_t));
         }
-        H5D_rw_multi_t *temp = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
-        memcpy(temp, multi_datasets, sizeof(H5D_rw_multi_t) * dataset_size);
-        free(multi_datasets);
-        multi_datasets = temp;
     }
     multi_datasets[dataset_size].mem_space_id = msid;
     multi_datasets[dataset_size].dset_id = did;

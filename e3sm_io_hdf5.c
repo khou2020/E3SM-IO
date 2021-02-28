@@ -104,8 +104,11 @@ int hdf5_wrap_init () {
     dataset_size = 0;
     dataset_size_limit = 0;
 
-    recycle_size = 0;
-    recycle_size_limit = 0;
+    memspace_recycle_size = 0;
+    memspaee_recycle_size_limit = 0;
+
+    dataspace_recycle_size = 0;
+    dataspaee_recycle_size_limit = 0;
 
     f_ndim = 0;
     f_nd   = 0;

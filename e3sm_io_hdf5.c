@@ -14,7 +14,13 @@ hsize_t f_dims[1048576];
 hid_t f_dids[1048576];
 int dataset_size;
 int dataset_size_limit;
+int dataspace_recycle_size;
+int dataspace_recycle_size_limit;
+int memspace_recycle_size;
+int memspace_recycle_size_limit;
 H5D_rw_multi_t *multi_datasets;
+hid_t *memspace_recycle;
+hid_t *dataspace_recycle;
 static int f_nd;
 
 #ifdef ENABLE_LOGVOL
@@ -96,8 +102,10 @@ int hdf5_wrap_init () {
         mone[i] = 1;
     }
     dataset_size = 0;
-    multi_datasets = (H5D_rw_multi_t*) malloc(1048576*sizeof(H5D_rw_multi_t));
-    dataset_size_limit = 1048576;
+    dataset_size_limit = 0;
+
+    recycle_size = 0;
+    recycle_size_limit = 0;
 
     f_ndim = 0;
     f_nd   = 0;
@@ -130,9 +138,46 @@ void hdf5_wrap_finalize () {
     }
 }
 
+int register_dataspace_recycle(hid_t dsid) {
+    if (dataspace_recycle_size == dataspace_recycle_size_limit) {
+        if ( dataspace_recycle_size_limit > 0 ) {
+            dataspace_recycle_size_limit *= 2;
+        } else {
+            dataspace_recycle_size_limit = 1048576;
+        }
+
+        hid_t *temp = (hid_t*) malloc(dataspace_recycle_size_limit*sizeof(hid_t));
+        memcpy(temp, dataspace_recycle, sizeof(hid_t) * dataspace_recycle_size);
+        free(dataspace_recycle);
+        dataspace_recycle = temp;
+    }
+    dataspace_recycle[dataspace_recycle_size] = dsid;
+    dataspace_recycle_size++;
+}
+
+int register_memspace_recycle(hid_t msid) {
+    if (memspace_recycle_size == memspace_recycle_size_limit) {
+        if ( memspace_recycle_size_limit > 0 ) {
+            memspace_recycle_size_limit *= 2;
+        } else {
+            memspace_recycle_size_limit = 1048576;
+        }
+        temp = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
+        memcpy(temp, memspace_recycle, sizeof(hid_t) * memspace_recycle_size);
+        free(memspace_recycle);
+        memspace_recycle = temp;
+    }
+    memspace_recycle[memspace_recycle_size] = dsid;
+    memspace_recycle_size++;
+}
+
 int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mtype) {
     if (dataset_size == dataset_size_limit) {
-        dataset_size_limit *= 2;
+        if ( dataset_size_limit > 0 ) {
+            dataset_size_limit *= 2;
+        } else {
+            dataset_size_limit = 1048576;
+        }
         H5D_rw_multi_t *temp = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
         memcpy(temp, multi_datasets, sizeof(H5D_rw_multi_t) * dataset_size);
         free(multi_datasets);
@@ -153,11 +198,25 @@ int flush_multidatasets(){
     printf("Number of datasets to be written %d\n", dataset_size);
     //H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
     H5Pclose(plist_id);
-    for ( i = 0; i < dataset_size; ++i ) {
-        H5Pclose(multi_datasets[i].mem_space_id);
-        H5Pclose(multi_datasets[i].dset_space_id);
-    }
     dataset_size = 0;
+    dataset_size_limit = 0;
+    free(multi_datasets);
+}
+
+int dataspace_recycle() {
+    int i;
+    for ( i = 0; i < dataspace_recycle_size; ++i ) {
+        H5Pclose(dataspace_recycle[i]);
+    }
+    free(dataspace_recycle);
+}
+
+int memspace_recycle() {
+    int i;
+    for ( i = 0; i < memspace_recycle_size; ++i ) {
+        H5Pclose(memspace_recycle[i]);
+    }
+    free(memspace_recycle);
 }
 
 int hdf5_put_vara (
@@ -298,6 +357,8 @@ int hdf5_put_vara_mpi (
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
     //CHECK_HERR
+    register_dataspace_recycle(dsid);
+    register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;
@@ -599,7 +660,6 @@ int hdf5_put_varn_mpi (int vid,
 
     ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
     CHECK_HID (ndim)
-
     // Extend rec dim if needed
     ts = MPI_Wtime ();
     if (ndim && mdims[0] == H5S_UNLIMITED) {
@@ -622,9 +682,12 @@ int hdf5_put_varn_mpi (int vid,
     }
     text += MPI_Wtime () - ts;
 
+    register_memspace_recycle(dsid);
+    register_memspace_recycle(msid);
     // Call H5DWrite
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+
     for (i = 0; i < cnt; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
@@ -642,14 +705,13 @@ int hdf5_put_varn_mpi (int vid,
 #ifndef ENABLE_LOGVOL
             // Recreate only when size mismatch
             if (rsize != rsize_old) {
-                if (msid >= 0) H5Sclose (msid);
+                //if (msid >= 0) H5Sclose (msid);
                 msid = H5Screate_simple (1, &memspace_size, &memspace_size);
                 CHECK_HID (msid)
-
+                register_memspace_recycle(msid);
                 rsize_old = rsize;
             }
 #endif
-
             ts = MPI_Wtime ();
             herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
             CHECK_HERR

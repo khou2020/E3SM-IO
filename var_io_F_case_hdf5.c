@@ -32,6 +32,8 @@ int hdf5_put_varn_mpi (int vid,
                    MPI_Offset **mcounts,
                    void *buf);
 
+int flush_multidatasets();
+
 /*----< write_small_vars_F_case_hdf5() >------------------------------------------*/
 static int write_small_vars_F_case_hdf5 (hid_t ncid,
                                          int rank,
@@ -869,6 +871,8 @@ int run_varn_F_case_hdf5 (
         post_timing += MPI_Wtime () - timing;
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/
+        flush_multidatasets();
+
         timing = MPI_Wtime ();
 
         err = HDF5_WAIT_ALL (ncid, NC_REQ_ALL, NULL, NULL);

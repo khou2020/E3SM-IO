@@ -12,6 +12,9 @@ MPI_Offset mone[H5S_MAX_RANK];
 static int f_ndim;
 hsize_t f_dims[1048576];
 hid_t f_dids[1048576];
+int dataset_size;
+int dataset_size_limit;
+H5D_rw_multi_t *multi_datasets;
 static int f_nd;
 
 #ifdef ENABLE_LOGVOL
@@ -92,6 +95,9 @@ int hdf5_wrap_init () {
         one[i]  = 1;
         mone[i] = 1;
     }
+    dataset_size = 0;
+    multi_datasets = (H5D_rw_multi_t*) malloc(1048576*sizeof(H5D_rw_multi_t));
+    dataset_size_limit = 1048576;
 
     f_ndim = 0;
     f_nd   = 0;
@@ -122,6 +128,30 @@ void hdf5_wrap_finalize () {
         printf ("H5Sselect_hyperslab_time_max: %lf\n", tsel_all);
         printf ("H5Dset_extent_time_max: %lf\n", text_all);
     }
+}
+
+int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mtype) {
+    if (dataset_size == dataset_size_limit) {
+        dataset_size_limit *= 2;
+        H5D_rw_multi_t *temp = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
+        memcpy(temp, multi_datasets, sizeof(H5D_rw_multi_t) * dataset_size);
+        free(multi_datasets);
+        multi_datasets = temp;
+    }
+    multi_datasets[dataset_size].mem_space_id = msid;
+    multi_datasets[dataset_size].dset_id = did;
+    multi_datasets[dataset_size].dset_space_id = dsid;
+    multi_datasets[dataset_size].mem_type_id = mtype;
+    multi_datasets[dataset_size].u.wbuf = buf;
+    dataset_size++;
+}
+
+int flush_multidatasets(){ 
+    hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
+    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
+    H5Pclose(plist_id);
+    dataset_size = 0;
 }
 
 int hdf5_put_vara (
@@ -186,10 +216,12 @@ int hdf5_put_vara (
     twrite += MPI_Wtime () - te;
 
 fn_exit:;
+/*
     if (dsid >= 0) H5Sclose (dsid);
 #ifndef ENABLE_LOGVOL
     if (msid >= 0) H5Sclose (msid);
 #endif
+*/
     return (int)herr;
 }
 
@@ -259,7 +291,8 @@ int hdf5_put_vara_mpi (
 #else
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
-    CHECK_HERR
+    //CHECK_HERR
+    register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;
 
@@ -620,8 +653,11 @@ int hdf5_put_varn_mpi (int vid,
             herr = H5Dwrite (did, mtype, H5S_CONTIG, dsid, dxplid, bufp);
             CHECK_HERR
 #else
-            //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-            //CHECK_HERR
+/*
+            herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+            CHECK_HERR
+*/
+            register_multidataset(buf, did, dsid, msid, mtype);
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;
@@ -638,14 +674,16 @@ int hdf5_put_varn_mpi (int vid,
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     CHECK_HERR
     for ( i = cnt; i < max_cnt; ++i ) {
-        //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-        //CHECK_HERR
+        herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+        CHECK_HERR
     }
 fn_exit:;
+/*
     if (dsid >= 0) H5Sclose (dsid);
 #ifndef ENABLE_LOGVOL
     if (msid >= 0) H5Sclose (msid);
 #endif
+*/
     return (int)herr;
 }
 #endif

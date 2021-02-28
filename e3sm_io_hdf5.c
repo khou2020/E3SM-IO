@@ -162,7 +162,7 @@ int register_memspace_recycle(hid_t msid) {
     if (memspace_recycle_size == memspace_recycle_size_limit) {
         if ( memspace_recycle_size_limit > 0 ) {
             memspace_recycle_size_limit *= 2;
-            hit_t *temp = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
+            hid_t *temp = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
             memcpy(temp, memspace_recycle, sizeof(hid_t) * memspace_recycle_size);
             free(memspace_recycle);
             memspace_recycle = temp;

@@ -167,7 +167,7 @@ int register_memspace_recycle(hid_t msid) {
         free(memspace_recycle);
         memspace_recycle = temp;
     }
-    memspace_recycle[memspace_recycle_size] = dsid;
+    memspace_recycle[memspace_recycle_size] = msid;
     memspace_recycle_size++;
 }
 

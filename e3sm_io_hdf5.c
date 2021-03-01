@@ -392,8 +392,6 @@ int hdf5_put_vara_mpi (
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
     //CHECK_HERR
-    int rank;
-    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     register_dataspace_recycle(dsid);
     register_memspace_recycle(msid);
             if (dataset_size == 0 && rank ==0) {

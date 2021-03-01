@@ -366,8 +366,9 @@ int hdf5_put_vara_mpi (
     register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;
-/*
+
 fn_exit:;
+/*
     if (dsid >= 0) H5Sclose (dsid);
 #ifndef ENABLE_LOGVOL
     if (msid >= 0) H5Sclose (msid);

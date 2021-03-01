@@ -185,7 +185,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
             multi_datasets = temp;
         } else {
             dataset_size_limit = 1048576;
-            multi_datasets = (hid_t*) malloc(dataset_size_limit*sizeof(hid_t));
+            multi_datasets = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
         }
     }
     multi_datasets[dataset_size].mem_space_id = msid;

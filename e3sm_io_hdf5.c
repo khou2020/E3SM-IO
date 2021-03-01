@@ -233,7 +233,7 @@ int flush_multidatasets(){
             printf("\n");
 */
         }
-        //herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
+        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
     }
 
     if (dataset_size) {
@@ -793,8 +793,7 @@ int hdf5_put_varn_mpi (int vid,
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     CHECK_HID (msid)
     register_memspace_recycle(msid);
-    //register_multidataset(buf, did, dsid, msid, mtype);
-    herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, buf);
+    register_multidataset(buf, did, dsid, msid, mtype);
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
 /*
     //if (msid >= 0) H5Sclose (msid);

@@ -212,9 +212,10 @@ int dataspace_recycle_all() {
     int i;
     printf("recycle %d dataspace\n", dataspace_recycle_size);
     for ( i = 0; i < dataspace_recycle_size; ++i ) {
-        H5Pclose(dataspace_recycle[i]);
+        if ( dataspace_recycle[i] >= 0 ) {
+            H5Pclose(dataspace_recycle[i]);
+        }
     }
-    printf("\n");
     if (dataspace_recycle_size) {
         free(dataspace_recycle);
     }
@@ -224,7 +225,9 @@ int memspace_recycle_all() {
     int i;
     printf("recycle %d memspace\n", memspace_recycle_size);
     for ( i = 0; i < memspace_recycle_size; ++i ) {
-        H5Pclose(memspace_recycle[i]);
+        if ( memspace_recycle[i] >= 0 ){
+            H5Pclose(memspace_recycle[i]);
+        }
     }
     if (memspace_recycle_size) {
         free(memspace_recycle);
@@ -368,8 +371,8 @@ int hdf5_put_vara_mpi (
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
     //CHECK_HERR
-    //register_dataspace_recycle(dsid);
-    //register_memspace_recycle(msid);
+    register_dataspace_recycle(dsid);
+    register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;

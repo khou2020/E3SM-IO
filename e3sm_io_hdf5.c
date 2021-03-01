@@ -203,11 +203,11 @@ int flush_multidatasets(){
     printf("Number of datasets to be written %d\n", dataset_size);
     H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
     H5Pclose(plist_id);
-    dataset_size = 0;
-    dataset_size_limit = 0;
     if (dataset_size) {
         free(multi_datasets);
     }
+    dataset_size = 0;
+    dataset_size_limit = 0;
 }
 
 int dataspace_recycle_all() {
@@ -221,6 +221,7 @@ int dataspace_recycle_all() {
     if (dataspace_recycle_size) {
         free(dataspace_recycle);
     }
+    dataspace_recycle_size = 0;
 }
 
 int memspace_recycle_all() {
@@ -234,6 +235,7 @@ int memspace_recycle_all() {
     if (memspace_recycle_size) {
         free(memspace_recycle);
     }
+    memspace_recycle_size = 0;
 }
 
 int hdf5_put_vara (
@@ -738,11 +740,11 @@ int hdf5_put_varn_mpi (int vid,
             herr = H5Dwrite (did, mtype, H5S_CONTIG, dsid, dxplid, bufp);
             CHECK_HERR
 #else
-/*
+
             herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             CHECK_HERR
-*/
-            register_multidataset(bufp, did, dsid, msid, mtype);
+
+            //register_multidataset(bufp, did, dsid, msid, mtype);
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;

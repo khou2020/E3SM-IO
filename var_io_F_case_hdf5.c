@@ -874,11 +874,12 @@ int run_varn_F_case_hdf5 (
         post_timing += MPI_Wtime () - timing;
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/
+
+        timing = MPI_Wtime ();
+
         flush_multidatasets();
         dataspace_recycle_all();
         memspace_recycle_all();
-
-        timing = MPI_Wtime ();
 
         err = HDF5_WAIT_ALL (ncid, NC_REQ_ALL, NULL, NULL);
         ERR

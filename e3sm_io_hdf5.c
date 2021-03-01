@@ -782,6 +782,9 @@ int hdf5_put_varn_mpi (int vid,
         }
     }
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
+    if (rank == 0) {
+        printf("rank 0 register %d memspace\n", total_memspace_size);
+    }
     CHECK_HID (msid)
     register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);

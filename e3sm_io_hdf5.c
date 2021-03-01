@@ -216,6 +216,7 @@ int flush_multidatasets(){
 
     for ( i = 0; i < dataset_size; ++i ) {
         if (rank ==0 && i==0) {
+/*
             printf("flushing did = %lld, dsid = %lld, msid= %lld\n", (long long int)multi_datasets[i].dset_id, (long long int)multi_datasets[i].dset_space_id, (long long int)multi_datasets[i].mem_space_id);
             ndim = H5Sget_simple_extent_dims (multi_datasets[i].dset_space_id, dims, mdims);
             printf("flushing dataspace ndim=%d,",ndim);
@@ -230,6 +231,7 @@ int flush_multidatasets(){
                 printf("%lld,", dims[j]);
             }
             printf("\n");
+*/
             herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
         }
     }
@@ -694,7 +696,7 @@ int hdf5_put_varn_mpi (int vid,
     herr_t herr = 0;
     int i, j;
     double ts, te;
-    hsize_t esize, rsize, rsize_old = 0, memspace_size;
+    hsize_t esize, rsize, rsize_old = 0, memspace_size, total_memspace_size, hyperslab_set;
     int ndim;
     hid_t dsid = -1, msid = -1;
     hid_t mtype;
@@ -740,12 +742,13 @@ int hdf5_put_varn_mpi (int vid,
     // Call H5DWrite
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-
+    hyperslab_set = 0;
+    total_memspace_size = 0;
     for (i = 0; i < cnt; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
         memspace_size = rsize / esize;
-
+        total_memspace_size += memspace_size;
         if (rsize) {
             // err = hdf5_put_vara (vid, mtype, dxplid, mstarts[i], mcounts[i], bufp);
             // CHECK_ERR
@@ -759,14 +762,19 @@ int hdf5_put_varn_mpi (int vid,
             // Recreate only when size mismatch
             if (rsize != rsize_old) {
                 //if (msid >= 0) H5Sclose (msid);
-                msid = H5Screate_simple (1, &memspace_size, &memspace_size);
-                CHECK_HID (msid)
-                register_memspace_recycle(msid);
+                //msid = H5Screate_simple (1, &memspace_size, &memspace_size);
+                //CHECK_HID (msid)
+                //register_memspace_recycle(msid);
                 rsize_old = rsize;
             }
 #endif
             ts = MPI_Wtime ();
-            herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
+            if (!hyperslab_set) {
+                herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
+                hyperslab_set = 1;
+            } else {
+                herr = H5Sselect_hyperslab (dsid, H5S_SELECT_OR, start, NULL, one, block);
+            }
             CHECK_HERR
             te = MPI_Wtime ();
             tsel += te - ts;
@@ -777,28 +785,15 @@ int hdf5_put_varn_mpi (int vid,
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, bufp);
             //CHECK_HERR
-            if (dataset_size == 0 && rank ==0) {
-                printf("registered did = %lld, dsid = %lld, msid= %lld\n", (long long int)did, (long long int)dsid, (long long int)msid);
-            ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
-            printf("register dataspace ndim=%d,",ndim);
-            for ( j = 0; j < ndim; ++j ) {
-                printf("%lld,", dims[j]);
-            }
-            printf("\n");
-
-            ndim = H5Sget_simple_extent_dims (msid, dims, mdims);
-            printf("register memspace ndim=%d, memspace_size = %lld, rsize = %lld, esize = %lld,",ndim, (long long int)memspace_size, (long long int) rsize, (long long int) esize);
-            for ( j = 0; j < ndim; ++j ) {
-                printf("%lld,", dims[j]);
-            }
-            printf("\n");
-            }
-            register_multidataset(bufp, did, dsid, msid, mtype);
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;
         }
     }
+    msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
+    CHECK_HID (msid)
+    register_memspace_recycle(msid);
+    register_multidataset(buf, did, dsid, msid, mtype);
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
 /*
     //if (msid >= 0) H5Sclose (msid);

@@ -185,7 +185,6 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
             memcpy(temp, multi_datasets, sizeof(H5D_rw_multi_t) * dataset_size);
             free(multi_datasets);
             multi_datasets = temp;
-            return 0;
         } else {
             dataset_size_limit = 1048576;
             multi_datasets = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
@@ -211,7 +210,7 @@ int flush_multidatasets(){
     H5Pclose(plist_id);
 
     for ( i = 0; i < dataset_size; ++i ) {
-        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
+        //herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
     }
 
     if (dataset_size) {

@@ -787,7 +787,7 @@ int hdf5_put_varn_mpi (int vid,
             printf("\n");
 
             ndim = H5Sget_simple_extent_dims (msid, dims, mdims);
-            printf("register memspace ndim=%d, memspace_size = %lld, ",ndim, (long long int)memspace_size);
+            printf("register memspace ndim=%d, memspace_size = %lld, rsize = %lld, esize = %lld,",ndim, (long long int)memspace_size, (long long int) rsize, (long long int) esize);
             for ( j = 0; j < ndim; ++j ) {
                 printf("%lld,", dims[j]);
             }

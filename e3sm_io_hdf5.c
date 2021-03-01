@@ -211,17 +211,21 @@ int flush_multidatasets(){
 int dataspace_recycle_all() {
     int i;
     for ( i = 0; i < dataspace_recycle_size; ++i ) {
-        H5Pclose(dataspace_recycle[i]);
+        //H5Pclose(dataspace_recycle[i]);
     }
-    free(dataspace_recycle);
+    if (dataspace_recycle_size) {
+        free(dataspace_recycle);
+    }
 }
 
 int memspace_recycle_all() {
     int i;
     for ( i = 0; i < memspace_recycle_size; ++i ) {
-        H5Pclose(memspace_recycle[i]);
+        //H5Pclose(memspace_recycle[i]);
     }
-    free(memspace_recycle);
+    if (memspace_recycle_size) {
+        free(memspace_recycle);
+    }
 }
 
 int hdf5_put_vara (

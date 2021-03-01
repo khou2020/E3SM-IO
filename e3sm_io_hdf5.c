@@ -212,7 +212,7 @@ int dataspace_recycle_all() {
     int i;
     printf("recycle %d dataspace\n", dataspace_recycle_size);
     for ( i = 0; i < dataspace_recycle_size; ++i ) {
-        H5Pclose(dataspace_recycle[i]);
+        //H5Pclose(dataspace_recycle[i]);
     }
     if (dataspace_recycle_size) {
         free(dataspace_recycle);
@@ -221,9 +221,9 @@ int dataspace_recycle_all() {
 
 int memspace_recycle_all() {
     int i;
-    printf("recycle %d memspace\n", dataspace_recycle_size);
+    printf("recycle %d memspace\n", memspace_recycle_size);
     for ( i = 0; i < memspace_recycle_size; ++i ) {
-        H5Pclose(memspace_recycle[i]);
+        //H5Pclose(memspace_recycle[i]);
     }
     if (memspace_recycle_size) {
         free(memspace_recycle);

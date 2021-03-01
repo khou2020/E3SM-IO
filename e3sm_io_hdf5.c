@@ -156,6 +156,7 @@ int register_dataspace_recycle(hid_t dsid) {
     }
     dataspace_recycle[dataspace_recycle_size] = dsid;
     dataspace_recycle_size++;
+    return 0;
 }
 
 int register_memspace_recycle(hid_t msid) {
@@ -173,6 +174,7 @@ int register_memspace_recycle(hid_t msid) {
     }
     memspace_recycle[memspace_recycle_size] = msid;
     memspace_recycle_size++;
+    return 0;
 }
 
 int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mtype) {
@@ -183,6 +185,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
             memcpy(temp, multi_datasets, sizeof(H5D_rw_multi_t) * dataset_size);
             free(multi_datasets);
             multi_datasets = temp;
+            return 0;
         } else {
             dataset_size_limit = 1048576;
             multi_datasets = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
@@ -194,6 +197,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
     multi_datasets[dataset_size].mem_type_id = mtype;
     multi_datasets[dataset_size].u.wbuf = buf;
     dataset_size++;
+    return 0;
 }
 
 int flush_multidatasets(){ 
@@ -215,6 +219,7 @@ int flush_multidatasets(){
     }
     dataset_size = 0;
     dataset_size_limit = 0;
+    return 0;
 }
 
 int dataspace_recycle_all() {
@@ -229,6 +234,7 @@ int dataspace_recycle_all() {
         free(dataspace_recycle);
     }
     dataspace_recycle_size = 0;
+    return 0;
 }
 
 int memspace_recycle_all() {
@@ -243,6 +249,7 @@ int memspace_recycle_all() {
         free(memspace_recycle);
     }
     memspace_recycle_size = 0;
+    return 0;
 }
 
 int hdf5_put_vara (

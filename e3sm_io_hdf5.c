@@ -368,8 +368,8 @@ int hdf5_put_vara_mpi (
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
     //CHECK_HERR
-    register_dataspace_recycle(dsid);
-    register_memspace_recycle(msid);
+    //register_dataspace_recycle(dsid);
+    //register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;

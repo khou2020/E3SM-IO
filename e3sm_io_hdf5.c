@@ -211,7 +211,7 @@ int flush_multidatasets(){
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
     printf("Number of datasets to be written %d\n", dataset_size);
-    H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
+    H5Dwrite_multi(plist_id, 16, multi_datasets+16);
     H5Pclose(plist_id);
 
     for ( i = 0; i < dataset_size; ++i ) {
@@ -793,7 +793,7 @@ int hdf5_put_varn_mpi (int vid,
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     CHECK_HID (msid)
     register_memspace_recycle(msid);
-    //register_multidataset(buf, did, dsid, msid, mtype);
+    register_multidataset(buf, did, dsid, msid, mtype);
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
 /*
     //if (msid >= 0) H5Sclose (msid);

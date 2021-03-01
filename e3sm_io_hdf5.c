@@ -202,31 +202,39 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 }
 
 int flush_multidatasets(){
-    int i, rank;
+    int i, j, rank;
     herr_t herr = 0;
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     printf("Number of datasets to be written %d\n", dataset_size);
-/*
+
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-    #define VALUE 4
+    #define VALUE 1
     for ( i = 0; i < dataset_size; i += VALUE ) {
          if (!rank) {
-             printf("checkpoint %d\n", i);
+             //printf("checkpoint %d\n", i);
          }
+         for ( j = i+1; j < dataset_size; ++j ) {
+             if (multi_datasets[i].dset_id == multi_datasets[j].dset_id) {
+                 printf("rank %d found overlapping dataset %lld at index i = %d, j = %d\n", rank, (long long int)multi_datasets[i].dset_id, i, j);
+             }
+         }
+/*
          if ( i + VALUE > dataset_size ) {
              H5Dwrite_multi(plist_id, dataset_size - i, multi_datasets+i);
          } else {
              H5Dwrite_multi(plist_id, VALUE, multi_datasets+i);
          }
+*/
     }
     H5Pclose(plist_id);
-*/
+
+/*
     for ( i = 0; i < dataset_size; ++i ) {
         herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
-
+*/
     if (dataset_size) {
         free(multi_datasets);
     }
@@ -783,7 +791,7 @@ int hdf5_put_varn_mpi (int vid,
     }
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     if (rank == 0) {
-        printf("rank 0 register %d memspace\n", total_memspace_size);
+        //printf("rank 0 register %d memspace\n", total_memspace_size);
     }
     CHECK_HID (msid)
     register_memspace_recycle(msid);

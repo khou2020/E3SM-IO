@@ -211,7 +211,7 @@ int flush_multidatasets(){
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
     printf("Number of datasets to be written %d\n", dataset_size);
-    //H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
+    H5Dwrite_multi(plist_id, 1, multi_datasets);
     H5Pclose(plist_id);
 
     for ( i = 0; i < dataset_size; ++i ) {
@@ -233,7 +233,7 @@ int flush_multidatasets(){
             printf("\n");
 */
         }
-        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
+        //herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
     }
 
     if (dataset_size) {

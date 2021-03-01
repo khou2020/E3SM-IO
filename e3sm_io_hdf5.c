@@ -749,7 +749,7 @@ int hdf5_put_varn_mpi (int vid,
         }
     }
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
-/*
+
     //if (msid >= 0) H5Sclose (msid);
     memspace_size = 0;
     msid = H5Screate_simple (1, &memspace_size, &memspace_size);
@@ -761,12 +761,14 @@ int hdf5_put_varn_mpi (int vid,
     dsid = H5Dget_space (did);
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     CHECK_HERR
+    register_dataspace_recycle(dsid);
+    register_memspace_recycle(msid);
     for ( i = cnt; i < max_cnt; ++i ) {
-        herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-        CHECK_HERR
-        //register_multidataset(bufp, did, dsid, msid, mtype);
+        //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+        //CHECK_HERR
+        register_multidataset(bufp, did, dsid, msid, mtype);
     }
-*/
+
 fn_exit:;
 /*
     if (dsid >= 0) H5Sclose (dsid);

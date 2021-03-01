@@ -197,12 +197,21 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 }
 
 int flush_multidatasets(){ 
-    int i;
+    int max_cnt;
+    herr_t herr = 0;
+
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
     printf("Number of datasets to be written %d\n", dataset_size);
     //H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
     H5Pclose(plist_id);
+
+    MPI_Allreduce(&dataset_size, &max_cnt, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+    for ( i = 0; i < dataset_size; ++i ) {
+        herr = H5Dwrite (multi_datasets[dataset_size].dset_id, multi_datasets[dataset_size].mem_type_id, multi_datasets[dataset_size].mem_space_id, multi_datasets[dataset_size].dset_space_id, dxplid_indep, multi_datasets[dataset_size].u.wbuf);
+        CHECK_HERR
+    }
+
     if (dataset_size) {
         free(multi_datasets);
     }

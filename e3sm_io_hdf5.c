@@ -210,7 +210,7 @@ int flush_multidatasets(){
 
 int dataspace_recycle_all() {
     int i;
-    printf("recycle %d dataspace\n", dataspace_recycle_size);
+    //printf("recycle %d dataspace\n", dataspace_recycle_size);
     for ( i = 0; i < dataspace_recycle_size; ++i ) {
         if ( dataspace_recycle[i] >= 0 ) {
             H5Sclose(dataspace_recycle[i]);
@@ -223,7 +223,7 @@ int dataspace_recycle_all() {
 
 int memspace_recycle_all() {
     int i;
-    printf("recycle %d memspace\n", memspace_recycle_size);
+    //printf("recycle %d memspace\n", memspace_recycle_size);
     for ( i = 0; i < memspace_recycle_size; ++i ) {
         if ( memspace_recycle[i] >= 0 ){
             H5Sclose(memspace_recycle[i]);

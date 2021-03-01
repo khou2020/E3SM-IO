@@ -178,6 +178,7 @@ int register_memspace_recycle(hid_t msid) {
 }
 
 int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mtype) {
+    int ndim;
     if (dataset_size == dataset_size_limit) {
         if ( dataset_size_limit > 0 ) {
             dataset_size_limit *= 2;
@@ -190,6 +191,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
             multi_datasets = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
         }
     }
+
     multi_datasets[dataset_size].mem_space_id = msid;
     multi_datasets[dataset_size].dset_id = did;
     multi_datasets[dataset_size].dset_space_id = dsid;
@@ -199,8 +201,9 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
     return 0;
 }
 
-int flush_multidatasets(){ 
-    int i, rank;
+int flush_multidatasets(){
+    hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
+    int i, j, rank;
     herr_t herr = 0;
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
@@ -212,8 +215,21 @@ int flush_multidatasets(){
 
     for ( i = 0; i < dataset_size; ++i ) {
         if (rank ==0 && i==0) {
-                printf("flushing did = %lld, dsid = %lld, msid= %lld\n", (long long int)multi_datasets[i].dset_id, (long long int)multi_datasets[i].dset_space_id, (long long int)multi_datasets[i].mem_space_id);
-        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
+            printf("flushing did = %lld, dsid = %lld, msid= %lld\n", (long long int)multi_datasets[i].dset_id, (long long int)multi_datasets[i].dset_space_id, (long long int)multi_datasets[i].mem_space_id);
+            ndim = H5Sget_simple_extent_dims (multi_datasets[i].dset_space_id, dims, mdims);
+            printf("dataspace ndim=%d,",ndim);
+            for ( j = 0; j < ndim; ++j ) {
+                printf("%lld,", dims[j]);
+            }
+            printf("\n");
+
+            ndim = H5Sget_simple_extent_dims (multi_datasets[i].mem_space_id, dims, mdims);
+            printf("memspace ndim=%d,",ndim);
+            for ( j = 0; j < ndim; ++j ) {
+                printf("%lld,", dims[j]);
+            }
+            printf("\n");
+            herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
         }
     }
 
@@ -394,9 +410,6 @@ int hdf5_put_vara_mpi (
     //CHECK_HERR
     register_dataspace_recycle(dsid);
     register_memspace_recycle(msid);
-            if (rank ==0) {
-                printf("vara registered did = %lld, dsid = %lld, msid= %lld, dataset_size = %lld\n", (long long int)did, (long long int)dsid, (long long int)msid, (long long int) dataset_size);
-            }
     register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;

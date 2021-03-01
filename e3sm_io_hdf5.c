@@ -765,9 +765,9 @@ int hdf5_put_varn_mpi (int vid,
     CHECK_HERR
     register_dataspace_recycle(dsid);
     for ( i = cnt; i < max_cnt; ++i ) {
-        //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-        //CHECK_HERR
-        register_multidataset(bufp, did, dsid, msid, mtype);
+        herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
+        CHECK_HERR
+        //register_multidataset(bufp, did, dsid, msid, mtype);
     }
 
 fn_exit:;

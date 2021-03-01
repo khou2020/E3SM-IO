@@ -197,7 +197,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 }
 
 int flush_multidatasets(){ 
-    int max_cnt;
+    int i;
     herr_t herr = 0;
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);

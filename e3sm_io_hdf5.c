@@ -762,7 +762,6 @@ int hdf5_put_varn_mpi (int vid,
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     CHECK_HERR
     register_dataspace_recycle(dsid);
-    register_memspace_recycle(msid);
     for ( i = cnt; i < max_cnt; ++i ) {
         //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
         //CHECK_HERR

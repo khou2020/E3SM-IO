@@ -210,6 +210,7 @@ int flush_multidatasets(){
 
 int dataspace_recycle_all() {
     int i;
+    printf("recycle %d dataspace\n", dataspace_recycle_size);
     for ( i = 0; i < dataspace_recycle_size; ++i ) {
         //H5Pclose(dataspace_recycle[i]);
     }
@@ -220,6 +221,7 @@ int dataspace_recycle_all() {
 
 int memspace_recycle_all() {
     int i;
+    printf("recycle %d memspace\n", dataspace_recycle_size);
     for ( i = 0; i < memspace_recycle_size; ++i ) {
         //H5Pclose(memspace_recycle[i]);
     }
@@ -693,7 +695,6 @@ int hdf5_put_varn_mpi (int vid,
     text += MPI_Wtime () - ts;
 
     register_memspace_recycle(dsid);
-    register_memspace_recycle(msid);
     // Call H5DWrite
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);

@@ -203,6 +203,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 
 int flush_multidatasets(){
     hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
+    int ndim;
     int i, j, rank;
     herr_t herr = 0;
 

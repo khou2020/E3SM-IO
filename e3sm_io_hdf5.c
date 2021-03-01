@@ -757,7 +757,7 @@ int hdf5_put_varn_mpi (int vid,
             herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             CHECK_HERR
 */
-            if (i==0)
+            if (i<2)
             register_multidataset(bufp, did, dsid, msid, mtype);
 #endif
             twrite += MPI_Wtime () - te;

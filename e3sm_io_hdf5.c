@@ -200,9 +200,10 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 }
 
 int flush_multidatasets(){ 
-    int i;
+    int i, rank;
     herr_t herr = 0;
 
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
     printf("Number of datasets to be written %d\n", dataset_size);
@@ -210,7 +211,9 @@ int flush_multidatasets(){
     H5Pclose(plist_id);
 
     for ( i = 0; i < dataset_size; ++i ) {
+        if (rank ==0 && i==0) {
         herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
+        }
     }
 
     if (dataset_size) {
@@ -754,10 +757,10 @@ int hdf5_put_varn_mpi (int vid,
             CHECK_HERR
 #else
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
-            herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, bufp);
-            CHECK_HERR
+            //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, bufp);
+            //CHECK_HERR
 
-            //register_multidataset(bufp, did, dsid, msid, mtype);
+            register_multidataset(bufp, did, dsid, msid, mtype);
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;

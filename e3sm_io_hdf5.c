@@ -218,14 +218,14 @@ int flush_multidatasets(){
         if (rank ==0 && i==0) {
             printf("flushing did = %lld, dsid = %lld, msid= %lld\n", (long long int)multi_datasets[i].dset_id, (long long int)multi_datasets[i].dset_space_id, (long long int)multi_datasets[i].mem_space_id);
             ndim = H5Sget_simple_extent_dims (multi_datasets[i].dset_space_id, dims, mdims);
-            printf("dataspace ndim=%d,",ndim);
+            printf("flushing dataspace ndim=%d,",ndim);
             for ( j = 0; j < ndim; ++j ) {
                 printf("%lld,", dims[j]);
             }
             printf("\n");
 
             ndim = H5Sget_simple_extent_dims (multi_datasets[i].mem_space_id, dims, mdims);
-            printf("memspace ndim=%d,",ndim);
+            printf("flushing memspace ndim=%d,",ndim);
             for ( j = 0; j < ndim; ++j ) {
                 printf("%lld,", dims[j]);
             }
@@ -779,6 +779,18 @@ int hdf5_put_varn_mpi (int vid,
             //CHECK_HERR
             if (dataset_size == 0 && rank ==0) {
                 printf("registered did = %lld, dsid = %lld, msid= %lld\n", (long long int)did, (long long int)dsid, (long long int)msid);
+            printf("register dataspace ndim=%d,",ndim);
+            for ( j = 0; j < ndim; ++j ) {
+                printf("%lld,", dims[j]);
+            }
+            printf("\n");
+
+            ndim = H5Sget_simple_extent_dims (multi_datasets[i].mem_space_id, dims, mdims);
+            printf("register memspace ndim=%d,",ndim);
+            for ( j = 0; j < ndim; ++j ) {
+                printf("%lld,", dims[j]);
+            }
+            printf("\n");
             }
             register_multidataset(bufp, did, dsid, msid, mtype);
 #endif

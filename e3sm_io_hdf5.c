@@ -206,10 +206,10 @@ int flush_multidatasets(){
     herr_t herr = 0;
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+    printf("Number of datasets to be written %d\n", dataset_size);
 /*
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-    printf("Number of datasets to be written %d\n", dataset_size);
     #define VALUE 4
     for ( i = 0; i < dataset_size; i += VALUE ) {
          if (!rank) {

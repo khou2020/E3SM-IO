@@ -694,7 +694,7 @@ int hdf5_put_varn_mpi (int vid,
     }
     text += MPI_Wtime () - ts;
 
-    register_memspace_recycle(dsid);
+    register_dataspace_recycle(dsid);
     // Call H5DWrite
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
@@ -736,7 +736,7 @@ int hdf5_put_varn_mpi (int vid,
             herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             CHECK_HERR
 */
-            register_multidataset(buf, did, dsid, msid, mtype);
+            register_multidataset(bufp, did, dsid, msid, mtype);
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;

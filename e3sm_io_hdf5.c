@@ -392,9 +392,13 @@ int hdf5_put_vara_mpi (
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, buf);
     //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_coll, buf);
     //CHECK_HERR
-    printf("checkpoin1111111111111111111------------------------\n");
+    int rank;
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     register_dataspace_recycle(dsid);
     register_memspace_recycle(msid);
+            if (dataset_size == 0 && rank ==0) {
+                printf("vara registered did = %lld, dsid = %lld, msid= %lld\n", (long long int)did, (long long int)dsid, (long long int)msid);
+            }
     register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;

@@ -208,10 +208,11 @@ int flush_multidatasets(){
     herr_t herr = 0;
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+/*
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
     printf("Number of datasets to be written %d\n", dataset_size);
-    #define VALUE 10
+    #define VALUE 4
     for ( i = 0; i < dataset_size; i += VALUE ) {
          if (!rank) {
              printf("checkpoint %d\n", i);
@@ -223,9 +224,9 @@ int flush_multidatasets(){
          }
     }
     H5Pclose(plist_id);
-
+*/
     for ( i = 0; i < dataset_size; ++i ) {
-        //herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
+        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
 
     if (dataset_size) {

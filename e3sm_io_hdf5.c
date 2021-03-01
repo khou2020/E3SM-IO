@@ -206,7 +206,6 @@ int flush_multidatasets(){
     //H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
     H5Pclose(plist_id);
 
-    MPI_Allreduce(&dataset_size, &max_cnt, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
     for ( i = 0; i < dataset_size; ++i ) {
         herr = H5Dwrite (multi_datasets[dataset_size].dset_id, multi_datasets[dataset_size].mem_type_id, multi_datasets[dataset_size].mem_space_id, multi_datasets[dataset_size].dset_space_id, dxplid_indep, multi_datasets[dataset_size].u.wbuf);
     }

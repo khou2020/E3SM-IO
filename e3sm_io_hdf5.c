@@ -210,10 +210,12 @@ int flush_multidatasets(){
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+
+    H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
     #define VALUE 3
     for ( i = 0; i < dataset_size; i += VALUE ) {
          if (!rank) {
-             printf("checkpoint %d\n", i);
+             //printf("checkpoint %d\n", i);
          }
 /*
          for ( j = i+1; j < dataset_size; ++j ) {
@@ -231,7 +233,7 @@ int flush_multidatasets(){
     H5Pclose(plist_id);
 
     for ( i = 0; i < dataset_size; ++i ) {
-        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
+        //herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
 
     if (dataset_size) {

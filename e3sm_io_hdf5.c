@@ -223,18 +223,17 @@ int flush_multidatasets(){
          }
 */
          if ( i + VALUE > dataset_size ) {
-             H5Dwrite_multi(plist_id, dataset_size - i, multi_datasets+i);
+             //H5Dwrite_multi(plist_id, dataset_size - i, multi_datasets+i);
          } else {
-             H5Dwrite_multi(plist_id, VALUE, multi_datasets+i);
+             //H5Dwrite_multi(plist_id, VALUE, multi_datasets+i);
          }
     }
     H5Pclose(plist_id);
 
-/*
     for ( i = 0; i < dataset_size; ++i ) {
         herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
-*/
+
     if (dataset_size) {
         free(multi_datasets);
     }

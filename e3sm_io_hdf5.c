@@ -212,6 +212,9 @@ int flush_multidatasets(){
 
     for ( i = 0; i < dataset_size; ++i ) {
         if (rank ==0 && i==0) {
+            if (dataset_size == 0 && rank ==0) {
+                printf("flushing did = %lld, dsid = %lld, msid= %lld\n", (long long int)multi_datasets[i].dset_id, (long long int)multi_datasets[i].dset_space_id, (long long int)multi_datasets[i].mem_space_id);
+            }
         herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
         }
     }
@@ -759,7 +762,9 @@ int hdf5_put_varn_mpi (int vid,
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, bufp);
             //CHECK_HERR
-
+            if (dataset_size == 0 && rank ==0) {
+                printf("registered did = %lld, dsid = %lld, msid= %lld\n", (long long int)did, (long long int)dsid, (long long int)msid);
+            }
             register_multidataset(bufp, did, dsid, msid, mtype);
 #endif
             twrite += MPI_Wtime () - te;

@@ -215,25 +215,7 @@ int flush_multidatasets(){
     H5Pclose(plist_id);
 
     for ( i = 0; i < dataset_size; ++i ) {
-        if (rank ==0 && i==0) {
-/*
-            printf("flushing did = %lld, dsid = %lld, msid= %lld\n", (long long int)multi_datasets[i].dset_id, (long long int)multi_datasets[i].dset_space_id, (long long int)multi_datasets[i].mem_space_id);
-            ndim = H5Sget_simple_extent_dims (multi_datasets[i].dset_space_id, dims, mdims);
-            printf("flushing dataspace ndim=%d,",ndim);
-            for ( j = 0; j < ndim; ++j ) {
-                printf("%lld,", dims[j]);
-            }
-            printf("\n");
-
-            ndim = H5Sget_simple_extent_dims (multi_datasets[i].mem_space_id, dims, mdims);
-            printf("flushing memspace ndim=%d,",ndim);
-            for ( j = 0; j < ndim; ++j ) {
-                printf("%lld,", dims[j]);
-            }
-            printf("\n");
-*/
-        }
-        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_indep, multi_datasets[i].u.wbuf);
+        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
 
     if (dataset_size) {

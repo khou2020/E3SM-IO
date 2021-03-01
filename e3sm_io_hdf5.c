@@ -695,7 +695,7 @@ int hdf5_put_varn_mpi (int vid,
     }
     text += MPI_Wtime () - ts;
 
-    register_dataspace_recycle(dsid);
+    //register_dataspace_recycle(dsid);
     // Call H5DWrite
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
@@ -720,7 +720,7 @@ int hdf5_put_varn_mpi (int vid,
                 //if (msid >= 0) H5Sclose (msid);
                 msid = H5Screate_simple (1, &memspace_size, &memspace_size);
                 CHECK_HID (msid)
-                register_memspace_recycle(msid);
+                //register_memspace_recycle(msid);
                 rsize_old = rsize;
             }
 #endif

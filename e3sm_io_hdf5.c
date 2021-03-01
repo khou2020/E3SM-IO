@@ -226,7 +226,7 @@ int memspace_recycle_all() {
         //H5Pclose(memspace_recycle[i]);
     }
     if (memspace_recycle_size) {
-        free(memspace_recycle);
+        //free(memspace_recycle);
     }
 }
 

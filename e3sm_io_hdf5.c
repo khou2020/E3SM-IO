@@ -394,8 +394,8 @@ int hdf5_put_vara_mpi (
     //CHECK_HERR
     register_dataspace_recycle(dsid);
     register_memspace_recycle(msid);
-            if (dataset_size == 0 && rank ==0) {
-                printf("vara registered did = %lld, dsid = %lld, msid= %lld\n", (long long int)did, (long long int)dsid, (long long int)msid);
+            if (rank ==0) {
+                printf("vara registered did = %lld, dsid = %lld, msid= %lld, dataset_size = %lld\n", (long long int)did, (long long int)dsid, (long long int)msid, (long long int) dataset_size);
             }
     register_multidataset(buf, did, dsid, msid, mtype);
 #endif

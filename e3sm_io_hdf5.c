@@ -212,6 +212,8 @@ int flush_multidatasets(){
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
     printf("Number of datasets to be written %d\n", dataset_size);
     for ( i = 0; i < dataset_size; ++i ) {
+         if (!rank)
+         printf("checkpoint %d\n", i);
          H5Dwrite_multi(plist_id, 1, multi_datasets+i);
     }
     H5Pclose(plist_id);

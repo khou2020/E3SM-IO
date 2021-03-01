@@ -210,23 +210,23 @@ int flush_multidatasets(){
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-    #define VALUE 1
+    #define VALUE 4
     for ( i = 0; i < dataset_size; i += VALUE ) {
          if (!rank) {
-             //printf("checkpoint %d\n", i);
+             printf("checkpoint %d\n", i);
          }
+/*
          for ( j = i+1; j < dataset_size; ++j ) {
              if (multi_datasets[i].dset_id == multi_datasets[j].dset_id) {
                  printf("rank %d found overlapping dataset %lld at index i = %d, j = %d\n", rank, (long long int)multi_datasets[i].dset_id, i, j);
              }
          }
-/*
+*/
          if ( i + VALUE > dataset_size ) {
              H5Dwrite_multi(plist_id, dataset_size - i, multi_datasets+i);
          } else {
              H5Dwrite_multi(plist_id, VALUE, multi_datasets+i);
          }
-*/
     }
     H5Pclose(plist_id);
 

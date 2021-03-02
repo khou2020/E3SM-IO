@@ -211,30 +211,30 @@ int flush_multidatasets(){
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-    H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
+    H5Dwrite_multi(plist_id, 3, multi_datasets);
+    H5Dwrite_multi(plist_id, dataset_size - 3, multi_datasets + 3);
     #define VALUE 1
-    for ( i = 0; i < dataset_size; i += VALUE ) {
 /*
+    for ( i = 0; i < dataset_size; i += VALUE ) {
+
          for ( j = i+1; j < dataset_size; ++j ) {
              if (multi_datasets[i].dset_id == multi_datasets[j].dset_id) {
                  printf("rank %d found overlapping dataset %lld at index i = %d, j = %d\n", rank, (long long int)multi_datasets[i].dset_id, i, j);
              }
          }
-*/
-/*
          if ( i + VALUE > dataset_size ) {
              H5Dwrite_multi(plist_id, dataset_size - i, multi_datasets+i);
          } else {
              H5Dwrite_multi(plist_id, VALUE, multi_datasets+i);
          }
+    }
 */
-    }
     H5Pclose(plist_id);
-
+/*
     for ( i = 0; i < dataset_size; ++i ) {
-        //herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
+        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
-
+*/
     if (dataset_size) {
         free(multi_datasets);
     }
@@ -738,12 +738,6 @@ int hdf5_put_varn_mpi (int vid,
     text += MPI_Wtime () - ts;
 
     register_dataspace_recycle(dsid);
-/*
-    for (j = 0; j < ndim; j++) {
-        start[j] = 0;
-        block[j] = 0;
-    }
-*/
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     // Call H5DWrite
     int rank;
@@ -797,9 +791,6 @@ int hdf5_put_varn_mpi (int vid,
         }
     }
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
-    if (rank == 0) {
-        //printf("rank 0 register %d memspace\n", total_memspace_size);
-    }
     CHECK_HID (msid)
     register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);

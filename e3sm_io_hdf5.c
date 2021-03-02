@@ -212,7 +212,7 @@ int flush_multidatasets(){
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
     //H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
-    #define VALUE 2
+    #define VALUE 1
     for ( i = 0; i < dataset_size; i += VALUE ) {
 /*
          for ( j = i+1; j < dataset_size; ++j ) {

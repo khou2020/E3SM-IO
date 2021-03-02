@@ -1,6 +1,7 @@
 #include "e3sm_io_hdf5.h"
 #include <stdlib.h>
 #include <string.h>
+#define ENABLE_MULTI_DATASET 1
 
 // hid_t dxplid_nb  = -1;
 hid_t dxplid_coll     = -1;
@@ -18,7 +19,21 @@ int dataspace_recycle_size;
 int dataspace_recycle_size_limit;
 int memspace_recycle_size;
 int memspace_recycle_size_limit;
+#if ENABLE_MULTIDATASET == 1
 H5D_rw_multi_t *multi_datasets;
+#else
+typedef struct H5D_rw_multi_t
+{
+    hid_t dset_id;          /* dataset ID */
+    hid_t dset_space_id;    /* dataset selection dataspace ID */
+    hid_t mem_type_id;      /* memory datatype ID */
+    hid_t mem_space_id;     /* memory selection dataspace ID */
+    union {
+        void *rbuf;         /* pointer to read buffer */
+        const void *wbuf;   /* pointer to write buffer */
+    } u;
+} H5D_rw_multi_t;
+#endif
 hid_t *memspace_recycle;
 hid_t *dataspace_recycle;
 static int f_nd;
@@ -203,11 +218,10 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 
 int flush_multidatasets() {
     int i, j, rank;
-    herr_t herr = 0;
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     //printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
-
+#if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
@@ -229,11 +243,11 @@ int flush_multidatasets() {
     }
 */
     H5Pclose(plist_id);
-/*
+#else
     for ( i = 0; i < dataset_size; ++i ) {
-        herr = H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
+        H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
-*/
+#endif
     if (dataset_size) {
         free(multi_datasets);
     }

@@ -736,6 +736,7 @@ int run_varn_F_case_hdf5 (
 
             ERR
         //}
+        flush_multidatasets();
         i += 27;
         post_timing += MPI_Wtime () - timing;
 

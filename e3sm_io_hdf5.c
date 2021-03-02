@@ -201,12 +201,12 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
     return 0;
 }
 
-int flush_multidatasets(){
+int flush_multidatasets() {
     int i, j, rank;
     herr_t herr = 0;
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-    printf("Number of datasets to be written %d\n", dataset_size);
+    printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
@@ -412,7 +412,7 @@ int hdf5_put_vara_mpi (
     //CHECK_HERR
     register_dataspace_recycle(dsid);
     register_memspace_recycle(msid);
-    //register_multidataset(buf, did, dsid, msid, mtype);
+    register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;
 

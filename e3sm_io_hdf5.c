@@ -799,7 +799,7 @@ int hdf5_put_varn_mpi (int vid,
     }
     CHECK_HID (msid)
     register_memspace_recycle(msid);
-    if (dataset_size < 4)
+    if (dataset_size > 3)
     register_multidataset(buf, did, dsid, msid, mtype);
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
 /*

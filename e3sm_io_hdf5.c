@@ -211,7 +211,7 @@ int flush_multidatasets(){
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-    //H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
+    H5Dwrite_multi(plist_id, dataset_size, multi_datasets);
     #define VALUE 1
     for ( i = 0; i < dataset_size; i += VALUE ) {
 /*
@@ -221,11 +221,13 @@ int flush_multidatasets(){
              }
          }
 */
+/*
          if ( i + VALUE > dataset_size ) {
              H5Dwrite_multi(plist_id, dataset_size - i, multi_datasets+i);
          } else {
              H5Dwrite_multi(plist_id, VALUE, multi_datasets+i);
          }
+*/
     }
     H5Pclose(plist_id);
 

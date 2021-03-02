@@ -739,12 +739,18 @@ int hdf5_put_varn_mpi (int vid,
     text += MPI_Wtime () - ts;
 
     register_dataspace_recycle(dsid);
+    for (j = 0; j < ndim; j++) {
+        start[j] = 0;
+        block[j] = 0;
+    }
+    total_memspace_size = 0;
+    herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     // Call H5DWrite
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     hyperslab_set = 0;
     total_memspace_size = 0;
-    for (i = 0; i < 1; i++) {
+    for (i = 0; i < 0; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
         memspace_size = rsize / esize;
@@ -792,7 +798,7 @@ int hdf5_put_varn_mpi (int vid,
     }
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     if (rank == 0) {
-        printf("rank 0 register %d memspace\n", total_memspace_size);
+        //printf("rank 0 register %d memspace\n", total_memspace_size);
     }
     CHECK_HID (msid)
     register_memspace_recycle(msid);

@@ -391,6 +391,7 @@ int hdf5_put_vara_mpi (
         }
     }
     herr = H5Sselect_hyperslab (msid, H5S_SELECT_SET, start, NULL, one, block);
+    herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     CHECK_HID (msid)
 #endif
 

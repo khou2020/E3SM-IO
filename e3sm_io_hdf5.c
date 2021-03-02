@@ -744,7 +744,7 @@ int hdf5_put_varn_mpi (int vid,
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     hyperslab_set = 0;
     total_memspace_size = 0;
-    for (i = 0; i < cnt; i++) {
+    for (i = 0; i < 1; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
         memspace_size = rsize / esize;

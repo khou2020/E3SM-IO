@@ -413,7 +413,7 @@ int hdf5_put_vara_mpi (
     //CHECK_HERR
     register_dataspace_recycle(dsid);
     register_memspace_recycle(msid);
-    register_multidataset(buf, did, dsid, msid, mtype);
+    //register_multidataset(buf, did, dsid, msid, mtype);
 #endif
     twrite += MPI_Wtime () - te;
 

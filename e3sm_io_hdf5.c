@@ -241,7 +241,7 @@ int flush_multidatasets() {
         for ( j = 0; j < ndim; ++j ) {
             mem_size *= dims[j];
         }
-        printf("rank %d, i = %d, data_size = %lld, mem_size = %lld\n", rank, i, data_size, mem_size);
+        //printf("rank %d, i = %d, data_size = %lld, mem_size = %lld\n", rank, i, data_size, mem_size);
     }
 
     H5Pclose(plist_id);

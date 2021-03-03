@@ -505,7 +505,7 @@ int run_varn_F_case_hdf5 (
     int *const disps[3],     /* request's displacements */
     int *const blocklens[3], /* request's block lengths */
     double *dbl_bufp,        /* buffer for fixed size double var */
-    itype *rec_bufp, *rec_bufp_backup,         /* buffer for rec floating point var */
+    itype *rec_bufp,         /* buffer for rec floating point var */
     char *txt_buf,           /* buffer for char var */
     int *int_buf)            /* buffer for int var */
 {
@@ -568,7 +568,6 @@ int run_varn_F_case_hdf5 (
         rec_buflen = nelems[1] * 20 + nelems[2] + (20 + 1) * gap;
 
     if (rec_bufp != NULL) {
-        printf("checkpoint\n");
         rec_buf = rec_bufp;
     } else {
         rec_buf = (itype *)malloc (rec_buflen * sizeof (itype));
@@ -576,6 +575,7 @@ int run_varn_F_case_hdf5 (
         for (i = 0; i < rec_buflen; i++) rec_buf[i] = rank;
         for (i = 0; i < 10; i++) int_buf[i] = rank;
         for (i = 0; i < 16; i++) txt_buf[i] = 'a' + rank;
+
     }
 
     pre_timing = MPI_Wtime () - pre_timing;

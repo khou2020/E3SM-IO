@@ -705,10 +705,10 @@ typedef struct {
 } Index_order;
 
 int index_order_cmp (const void *a, const void *b) {
-   return ( ((Index_order *))a->index - ((Index_order *)b)->index);
+   return ( ((Index_order *)a)->index - ((Index_order *)b)->index);
 }
 
-int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, int ndim, hsize_t dims, hsize_t *start, hsize_t *block) {
+int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, int ndim, hsize_t *dims, hsize_t *start, hsize_t *block) {
     int i, j, k;
     hsize_t size_copied = 0;
     if ( ndim == 1 ) {

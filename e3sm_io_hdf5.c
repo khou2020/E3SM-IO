@@ -164,7 +164,7 @@ int register_dataspace_recycle(hid_t dsid) {
             free(dataspace_recycle);
             dataspace_recycle = temp;
         } else {
-            dataspace_recycle_size_limit = 1048576;
+            dataspace_recycle_size_limit = 512;
             dataspace_recycle = (hid_t*) malloc(dataspace_recycle_size_limit*sizeof(hid_t));
         }
     }
@@ -182,7 +182,7 @@ int register_memspace_recycle(hid_t msid) {
             free(memspace_recycle);
             memspace_recycle = temp;
         } else {
-            memspace_recycle_size_limit = 1048576;
+            memspace_recycle_size_limit = 512;
             memspace_recycle = (hid_t*) malloc(memspace_recycle_size_limit*sizeof(hid_t));
         }
     }
@@ -201,7 +201,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
             free(multi_datasets);
             multi_datasets = temp;
         } else {
-            dataset_size_limit = 1048576;
+            dataset_size_limit = 512;
             multi_datasets = (H5D_rw_multi_t*) malloc(dataset_size_limit*sizeof(H5D_rw_multi_t));
         }
     }
@@ -699,6 +699,46 @@ fn_exit:;
     return (int)herr;
 }
 
+typedef struct {
+    int index;
+    void *data
+} Index_order;
+
+int index_order_cmp (const void *a, const void *b) {
+   return ( ((Index_order *))a->index - ((Index_order *)b)->index);
+}
+
+int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, int ndim, hsize_t dims, hsize_t *start, hsize_t *block) {
+    int i, j, k;
+    hsize_t size_copied = 0;
+    if ( ndim == 1 ) {
+        for ( k = 0; k < block[0]; k++ ) {
+            index_order[index[0]].index = start[0] + k;
+            index_order[index[0]].data = src + esize * (start[0] + k);
+        }
+        index[0]++;
+    } else if (ndim == 2) {
+        for ( i = 0; i < block[0]; ++i ) {
+            for ( k = 0; k < block[1]; ++k ) {
+                index_order[index[0]].index = start[1] + start[0] * dims[1] + k;
+                index_order[index[0]].data = src + esize * (start[1] + start[0] * dims[1] + k);
+            }
+        }
+    } else if (ndim == 3) {
+        for ( i = 0; i < block[0]; ++i ) {
+            for ( j = 0; j < block[1]; ++j ) {
+                for ( k = 0; k < block[2]; ++k ) {
+                    index_order[index[0]].index = start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2] + k;
+                    index_order[index[0]].data = src + esize * (start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2] + k);
+                }
+            }
+        }
+    } else {
+        printf("critical error, dimension is greater than 3.\n");
+        return -1;
+    }
+}
+
 int hdf5_put_varn_mpi (int vid,
                    MPI_Datatype mpitype,
                    hid_t dxplid,
@@ -719,6 +759,8 @@ int hdf5_put_varn_mpi (int vid,
     hid_t did;
     hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
     hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
+    int index;
+    Index_order *index_order;
 
     did = f_dids[vid];
 
@@ -753,6 +795,15 @@ int hdf5_put_varn_mpi (int vid,
     }
     text += MPI_Wtime () - ts;
 
+    ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
+    total_memspace_size = 0;
+    for (i = 0; i < cnt; i++) {
+        rsize = 1;
+        for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
+        total_memspace_size += rsize;
+    }
+    index_order = (Index_order*) malloc(sizeof(Index_order) * total_memspace_size);
+
     register_dataspace_recycle(dsid);
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     // Call H5DWrite
@@ -760,6 +811,7 @@ int hdf5_put_varn_mpi (int vid,
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     hyperslab_set = 0;
     total_memspace_size = 0;
+    index = 0;
     for (i = 0; i < cnt; i++) {
         rsize = esize;
         for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
@@ -801,11 +853,14 @@ int hdf5_put_varn_mpi (int vid,
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, bufp);
             //CHECK_HERR
+            pack_data(index_order, &index, bufp, esize, ndim, dims, start, block);
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;
         }
     }
+    qsort(index_order, total_memspace_size, sizeof(Index_order), index_order_cmp);
+    printf("index = %d, total_memspace_size = %lld\n", index, total_memspace_size);
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     CHECK_HID (msid)
     register_memspace_recycle(msid);

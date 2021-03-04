@@ -699,7 +699,7 @@ fn_exit:;
     return (int)herr;
 }
 
-typedef struct {
+typedef struct Index_order{
     int index;
     void *data
 } Index_order;

@@ -701,7 +701,7 @@ fn_exit:;
 
 typedef struct Index_order{
     int index;
-    void *data
+    void *data;
 } Index_order;
 
 int index_order_cmp (const void *a, const void *b) {

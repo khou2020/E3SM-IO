@@ -715,13 +715,14 @@ int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, in
         for ( k = 0; k < block[0]; k++ ) {
             index_order[index[0]].index = start[0] + k;
             index_order[index[0]].data = src + esize * (start[0] + k);
+            index[0]++;
         }
-        index[0]++;
     } else if (ndim == 2) {
         for ( i = 0; i < block[0]; ++i ) {
             for ( k = 0; k < block[1]; ++k ) {
                 index_order[index[0]].index = start[1] + start[0] * dims[1] + k;
                 index_order[index[0]].data = src + esize * (start[1] + start[0] * dims[1] + k);
+                index[0]++;
             }
         }
     } else if (ndim == 3) {
@@ -730,6 +731,7 @@ int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, in
                 for ( k = 0; k < block[2]; ++k ) {
                     index_order[index[0]].index = start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2] + k;
                     index_order[index[0]].data = src + esize * (start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2] + k);
+                    index[0]++;
                 }
             }
         }

@@ -709,20 +709,20 @@ int index_order_cmp (const void *a, const void *b) {
     return ( ((Index_order *)a)->index - ((Index_order *)b)->index);
 }
 
-int count_data(int cnt, int ndim, hsize_t *blocks, int *index) {
+int count_data(int cnt, int ndim, MPI_Offset **blocks, int *index) {
     int i, j, k;
-    hsize_t r_size;
+    hsize_t rsize;
     index[0] = 0;
     for ( k = 0; k < cnt; ++k ) {
         rsize = 1;
-        for (j = 0; j < ndim; j++) { rsize *= block[k][j]; }
+        for (j = 0; j < ndim; j++) { rsize *= blocks[k][j]; }
         if (rsize) {
             if (ndim == 1) {
                 index[0]++;
             } else if (ndim == 2) {
-                index[0] += block[k][0];
+                index[0] += blocks[k][0];
             } else if (ndim == 3) {
-                index[0] += block[k][0] * block[k][1];
+                index[0] += blocks[k][0] * blocks[k][1];
             } else {
                 printf("critical error, dimension is greater than 3.\n");
                 return -1;

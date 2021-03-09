@@ -762,8 +762,13 @@ int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, in
     }
 }
 
-int copy_index_buf(Index_order *index_order,char **out_buf){
-
+int copy_index_buf(Index_order *index_order, int total_blocks, char *out_buf) {
+    hsize_t displs = 0;
+    int i;
+    for ( i = 0; i < total_blocks; ++i ) {
+        memcpy(out_buf + displs, index_order[i].data, sizeof(char) * index_order[i].coverage);
+        displs += index_order[i].coverage;
+    }
 }
 
 int hdf5_put_varn_mpi (int vid,
@@ -885,16 +890,15 @@ int hdf5_put_varn_mpi (int vid,
     }
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
     buf2 = (char*) malloc(esize * total_memspace_size);
-
+    copy_index_buf(index_order, total_blocks, buf2);
+    memcpy(buf, buf2, sizeof(char) * total_memspace_size);
+    free(index_order);
+    free(buf2);
 
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     CHECK_HID (msid)
     register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);
-
-
-    free(index_order);
-    free(buf2);
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
 /*
     //if (msid >= 0) H5Sclose (msid);

@@ -706,7 +706,30 @@ typedef struct Index_order{
 } Index_order;
 
 int index_order_cmp (const void *a, const void *b) {
-   return ( ((Index_order *)a)->index - ((Index_order *)b)->index);
+    return ( ((Index_order *)a)->index - ((Index_order *)b)->index);
+}
+
+int count_data(int cnt, int ndim, hsize_t *blocks, int *index) {
+    int i, j, k;
+    hsize_t r_size;
+    index[0] = 0;
+    for ( k = 0; k < cnt; ++k ) {
+        rsize = 1;
+        for (j = 0; j < ndim; j++) { rsize *= block[k][j]; }
+        if (rsize) {
+            if (ndim == 1) {
+                index[0]++;
+            } else if (ndim == 2) {
+                index[0] += block[k][0];
+            } else if (ndim == 3) {
+                index[0] += block[k][0] * block[k][1];
+            } else {
+                printf("critical error, dimension is greater than 3.\n");
+                return -1;
+            }
+        }
+    }
+    return 0;
 }
 
 int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, int ndim, hsize_t *dims, hsize_t *start, hsize_t *block) {
@@ -739,6 +762,10 @@ int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, in
     }
 }
 
+int copy_index_buf(Index_order *index_order,char **out_buf){
+
+}
+
 int hdf5_put_varn_mpi (int vid,
                    MPI_Datatype mpitype,
                    hid_t dxplid,
@@ -761,6 +788,7 @@ int hdf5_put_varn_mpi (int vid,
     hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
     int index;
     Index_order *index_order;
+    int total_blocks;
 
     did = f_dids[vid];
 
@@ -796,13 +824,9 @@ int hdf5_put_varn_mpi (int vid,
     text += MPI_Wtime () - ts;
 
     ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
-    total_memspace_size = 0;
-    for (i = 0; i < cnt; i++) {
-        rsize = 1;
-        for (j = 0; j < ndim; j++) { rsize *= mcounts[i][j]; }
-        total_memspace_size += rsize;
-    }
-    index_order = (Index_order*) malloc(sizeof(Index_order) * total_memspace_size);
+
+    count_data(cnt, ndim, mcounts, &total_blocks);
+    index_order = (Index_order*) malloc(sizeof(Index_order) * total_blocks);
 
     register_dataspace_recycle(dsid);
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
@@ -859,7 +883,7 @@ int hdf5_put_varn_mpi (int vid,
             bufp += rsize;
         }
     }
-    qsort(index_order, total_memspace_size, sizeof(Index_order), index_order_cmp);
+    qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
     buf2 = (char*) malloc(esize * total_memspace_size);
 
 

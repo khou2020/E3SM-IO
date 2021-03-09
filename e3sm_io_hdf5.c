@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define ENABLE_MULTIDATASET 0
+#define MULTIDATASET_DEFINE 1
 
 // hid_t dxplid_nb  = -1;
 hid_t dxplid_coll     = -1;
@@ -19,7 +20,7 @@ int dataspace_recycle_size;
 int dataspace_recycle_size_limit;
 int memspace_recycle_size;
 int memspace_recycle_size_limit;
-#ifndef H5D_rw_multi_t
+#ifndef MULTIDATASET_DEFINE
 typedef struct H5D_rw_multi_t
 {
     hid_t dset_id;          /* dataset ID */

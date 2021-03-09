@@ -881,7 +881,7 @@ int run_varn_F_case_hdf5 (
 
         timing = MPI_Wtime ();
 
-        //flush_multidatasets();
+        flush_multidatasets();
         dataspace_recycle_all();
         memspace_recycle_all();
 

@@ -700,8 +700,9 @@ fn_exit:;
 }
 
 typedef struct Index_order{
-    int index;
-    void *data;
+    hsize_t index;
+    hsize_t coverage;
+    char *data;
 } Index_order;
 
 int index_order_cmp (const void *a, const void *b) {
@@ -709,30 +710,27 @@ int index_order_cmp (const void *a, const void *b) {
 }
 
 int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, int ndim, hsize_t *dims, hsize_t *start, hsize_t *block) {
-    int i, j, k;
+    int i, j;
     hsize_t size_copied = 0;
     if ( ndim == 1 ) {
-        for ( k = 0; k < block[0]; k++ ) {
-            index_order[index[0]].index = start[0] + k;
-            index_order[index[0]].data = src + esize * (start[0] + k);
-            index[0]++;
-        }
+        index_order[index[0]].index = start[0];
+        index_order[index[0]].coverage = esize * block[0];
+        index_order[index[0]].data = src;
+        index[0]++;
     } else if (ndim == 2) {
         for ( i = 0; i < block[0]; ++i ) {
-            for ( k = 0; k < block[1]; ++k ) {
-                index_order[index[0]].index = start[1] + start[0] * dims[1] + k;
-                index_order[index[0]].data = src + esize * (start[1] + start[0] * dims[1] + k);
-                index[0]++;
-            }
+            index_order[index[0]].index = start[1] + start[0] * dims[1];
+            index_order[index[0]].coverage = esize * block[1];
+            index_order[index[0]].data = src + esize * (start[1] + start[0] * dims[1]);
+            index[0]++;
         }
     } else if (ndim == 3) {
         for ( i = 0; i < block[0]; ++i ) {
             for ( j = 0; j < block[1]; ++j ) {
-                for ( k = 0; k < block[2]; ++k ) {
-                    index_order[index[0]].index = start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2] + k;
-                    index_order[index[0]].data = src + esize * (start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2] + k);
-                    index[0]++;
-                }
+                index_order[index[0]].index = start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2];
+                index_order[index[0]].coverage = esize * block[2];
+                index_order[index[0]].data = src + esize * (start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2]);
+                index[0]++;
             }
         }
     } else {
@@ -757,7 +755,7 @@ int hdf5_put_varn_mpi (int vid,
     int ndim;
     hid_t dsid = -1, msid = -1;
     hid_t mtype;
-    char *bufp = buf;
+    char *bufp = buf, *buf2;
     hid_t did;
     hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
     hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
@@ -862,11 +860,17 @@ int hdf5_put_varn_mpi (int vid,
         }
     }
     qsort(index_order, total_memspace_size, sizeof(Index_order), index_order_cmp);
-    printf("index = %d, total_memspace_size = %lld\n", index, total_memspace_size);
+    buf2 = (char*) malloc(esize * total_memspace_size);
+
+
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     CHECK_HID (msid)
     register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);
+
+
+    free(index_order);
+    free(buf2);
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
 /*
     //if (msid >= 0) H5Sclose (msid);

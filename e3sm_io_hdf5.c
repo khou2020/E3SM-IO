@@ -19,7 +19,7 @@ int dataspace_recycle_size;
 int dataspace_recycle_size_limit;
 int memspace_recycle_size;
 int memspace_recycle_size_limit;
-#if !defined(ENABLE_MULTIDATASET)
+#if !defined(H5D_rw_multi_t)
 typedef struct H5D_rw_multi_t
 {
     hid_t dset_id;          /* dataset ID */

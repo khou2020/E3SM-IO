@@ -61,7 +61,7 @@ You can change the Pnetcdf and HDF5 path to your customized ones.
 #SBATCH -L SCRATCH
 #SBATCH -C knl,quad,cache
 #SBATCH --mail-type=begin,end,fail
-#SBATCH --mail-user=qiaokang2015@u.northwestern.edu
+#SBATCH --mail-user=QKang@lbl.gov
 
 ulimit -c unlimited
 
@@ -93,6 +93,7 @@ echo ""
 OUTDIR=$SCRATCH/FS_1M_128
 cp e3sm_io $OUTDIR
 cp datasets/*.nc $OUTDIR
+cd $OUTDIR
 
 #export LD_LIBRARY_PATH=/global/homes/q/qkt561/mpich_develop/multi_dataset/hdf5/install/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/opt/cray/pe/hdf5-parallel/1.12.0.0/INTEL/19.1/lib:$LD_LIBRARY_PATH

@@ -98,7 +98,6 @@ cd $OUTDIR
 #export LD_LIBRARY_PATH=/global/homes/q/qkt561/mpich_develop/multi_dataset/hdf5/install/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/opt/cray/pe/hdf5-parallel/1.12.0.0/INTEL/19.1/lib:$LD_LIBRARY_PATH
 RUN_CMMD=e3sm_io
-cd $OUTDIR
 #RUN_OPTS="-k -o $OUTDIR -n -a hdf5 -f 0 $SCRATCH/FS_1M_128/f_case_72x777602_21632p.nc"
 RUN_OPTS="-k -o $OUTDIR -n -a hdf5 -f 0 $SCRATCH/FS_1M_128/f_case_866x72_16p.nc"
 #RUN_OPTS="-k -o $OUTDIR -n -a hdf5 -f 0 $SCRATCH/FS_1M_128/f_case_48602x72_512p.nc"

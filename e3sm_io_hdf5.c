@@ -228,7 +228,8 @@ int flush_multidatasets() {
     H5Pclose(plist_id);
 #else
     for ( i = 0; i < dataset_size; ++i ) {
-        H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
+        MPI_Barrier(MPI_COMM_WORLD);
+        //H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
 #endif
     if (dataset_size) {

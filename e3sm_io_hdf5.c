@@ -680,7 +680,7 @@ fn_exit:;
 #endif
     return (int)herr;
 }
-#if ENABLE_MULTIDATASET == 1
+
 typedef struct Index_order{
     hsize_t index;
     hsize_t coverage;
@@ -752,7 +752,7 @@ int copy_index_buf(Index_order *index_order, int total_blocks, char *out_buf) {
         displs += index_order[i].coverage;
     }
 }
-#endif
+
 
 int hdf5_put_varn_mpi (int vid,
                    MPI_Datatype mpitype,

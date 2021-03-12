@@ -726,7 +726,8 @@ int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, in
         for ( i = 0; i < block[0]; ++i ) {
             index_order[index[0]].index = start[1] + start[0] * dims[1];
             index_order[index[0]].coverage = esize * block[1];
-            index_order[index[0]].data = src + esize * (start[1] + start[0] * dims[1]);
+            index_order[index[0]].data = src;
+            src += index_order[index[0]].coverage;
             index[0]++;
         }
     } else if (ndim == 3) {
@@ -734,7 +735,8 @@ int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, in
             for ( j = 0; j < block[1]; ++j ) {
                 index_order[index[0]].index = start[0] * dims[1] * dims[2] + start[1] * dims[2] + start[2];
                 index_order[index[0]].coverage = esize * block[2];
-                index_order[index[0]].data = src + esize * (start[0] * dims[1] * dims[2] + start[1] * dims[2] + start[2]);
+                index_order[index[0]].data = src;
+                src += index_order[index[0]].coverage;
                 index[0]++;
             }
         }
@@ -748,7 +750,7 @@ int copy_index_buf(Index_order *index_order, int total_blocks, char *out_buf) {
     hsize_t displs = 0;
     int i;
     for ( i = 0; i < total_blocks; ++i ) {
-        memcpy(out_buf + displs, index_order[i].data, sizeof(char) * index_order[i].coverage);
+        memcpy(out_buf + displs, index_order[i].data, index_order[i].coverage);
         displs += index_order[i].coverage;
     }
 }
@@ -879,7 +881,7 @@ int hdf5_put_varn_mpi (int vid,
 
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
     buf2 = (char*) malloc(esize * total_memspace_size);
-    //copy_index_buf(index_order, total_blocks, buf2);
+    copy_index_buf(index_order, total_blocks, buf2);
     memcpy(buf, buf2, esize * total_memspace_size);
     free(index_order);
     free(buf2);

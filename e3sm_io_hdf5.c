@@ -692,7 +692,7 @@ int index_order_cmp (const void *a, const void *b) {
 }
 
 int count_data(int cnt, int ndim, MPI_Offset **blocks, int *index) {
-    int i, j, k;
+    int j, k;
     hsize_t rsize;
     index[0] = 0;
     for ( k = 0; k < cnt; ++k ) {
@@ -875,6 +875,9 @@ int hdf5_put_varn_mpi (int vid,
             twrite += MPI_Wtime () - te;
             bufp += rsize;
         }
+    }
+    if (index != total_blocks){
+        printf("critical error\n");
     }
 
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);

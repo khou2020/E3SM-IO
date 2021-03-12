@@ -868,7 +868,7 @@ int hdf5_put_varn_mpi (int vid,
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, bufp);
             //CHECK_HERR
 
-            pack_data(index_order, &index, bufp, esize, ndim, dims, start, block);
+            //pack_data(index_order, &index, bufp, esize, ndim, dims, start, block);
 
 
 #endif
@@ -877,12 +877,12 @@ int hdf5_put_varn_mpi (int vid,
         }
     }
 
-    qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
-    buf2 = (char*) malloc(esize * total_memspace_size);
-    copy_index_buf(index_order, total_blocks, buf2);
-    memcpy(buf, buf2, sizeof(char) * total_memspace_size);
+    //qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
+    //buf2 = (char*) malloc(esize * total_memspace_size);
+    //copy_index_buf(index_order, total_blocks, buf2);
+    //memcpy(buf, buf2, sizeof(char) * total_memspace_size);
     free(index_order);
-    free(buf2);
+    //free(buf2);
 
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     CHECK_HID (msid)

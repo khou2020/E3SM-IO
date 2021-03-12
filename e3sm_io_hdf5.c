@@ -774,12 +774,12 @@ int hdf5_put_varn_mpi (int vid,
     hid_t did;
     hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
     hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
-#if ENABLE_MULTIDATASET == 1
+
     char *buf2;
     int index;
     Index_order *index_order;
     int total_blocks;
-#endif
+
     did = f_dids[vid];
 
     mtype = mpi_type_to_hdf5_type (mpitype);
@@ -814,11 +814,11 @@ int hdf5_put_varn_mpi (int vid,
     text += MPI_Wtime () - ts;
 
     ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
-#if ENABLE_MULTIDATASET == 1
+
     count_data(cnt, ndim, mcounts, &total_blocks);
     index_order = (Index_order*) malloc(sizeof(Index_order) * total_blocks);
     index = 0;
-#endif
+
     register_dataspace_recycle(dsid);
     herr = H5Sselect_hyperslab (dsid, H5S_SELECT_SET, start, NULL, one, block);
     // Call H5DWrite
@@ -867,23 +867,23 @@ int hdf5_put_varn_mpi (int vid,
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid, bufp);
             //herr = H5Dwrite (did, mtype, msid, dsid, dxplid_indep, bufp);
             //CHECK_HERR
-#if ENABLE_MULTIDATASET == 1
+
             pack_data(index_order, &index, bufp, esize, ndim, dims, start, block);
-#endif
+
 
 #endif
             twrite += MPI_Wtime () - te;
             bufp += rsize;
         }
     }
-#if ENABLE_MULTIDATASET == 1
+
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
     buf2 = (char*) malloc(esize * total_memspace_size);
     copy_index_buf(index_order, total_blocks, buf2);
     memcpy(buf, buf2, sizeof(char) * total_memspace_size);
     free(index_order);
     free(buf2);
-#endif
+
     msid = H5Screate_simple (1, &total_memspace_size, &total_memspace_size);
     CHECK_HID (msid)
     register_memspace_recycle(msid);

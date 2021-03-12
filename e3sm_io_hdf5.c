@@ -732,9 +732,9 @@ int pack_data(Index_order *index_order, int *index, char* src, hsize_t esize, in
     } else if (ndim == 3) {
         for ( i = 0; i < block[0]; ++i ) {
             for ( j = 0; j < block[1]; ++j ) {
-                index_order[index[0]].index = start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2];
+                index_order[index[0]].index = start[0] * dims[1] * dims[2] + start[1] * dims[2] + start[2];
                 index_order[index[0]].coverage = esize * block[2];
-                index_order[index[0]].data = src + esize * (start[0] * dims[1] * dims[2] + start[1] * dims[1] + start[2]);
+                index_order[index[0]].data = src + esize * (start[0] * dims[1] * dims[2] + start[1] * dims[2] + start[2]);
                 index[0]++;
             }
         }
@@ -879,8 +879,8 @@ int hdf5_put_varn_mpi (int vid,
 
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
     buf2 = (char*) malloc(esize * total_memspace_size);
-    //copy_index_buf(index_order, total_blocks, buf2);
-    //memcpy(buf, buf2, sizeof(char) * total_memspace_size);
+    copy_index_buf(index_order, total_blocks, buf2);
+    memcpy(buf, buf2, sizeof(char) * total_memspace_size);
     free(index_order);
     free(buf2);
 

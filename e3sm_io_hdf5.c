@@ -220,7 +220,8 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 }
 
 int flush_multidatasets() {
-    int i;
+    int i, max_data_size;
+    hid_t mid, dsid
     //printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
@@ -230,9 +231,11 @@ int flush_multidatasets() {
 
     H5Pclose(plist_id);
 #else
+/*
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     printf("rank %d has dataset_size %lld\n", rank, (long long int) dataset_size);
+*/
     for ( i = 0; i < dataset_size; ++i ) {
         //MPI_Barrier(MPI_COMM_WORLD);
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);

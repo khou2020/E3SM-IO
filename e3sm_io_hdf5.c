@@ -793,6 +793,7 @@ int hdf5_put_varn_mpi (int vid,
     int total_blocks;
 
     did = f_dids[vid];
+/*
     if (cnt == 0) {
         memspace_size = 0;
         msid = H5Screate_simple (1, &memspace_size, &memspace_size);
@@ -801,7 +802,7 @@ int hdf5_put_varn_mpi (int vid,
         register_multidataset(NULL, did, msid, msid, mtype);
         return 0;
     }
-
+*/
 
     mtype = mpi_type_to_hdf5_type (mpitype);
     esize = (hsize_t)H5Tget_size (mtype);

@@ -21,6 +21,7 @@ int dataspace_recycle_size_limit;
 int memspace_recycle_size;
 int memspace_recycle_size_limit;
 int hyperslab_count;
+double hyperslab_time;
 
 #if MULTIDATASET_DEFINE == 1
 typedef struct H5D_rw_multi_t
@@ -121,6 +122,7 @@ int hdf5_wrap_init () {
     dataset_size = 0;
     dataset_size_limit = 0;
     hyperslab_count = 0;
+    hyperslab_time = .0;
 
     memspace_recycle_size = 0;
     memspace_recycle_size_limit = 0;
@@ -234,11 +236,11 @@ int flush_multidatasets() {
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
-    printf("rank %d has dataset_size %lld\n", rank, (long long int) dataset_size);
+    //printf("rank %d has dataset_size %lld\n", rank, (long long int) dataset_size);
     for ( i = 0; i < dataset_size; ++i ) {
         //MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0 ) {
-            printf("collective write at i = %d\n", i);
+            //printf("collective write at i = %d\n", i);
         }
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }

@@ -220,8 +220,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 }
 
 int flush_multidatasets() {
-    int i, max_data_size;
-    hid_t mid, dsid
+    int i;
     //printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);

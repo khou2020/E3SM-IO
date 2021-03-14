@@ -677,7 +677,22 @@ int run_varn_F_case_hdf5 (
         free (fix_starts_D2[0]);
         free (fix_starts_D2);
     } else {
-        i += 2;
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   0,
+                   max_cnt[1],
+                   NULL,
+                   NULL,
+                   NULL);
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   0,
+                   max_cnt[1],
+                   NULL,
+                   NULL,
+                   NULL);
     }
     flush_multidatasets();
     /* area */
@@ -707,7 +722,14 @@ int run_varn_F_case_hdf5 (
         free (fix_starts_D1[0]);
         free (fix_starts_D1);
     } else {
-        i++;
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   0,
+                   max_cnt[0],
+                   NULL,
+                   NULL,
+                   NULL);
     }
     flush_multidatasets();
     /* construct varn API arguments starts[][] and counts[][] */

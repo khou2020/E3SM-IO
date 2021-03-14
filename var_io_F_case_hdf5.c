@@ -483,8 +483,7 @@ fn_exit:
 
 #define POST_VARN(k, num, vid)                                                            \
     for (j = 0; j < num; j++) {                                                                    \
-        MPI_Allreduce(&xnreqs[k - 1], &max_cnt, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);              \
-        hdf5_put_varn_mpi (vid + j, REC_ITYPE, dxplid_coll, xnreqs[k - 1], max_cnt, starts_D##k, counts_D##k, rec_buf_ptr);\
+        hdf5_put_varn_mpi (vid + j, REC_ITYPE, dxplid_coll, xnreqs[k - 1], max_cnt[k - 1], starts_D##k, counts_D##k, rec_buf_ptr);\
         ERR                                                                                        \
         rec_buf_ptr += nelems[k - 1] + gap;                                                        \
         my_nreqs += xnreqs[k - 1];                                                                 \
@@ -512,8 +511,8 @@ int run_varn_F_case_hdf5 (
     char outfname[512], *txt_buf_ptr;
     herr_t herr;
     hid_t ncid, faplid;
-    int i, j, k, err, nerrs = 0, rank, cmode, *varids, nvars_D[3], max_cnt;
-    int rec_no, gap = 0, my_nreqs, *int_buf_ptr, xnreqs[3];
+    int i, j, k, err, nerrs = 0, rank, cmode, *varids, nvars_D[3];
+    int rec_no, gap = 0, my_nreqs, *int_buf_ptr, xnreqs[3], max_cnt[3];
     size_t dbl_buflen, rec_buflen, nelems[3];
     itype *rec_buf  = NULL, *rec_buf_ptr;
     double *dbl_buf = NULL, *dbl_buf_ptr;
@@ -630,6 +629,7 @@ int run_varn_F_case_hdf5 (
 
     i           = 0;
     dbl_buf_ptr = dbl_buf;
+    MPI_Allreduce(xnreqs, max_cnt, 3, MPI_INT, MPI_MAX, io_comm);
     if (xnreqs[1] > 0) {
         /* lat */
         MPI_Offset **fix_starts_D2, **fix_counts_D2;
@@ -643,12 +643,11 @@ int run_varn_F_case_hdf5 (
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
                               dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL);
 */
-        MPI_Allreduce(&xnreqs[1], &max_cnt, 1, MPI_INT, MPI_MAX, io_comm);
         hdf5_put_varn_mpi (varids[i++],
                    MPI_DOUBLE,
                    dxplid_coll,
                    xnreqs[1],
-                   max_cnt,
+                   max_cnt[1],
                    fix_starts_D2,
                    fix_counts_D2,
                    dbl_buf_ptr);
@@ -666,7 +665,7 @@ int run_varn_F_case_hdf5 (
                    MPI_DOUBLE,
                    dxplid_coll,
                    xnreqs[1],
-                   max_cnt,
+                   max_cnt[1],
                    fix_starts_D2,
                    fix_counts_D2,
                    dbl_buf_ptr);
@@ -691,12 +690,11 @@ int run_varn_F_case_hdf5 (
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[0], fix_starts_D1, fix_counts_D1,
                               dbl_buf_ptr, nelems[0], MPI_DOUBLE, NULL);
 */
-        MPI_Allreduce(&xnreqs[0], &max_cnt, 1, MPI_INT, MPI_MAX, io_comm);
         hdf5_put_varn_mpi (varids[i++],
                    MPI_DOUBLE,
                    dxplid_coll,
                    xnreqs[0],
-                   max_cnt,
+                   max_cnt[0],
                    fix_starts_D1,
                    fix_counts_D1,
                    dbl_buf_ptr);

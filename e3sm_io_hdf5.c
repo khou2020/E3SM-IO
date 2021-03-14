@@ -1,8 +1,8 @@
 #include "e3sm_io_hdf5.h"
 #include <stdlib.h>
 #include <string.h>
-#define ENABLE_MULTIDATASET 1
-#define MULTIDATASET_DEFINE 0
+#define ENABLE_MULTIDATASET 0
+#define MULTIDATASET_DEFINE 1
 
 // hid_t dxplid_nb  = -1;
 hid_t dxplid_coll     = -1;
@@ -235,7 +235,7 @@ int flush_multidatasets() {
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
 #endif
-    printf("number of hyperslab called %d\n", hyperslab_count);
+    //printf("number of hyperslab called %d\n", hyperslab_count);
 
     if (dataset_size) {
         free(multi_datasets);

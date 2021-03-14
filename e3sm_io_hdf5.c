@@ -20,6 +20,8 @@ int dataspace_recycle_size;
 int dataspace_recycle_size_limit;
 int memspace_recycle_size;
 int memspace_recycle_size_limit;
+int hyperslab_count;
+
 #if MULTIDATASET_DEFINE == 1
 typedef struct H5D_rw_multi_t
 {
@@ -118,6 +120,7 @@ int hdf5_wrap_init () {
     }
     dataset_size = 0;
     dataset_size_limit = 0;
+    hyperslab_count = 0;
 
     memspace_recycle_size = 0;
     memspace_recycle_size_limit = 0;
@@ -232,6 +235,8 @@ int flush_multidatasets() {
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
     }
 #endif
+    printf("number of hyperslab called %d\n", hyperslab_count);
+
     if (dataset_size) {
         free(multi_datasets);
     }
@@ -871,7 +876,7 @@ int hdf5_put_varn_mpi (int vid,
             //CHECK_HERR
 
             pack_data(index_order, &index, bufp, esize, ndim, dims, start, block);
-
+            hyperslab_count++;
 
 #endif
             twrite += MPI_Wtime () - te;

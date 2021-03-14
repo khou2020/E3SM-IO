@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define ENABLE_MULTIDATASET 0
-#define MULTIDATASET_DEFINE 1
+#define MULTIDATASET_DEFINE 0
 
 // hid_t dxplid_nb  = -1;
 hid_t dxplid_coll     = -1;
@@ -230,6 +230,9 @@ int flush_multidatasets() {
 
     H5Pclose(plist_id);
 #else
+    int rank;
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+    printf("rank %d has dataset_size %lld\n", (long long int) dataset_size);
     for ( i = 0; i < dataset_size; ++i ) {
         //MPI_Barrier(MPI_COMM_WORLD);
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);

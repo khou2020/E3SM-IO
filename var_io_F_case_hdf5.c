@@ -669,7 +669,6 @@ int run_varn_F_case_hdf5 (
                    fix_starts_D2,
                    fix_counts_D2,
                    dbl_buf_ptr);
-        flush_multidatasets();
         ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
@@ -677,8 +676,10 @@ int run_varn_F_case_hdf5 (
 
         free (fix_starts_D2[0]);
         free (fix_starts_D2);
-    } else
+    } else {
         i += 2;
+    }
+    flush_multidatasets();
     /* area */
     if (xnreqs[0] > 0) {
         MPI_Offset **fix_starts_D1, **fix_counts_D1;
@@ -698,8 +699,6 @@ int run_varn_F_case_hdf5 (
                    fix_starts_D1,
                    fix_counts_D1,
                    dbl_buf_ptr);
-        flush_multidatasets();
-
         ERR
         dbl_buf_ptr += nelems[0] + gap;
         my_nreqs += xnreqs[0];
@@ -707,8 +706,10 @@ int run_varn_F_case_hdf5 (
 
         free (fix_starts_D1[0]);
         free (fix_starts_D1);
-    } else
+    } else {
         i++;
+    }
+    flush_multidatasets();
     /* construct varn API arguments starts[][] and counts[][] */
     if (xnreqs[2] > 0)
         REC_3D_VAR_STARTS_COUNTS (0, starts_D3, counts_D3, xnreqs[2], disps[2], blocklens[2],

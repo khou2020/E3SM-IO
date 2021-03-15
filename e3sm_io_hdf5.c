@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define ENABLE_MULTIDATASET 0
-#define MULTIDATASET_DEFINE 0
+#define MULTIDATASET_DEFINE 1
 
 // hid_t dxplid_nb  = -1;
 hid_t dxplid_coll     = -1;

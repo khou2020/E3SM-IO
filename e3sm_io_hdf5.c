@@ -353,7 +353,8 @@ int flush_multidatasets() {
         }
     }
 #endif
-    //printf("number of hyperslab called %d\n", hyperslab_count);
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("rank %d number of hyperslab called %d\n", rank, hyperslab_count);
 
     if (dataset_size) {
         free(multi_datasets);

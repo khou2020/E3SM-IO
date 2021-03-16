@@ -235,15 +235,19 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
     case H5D_MPIO_DATA_TRANSFORMS: {
         printf("local flag: MPI-IO H5D_MPIO_DATA_TRANSFORMS.\n");
     }
+/*
     case H5D_MPIO_SET_MPIPOSIX: {
         printf("local flag: MPI-IO H5D_MPIO_SET_MPIPOSIX \n");
     }
+*/
     case H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES: {
         printf("local flag: MPI-IO NOT_SIMPLE_OR_SCALAR_DATASPACES\n");
     }
+/*
     case H5D_MPIO_POINT_SELECTIONS: {
         printf("local flag: MPI-IO H5D_MPIO_POINT_SELECTIONS\n");
     }
+*/
     case H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET: {
         printf("local flag: MPI-IO H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
     }

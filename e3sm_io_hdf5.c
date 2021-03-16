@@ -335,24 +335,16 @@ int flush_multidatasets() {
         //MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0 ) {
             //printf("collective write at i = %d\n", i);
-            switch(rank) {
-            case H5T_NATIVE_INT: {
+            if (multi_datasets[i].mem_type_id == H5T_NATIVE_INT) {
                 printf("getting int type\n");
-                break;
-            }
-            case H5T_NATIVE_FLOAT: {
+            } else if (multi_datasets[i].mem_type_id == H5T_NATIVE_FLOAT) {
                 printf("getting float type\n");
-                break;
-            }
-            case H5T_NATIVE_DOUBLE: {
+            } else if (multi_datasets[i].mem_type_id == H5T_NATIVE_DOUBLE) {
                 printf("getting double type\n");
-                break;
-            }
-            case H5T_NATIVE_CHAR: {
+            } else if (multi_datasets[i].mem_type_id == H5T_NATIVE_CHAR) {
                 printf("getting char type\n");
-                break;
-            }
-            default: { printf("bad type\n");break;}
+            } else {
+                printf("bad type\n")
             }
         }
 

@@ -344,7 +344,7 @@ int flush_multidatasets() {
             } else if (multi_datasets[i].mem_type_id == H5T_NATIVE_CHAR) {
                 printf("getting char type\n");
             } else {
-                printf("bad type\n")
+                printf("bad type\n");
             }
         }
 

@@ -347,11 +347,14 @@ int flush_multidatasets() {
                 printf("rank %d getting bad type\n", rank);
             }
         printf("rank %d checkpoint\n", rank);
+        MPI_Barrier(MPI_COMM_WORLD);
+/*
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
         if (!rank) {
         H5Pget_mpio_no_collective_cause( dxplid_coll, &local_no_collective_cause, &global_no_collective_cause);
         print_no_collective_cause(local_no_collective_cause, global_no_collective_cause);
         }
+*/
     }
 #endif
     MPI_Barrier(MPI_COMM_WORLD);

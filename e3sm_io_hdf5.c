@@ -1010,11 +1010,11 @@ int hdf5_put_varn_mpi (int vid,
     }
     te = MPI_Wtime ();
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
-    tsort = MPI_Wtime() - te;
+    tsort += MPI_Wtime() - te;
     buf2 = (char*) malloc(esize * total_memspace_size);
     te = MPI_Wtime();
     copy_index_buf(index_order, total_blocks, buf2);
-    tcpy = MPI_Wtime() - te;
+    tcpy += MPI_Wtime() - te;
     memcpy(buf, buf2, esize * total_memspace_size);
     free(index_order);
     free(buf2);

@@ -55,7 +55,7 @@ int two_buf;
  * behavior can be changed (i.e. memory buffer of type float) by removing the
  * line "#define _DOUBLE_TYPE_" below.
  */
-#define _DOUBLE_TYPE_
+#define _FLOAT_TYPE_
 
 #ifdef _DOUBLE_TYPE_
 typedef double itype;  /* internal data type of buffer in memory */

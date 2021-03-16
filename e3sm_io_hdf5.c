@@ -235,23 +235,20 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
     case H5D_MPIO_DATA_TRANSFORMS: {
         printf("local flag: MPI-IO H5D_MPIO_DATA_TRANSFORMS.\n");
     }
-    case H5D_MPIO_MPI_OPT_TYPES_ENV_VAR_DISABLED: {
-        printf("local flag: MPI-IO MPI_OPT_TYPES_ENV_VAR_DISABLED \n");
+    case H5D_MPIO_SET_MPIPOSIX: {
+        printf("local flag: MPI-IO H5D_MPIO_SET_MPIPOSIX \n");
     }
     case H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES: {
         printf("local flag: MPI-IO NOT_SIMPLE_OR_SCALAR_DATASPACES\n");
     }
+    case H5D_MPIO_POINT_SELECTIONS: {
+        printf("local flag: MPI-IO H5D_MPIO_POINT_SELECTIONS\n");
+    }
     case H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET: {
-        printf("local flag: MPI-IO NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
+        printf("local flag: MPI-IO H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
     }
-    case H5D_MPIO_PARALLEL_FILTERED_WRITES_DISABLED: {
-        printf("local flag: MPI-IO PARALLEL_FILTERED_WRITES_DISABLED\n");
-    }
-    case H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE: {
-        printf("local flag: MPI-IO ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE\n");
-    }
-    case H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE: {
-        printf("local flag: MPI-IO NO_COLLECTIVE_MAX_CAUSE\n");
+    case H5D_MPIO_FILTERS: {
+        printf("local flag: MPI-IO H5D_MPIO_FILTERS\n");
     }
     default: {
         printf("undefined label for collective cause\n");
@@ -271,23 +268,20 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
     case H5D_MPIO_DATA_TRANSFORMS: {
         printf("global flag: MPI-IO H5D_MPIO_DATA_TRANSFORMS.\n");
     }
-    case H5D_MPIO_MPI_OPT_TYPES_ENV_VAR_DISABLED: {
-        printf("global flag: MPI-IO MPI_OPT_TYPES_ENV_VAR_DISABLED \n");
+    case H5D_MPIO_SET_MPIPOSIX: {
+        printf("global flag: MPI-IO H5D_MPIO_SET_MPIPOSIX \n");
     }
     case H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES: {
         printf("global flag: MPI-IO NOT_SIMPLE_OR_SCALAR_DATASPACES\n");
     }
+    case H5D_MPIO_POINT_SELECTIONS: {
+        printf("global flag: MPI-IO H5D_MPIO_POINT_SELECTIONS\n");
+    }
     case H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET: {
-        printf("global flag: MPI-IO NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
+        printf("global flag: MPI-IO H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
     }
-    case H5D_MPIO_PARALLEL_FILTERED_WRITES_DISABLED: {
-        printf("global flag: MPI-IO PARALLEL_FILTERED_WRITES_DISABLED\n");
-    }
-    case H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE: {
-        printf("global flag: MPI-IO ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE\n");
-    }
-    case H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE: {
-        printf("global flag: MPI-IO NO_COLLECTIVE_MAX_CAUSE\n");
+    case H5D_MPIO_FILTERS: {
+        printf("global flag: MPI-IO H5D_MPIO_FILTERS\n");
     }
     default: {
         printf("undefined label for collective cause\n");

@@ -756,7 +756,6 @@ int run_varn_F_case_hdf5 (
 
         for (j = 0; j < xnreqs[1]; j++) starts_D2[j][0] = rec_no;
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
-#if 1==2
         if (nvars == 414) {
             if (two_buf) {
                 /* write 2D variables */
@@ -875,7 +874,6 @@ int run_varn_F_case_hdf5 (
                 POST_VARN (2, 7, 44)  /* U250 ... Z500 */
             }
         }
-#endif
         post_timing += MPI_Wtime () - timing;
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/

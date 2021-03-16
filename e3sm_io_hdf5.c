@@ -257,10 +257,12 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
         printf("local flag: MPI-IO H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
         break;
     }
+/*
     case H5D_MPIO_FILTERS: {
         printf("local flag: MPI-IO H5D_MPIO_FILTERS\n");
         break;
     }
+*/
     default: {
         printf("undefined label for collective cause\n");
         break;
@@ -302,10 +304,12 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
         printf("global flag: MPI-IO H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
         break;
     }
+/*
     case H5D_MPIO_FILTERS: {
         printf("global flag: MPI-IO H5D_MPIO_FILTERS\n");
         break;
     }
+*/
     default: {
         printf("undefined label for collective cause\n");
         break;

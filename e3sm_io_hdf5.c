@@ -333,21 +333,19 @@ int flush_multidatasets() {
     printf("rank %d has dataset_size %lld\n", rank, (long long int) dataset_size);
     for ( i = 0; i < dataset_size; ++i ) {
         //MPI_Barrier(MPI_COMM_WORLD);
-/*
+
             //printf("collective write at i = %d\n", i);
             if (multi_datasets[i].mem_type_id == H5T_NATIVE_INT) {
-                printf("getting int type\n");
+                printf("rank %d getting int type\n", rank);
             } else if (multi_datasets[i].mem_type_id == H5T_NATIVE_FLOAT) {
-                printf("getting float type\n");
+                printf("rank %d getting float type\n", rank);
             } else if (multi_datasets[i].mem_type_id == H5T_NATIVE_DOUBLE) {
-                printf("getting double type\n");
+                printf("rank %d getting double type\n", rank);
             } else if (multi_datasets[i].mem_type_id == H5T_NATIVE_CHAR) {
-                printf("getting char type\n");
+                printf("rank %d getting char type\n", rank);
             } else {
-                printf("bad type\n");
+                printf("rank %d getting bad type\n", rank);
             }
-        MPI_Barrier(MPI_COMM_WORLD);
-*/
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
         if (!rank) {
         H5Pget_mpio_no_collective_cause( dxplid_coll, &local_no_collective_cause, &global_no_collective_cause);

@@ -224,7 +224,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global_no_collective_cause) {
     switch (local_no_collective_cause) {
     case H5D_MPIO_COLLECTIVE: {
-        //printf("MPI-IO collective successful\n");
+        printf("MPI-IO collective successful\n");
     }
     case H5D_MPIO_SET_INDEPENDENT: {
         printf("local flag: MPI-IO independent flag is on\n");
@@ -261,7 +261,7 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
 
     switch (global_no_collective_cause) {
     case H5D_MPIO_COLLECTIVE: {
-        //printf("MPI-IO collective successful\n");
+        printf("MPI-IO collective successful\n");
     }
     case H5D_MPIO_SET_INDEPENDENT: {
         printf("global flag: MPI-IO independent flag is on\n");
@@ -321,8 +321,10 @@ int flush_multidatasets() {
             //printf("collective write at i = %d\n", i);
         }
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
-
+        if (!rank) {
         H5Pget_mpio_no_collective_cause( dxplid_coll, &local_no_collective_cause, &global_no_collective_cause);
+        print_no_collective_cause(local_no_collective_cause, global_no_collective_cause);
+        }
     }
 #endif
     //printf("number of hyperslab called %d\n", hyperslab_count);

@@ -333,7 +333,6 @@ int flush_multidatasets() {
     //printf("rank %d has dataset_size %lld\n", rank, (long long int) dataset_size);
     for ( i = 0; i < dataset_size; ++i ) {
         //MPI_Barrier(MPI_COMM_WORLD);
-        if (rank == 0 ) {
             //printf("collective write at i = %d\n", i);
             if (multi_datasets[i].mem_type_id == H5T_NATIVE_INT) {
                 printf("getting int type\n");
@@ -346,7 +345,6 @@ int flush_multidatasets() {
             } else {
                 printf("bad type\n");
             }
-        }
 
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
         if (!rank) {

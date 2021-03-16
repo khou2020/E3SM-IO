@@ -224,7 +224,7 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
 int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global_no_collective_cause) {
     switch (local_no_collective_cause) {
     case H5D_MPIO_COLLECTIVE: {
-        printf("MPI-IO collective successful\n");
+        //printf("MPI-IO collective successful\n");
         break;
     }
     case H5D_MPIO_SET_INDEPENDENT: {
@@ -269,7 +269,7 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
 
     switch (global_no_collective_cause) {
     case H5D_MPIO_COLLECTIVE: {
-        printf("MPI-IO collective successful\n");
+        //printf("MPI-IO collective successful\n");
         break;
     }
     case H5D_MPIO_SET_INDEPENDENT: {

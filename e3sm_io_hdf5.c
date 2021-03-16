@@ -79,7 +79,7 @@ hid_t mpi_type_to_hdf5_type (MPI_Datatype mpitype) {
     return -1;
 }
 
-double tsel, twrite, tread, text;
+double tsel, twrite, tread, text, tsort, tcpy;
 int hdf5_wrap_init () {
     herr_t herr = 0;
     int i;
@@ -133,7 +133,7 @@ int hdf5_wrap_init () {
     f_ndim = 0;
     f_nd   = 0;
 
-    tsel = twrite = tread = text = 0;
+    tsel = twrite = tread = text = tsort = tcpy = 0;
 
 fn_exit:;
     return (int)herr;
@@ -141,7 +141,7 @@ fn_exit:;
 
 void hdf5_wrap_finalize () {
     int rank;
-    double tsel_all, twrite_all, text_all;
+    double tsel_all, twrite_all, text_all, tcpy_all, tsort_all;
 
     if (dxplid_coll >= 0) H5Pclose (dxplid_coll);
     if (dxplid_indep >= 0) H5Pclose (dxplid_indep);
@@ -152,12 +152,16 @@ void hdf5_wrap_finalize () {
     MPI_Allreduce (&twrite, &twrite_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce (&tsel, &tsel_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce (&text, &text_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce (&tsort, &tsort_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce (&tcpy, &tcpy_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     if (rank == 0) {
         printf ("H5Dwrite_time_max: %lf\n", twrite_all);
         printf ("H5Sselect_hyperslab_time_max: %lf\n", tsel_all);
         printf ("H5Dset_extent_time_max: %lf\n", text_all);
+        printf ("H5D sort memory: %lf\n", tsort_all);
+        printf ("H5D copy memory: %lf\n", tcpy_all);
     }
 }
 
@@ -1004,10 +1008,13 @@ int hdf5_put_varn_mpi (int vid,
             bufp += rsize;
         }
     }
-
+    te = MPI_Wtime ();
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
+    tsort = MPI_Wtime() - te;
     buf2 = (char*) malloc(esize * total_memspace_size);
+    te = MPI_Wtime();
     copy_index_buf(index_order, total_blocks, buf2);
+    tcpy = MPI_Wtime() - te;
     memcpy(buf, buf2, esize * total_memspace_size);
     free(index_order);
     free(buf2);

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define ENABLE_MULTIDATASET 0
-#define MULTIDATASET_DEFINE 1
+#define MULTIDATASET_DEFINE 0
 
 // hid_t dxplid_nb  = -1;
 hid_t dxplid_coll     = -1;
@@ -221,8 +221,84 @@ int register_multidataset(void *buf, hid_t did, hid_t dsid, hid_t msid, hid_t mt
     return 0;
 }
 
+int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global_no_collective_cause) {
+    switch (local_no_collective_cause) {
+    case H5D_MPIO_COLLECTIVE: {
+        //printf("MPI-IO collective successful\n");
+    }
+    case H5D_MPIO_SET_INDEPENDENT: {
+        printf("local flag: MPI-IO independent flag is on\n");
+    }
+    case H5D_MPIO_DATATYPE_CONVERSION  : {
+        printf("local flag: MPI-IO datatype conversion needed\n");
+    }
+    case H5D_MPIO_DATA_TRANSFORMS: {
+        printf("local flag: MPI-IO H5D_MPIO_DATA_TRANSFORMS.\n");
+    }
+    case H5D_MPIO_MPI_OPT_TYPES_ENV_VAR_DISABLED: {
+        printf("local flag: MPI-IO MPI_OPT_TYPES_ENV_VAR_DISABLED \n");
+    }
+    case H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES: {
+        printf("local flag: MPI-IO NOT_SIMPLE_OR_SCALAR_DATASPACES\n");
+    }
+    case H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET: {
+        printf("local flag: MPI-IO NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
+    }
+    case H5D_MPIO_PARALLEL_FILTERED_WRITES_DISABLED: {
+        printf("local flag: MPI-IO PARALLEL_FILTERED_WRITES_DISABLED\n");
+    }
+    case H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE: {
+        printf("local flag: MPI-IO ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE\n");
+    }
+    case H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE: {
+        printf("local flag: MPI-IO NO_COLLECTIVE_MAX_CAUSE\n");
+    }
+    default: {
+        printf("undefined label for collective cause\n");
+    }
+    }
+
+    switch (global_no_collective_cause) {
+    case H5D_MPIO_COLLECTIVE: {
+        //printf("MPI-IO collective successful\n");
+    }
+    case H5D_MPIO_SET_INDEPENDENT: {
+        printf("global flag: MPI-IO independent flag is on\n");
+    }
+    case H5D_MPIO_DATATYPE_CONVERSION  : {
+        printf("global flag: MPI-IO datatype conversion needed\n");
+    }
+    case H5D_MPIO_DATA_TRANSFORMS: {
+        printf("global flag: MPI-IO H5D_MPIO_DATA_TRANSFORMS.\n");
+    }
+    case H5D_MPIO_MPI_OPT_TYPES_ENV_VAR_DISABLED: {
+        printf("global flag: MPI-IO MPI_OPT_TYPES_ENV_VAR_DISABLED \n");
+    }
+    case H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES: {
+        printf("global flag: MPI-IO NOT_SIMPLE_OR_SCALAR_DATASPACES\n");
+    }
+    case H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET: {
+        printf("global flag: MPI-IO NOT_CONTIGUOUS_OR_CHUNKED_DATASET\n");
+    }
+    case H5D_MPIO_PARALLEL_FILTERED_WRITES_DISABLED: {
+        printf("global flag: MPI-IO PARALLEL_FILTERED_WRITES_DISABLED\n");
+    }
+    case H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE: {
+        printf("global flag: MPI-IO ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE\n");
+    }
+    case H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE: {
+        printf("global flag: MPI-IO NO_COLLECTIVE_MAX_CAUSE\n");
+    }
+    default: {
+        printf("undefined label for collective cause\n");
+    }
+    }
+    return 0;
+}
+
 int flush_multidatasets() {
     int i;
+    uint32_t local_no_collective_cause, global_no_collective_cause;
     //printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
@@ -243,6 +319,8 @@ int flush_multidatasets() {
             //printf("collective write at i = %d\n", i);
         }
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
+
+        H5Pget_mpio_no_collective_cause( dxplid_coll, &local_no_collective_cause, &global_no_collective_cause);
     }
 #endif
     //printf("number of hyperslab called %d\n", hyperslab_count);

@@ -335,7 +335,7 @@ int flush_multidatasets() {
         //MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0 ) {
             //printf("collective write at i = %d\n", i);
-            switch(multi_datasets[i].mem_type_id) {
+            switch(rank) {
             case H5T_NATIVE_INT: {
                 printf("getting int type\n");
                 break;

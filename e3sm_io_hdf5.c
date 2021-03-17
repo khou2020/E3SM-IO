@@ -887,7 +887,7 @@ int hdf5_put_varn_mpi (int vid,
     int err;
     herr_t herr = 0;
     int i, j;
-    double ts, ts2 = MPI_Wtime(), te;
+    double ts, te;
     hsize_t esize, rsize, rsize_old = 0, memspace_size, total_memspace_size, hyperslab_set;
     int ndim;
     hid_t dsid = -1, msid = -1;
@@ -1011,6 +1011,7 @@ int hdf5_put_varn_mpi (int vid,
     qsort(index_order, total_blocks, sizeof(Index_order), index_order_cmp);
     tsort += MPI_Wtime() - ts;
 
+    ts = MPI_Wtime ();
     buf2 = (char*) malloc(esize * total_memspace_size);
     copy_index_buf(index_order, total_blocks, buf2);
     memcpy(buf, buf2, esize * total_memspace_size);
@@ -1021,7 +1022,7 @@ int hdf5_put_varn_mpi (int vid,
     //CHECK_HID (msid)
     register_memspace_recycle(msid);
     register_multidataset(buf, did, dsid, msid, mtype);
-    tcpy += MPI_Wtime() - ts2;
+    tcpy += MPI_Wtime() - ts;
     /* The folowing code is to place dummy H5Dwrite for collective call.*/
 
     //if (msid >= 0) H5Sclose (msid);

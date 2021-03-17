@@ -57,7 +57,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     /* scalar and small variables are written by rank 0 only */
     i = vid;
 
-    if (rec_no == 0) {
+    if (rec_no == 0 && rank == 0) {
         /* lev */
         err = HDF5_IPUT_VAR_DOUBLE (ncid, varids[i++], *dbl_buf, NULL);
         ERR
@@ -129,7 +129,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     ERR
     *txt_buf += nchars;
 
-    if (rec_no == 0) {
+    if (rec_no == 0 && rank == 0) {
         /* ndbase */
         err = HDF5_IPUT_VAR_INT (ncid, varids[i++], *int_buf, NULL);
         ERR

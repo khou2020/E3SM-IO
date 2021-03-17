@@ -149,11 +149,11 @@ void hdf5_wrap_finalize () {
     if (dxplid_indep_nb >= 0) H5Pclose (dxplid_indep_nb);
     // if (dxplid_nb >= 0) H5Pclose (dxplid_nb);
 
-    MPI_Allreduce (&twrite, &twrite_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-    MPI_Allreduce (&tsel, &tsel_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-    MPI_Allreduce (&text, &text_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-    MPI_Allreduce (&tsort, &tsort_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-    MPI_Allreduce (&tcpy, &tcpy_all, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Reduce (&twrite, &twrite_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (&tsel, &tsel_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (&text, &text_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (&tsort, &tsort_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (&tcpy, &tcpy_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     if (rank == 0) {

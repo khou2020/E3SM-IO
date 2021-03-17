@@ -516,7 +516,7 @@ int run_varn_F_case_hdf5 (
     size_t dbl_buflen, rec_buflen, nelems[3];
     itype *rec_buf  = NULL, *rec_buf_ptr;
     double *dbl_buf = NULL, *dbl_buf_ptr;
-    double pre_timing, open_timing, post_timing, wait_timing, close_timing;
+    double pre_timing, open_timing, post_timing, wait_timing, close_timing, small_write_timing;
     double timing, total_timing, max_timing;
     MPI_Offset tmp, metadata_size, put_size, total_size, max_nreqs, total_nreqs;
     MPI_Offset **starts_D2 = NULL, **counts_D2 = NULL;
@@ -531,6 +531,7 @@ int run_varn_F_case_hdf5 (
     post_timing  = 0.0;
     wait_timing  = 0.0;
     close_timing = 0.0;
+    small_write_timing = .0;
 
     MPI_Comm_rank (io_comm, &rank);
 
@@ -736,6 +737,7 @@ int run_varn_F_case_hdf5 (
 
             ERR
         //}
+        small_write_timing = MPI_Wtime () - timing;
         flush_multidatasets();
         i += 27;
         post_timing += MPI_Wtime () - timing;
@@ -935,6 +937,8 @@ int run_varn_F_case_hdf5 (
     pre_timing = max_timing;
     MPI_Reduce (&post_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     post_timing = max_timing;
+    MPI_Reduce (&small_write_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
+    small_write_timing = max_timing;
     MPI_Reduce (&wait_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     wait_timing = max_timing;
     MPI_Reduce (&close_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);

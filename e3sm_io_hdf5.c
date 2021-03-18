@@ -329,7 +329,7 @@ int flush_multidatasets() {
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
 
-    printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
+    //printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);

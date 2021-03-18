@@ -471,8 +471,6 @@ int hdf5_put_vara_mpi (
     hsize_t start[H5S_MAX_RANK], block[H5S_MAX_RANK];
     hsize_t dims[H5S_MAX_RANK];
 
-    return 0;
-
     did = f_dids[vid];
 
     dsid = H5Dget_space (did);

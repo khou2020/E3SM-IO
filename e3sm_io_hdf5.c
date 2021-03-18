@@ -903,7 +903,7 @@ int hdf5_put_varn_mpi (int vid,
     int index;
     Index_order *index_order;
     int total_blocks;
-    return 0;
+
     did = f_dids[vid];
 /*
     if (cnt == 0) {

@@ -488,7 +488,7 @@ int hdf5_put_vara_mpi (
         start[i] = (hsize_t)mstart[i];
         block[i] = (hsize_t)mcount[i];
     }
-    return 0;
+
     // Extend rec dim
     ts = MPI_Wtime ();
     if (dims[0] < start[0] + block[0]) {
@@ -502,6 +502,8 @@ int hdf5_put_vara_mpi (
         CHECK_HID (dsid)
     }
     text = MPI_Wtime () - ts;
+    return 0;
+
 #ifndef ENABLE_LOGVOL
     msid = H5Screate_simple (ndim, dims, dims);
     if ( rank != 0 ) {

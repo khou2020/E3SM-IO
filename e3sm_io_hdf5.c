@@ -46,36 +46,36 @@ hid_t log_vlid = -1;
 #endif
 
 hid_t nc_type_to_hdf5_type (nc_type nctype) {
-    switch (nctype) {
-        case NC_INT:
-            return H5T_NATIVE_INT;
-        case NC_FLOAT:
-            return H5T_NATIVE_FLOAT;
-        case NC_DOUBLE:
-            return H5T_NATIVE_DOUBLE;
-        case NC_CHAR:
-            return H5T_NATIVE_CHAR;
-        default:
-            printf ("Error at line %d in %s: Unknown type %d\n", __LINE__, __FILE__, nctype);
+    if (nctype == NC_INT) {
+        return H5T_NATIVE_INT;
     }
-
+    if (nctype == NC_FLOAT) {
+        return H5T_NATIVE_FLOAT;
+    }
+    if (nctype == NC_DOUBLE) {
+        return H5T_NATIVE_DOUBLE;
+    }
+    if (nctype == NC_CHAR) {
+        return H5T_NATIVE_CHAR;
+    }
+    printf ("Error at line %d in %s: Unknown type %d\n", __LINE__, __FILE__, nctype);
     return -1;
 }
 
 hid_t mpi_type_to_hdf5_type (MPI_Datatype mpitype) {
-    switch (mpitype) {
-        case MPI_INT:
-            return H5T_NATIVE_INT;
-        case MPI_FLOAT:
-            return H5T_NATIVE_FLOAT;
-        case MPI_DOUBLE:
-            return H5T_NATIVE_DOUBLE;
-        case MPI_CHAR:
-            return H5T_NATIVE_CHAR;
-        default:
-            printf ("Error at line %d in %s: Unknown type %d\n", __LINE__, __FILE__, mpitype);
+    if (mpitype == MPI_INT) {
+        return H5T_NATIVE_INT;
     }
-
+    if (mpitype == MPI_FLOAT) {
+        return H5T_NATIVE_FLOAT;
+    }
+    if (mpitype == MPI_DOUBLE) {
+        return H5T_NATIVE_DOUBLE;
+    }
+    if (mpitype == MPI_CHAR) {
+        return H5T_NATIVE_CHAR;
+    }
+    printf ("Error at line %d in %s: Unknown type %d\n", __LINE__, __FILE__, mpitype);
     return -1;
 }
 

@@ -330,7 +330,6 @@ int flush_multidatasets() {
 
 
     printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
-    return 0;
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
@@ -489,7 +488,7 @@ int hdf5_put_vara_mpi (
         start[i] = (hsize_t)mstart[i];
         block[i] = (hsize_t)mcount[i];
     }
-
+    return 0;
     // Extend rec dim
     ts = MPI_Wtime ();
     if (dims[0] < start[0] + block[0]) {

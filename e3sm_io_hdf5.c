@@ -325,7 +325,8 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
 int flush_multidatasets() {
     int i;
     uint32_t local_no_collective_cause, global_no_collective_cause;
-    //printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
+    printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
+    return 0;
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);

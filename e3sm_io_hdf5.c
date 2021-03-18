@@ -325,6 +325,10 @@ int print_no_collective_cause(uint32_t local_no_collective_cause,uint32_t global
 int flush_multidatasets() {
     int i;
     uint32_t local_no_collective_cause, global_no_collective_cause;
+    int rank;
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+
+
     printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
     return 0;
 #if ENABLE_MULTIDATASET==1
@@ -335,9 +339,6 @@ int flush_multidatasets() {
 
     H5Pclose(plist_id);
 #else
-
-    int rank;
-    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
     //printf("rank %d has dataset_size %lld\n", rank, (long long int) dataset_size);
     for ( i = 0; i < dataset_size; ++i ) {

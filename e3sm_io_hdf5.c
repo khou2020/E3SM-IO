@@ -328,7 +328,6 @@ int flush_multidatasets() {
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
-
     printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
@@ -340,7 +339,6 @@ int flush_multidatasets() {
 #else
 
     //printf("rank %d has dataset_size %lld\n", rank, (long long int) dataset_size);
-/*
     for ( i = 0; i < dataset_size; ++i ) {
         //MPI_Barrier(MPI_COMM_WORLD);
         H5Dwrite (multi_datasets[i].dset_id, multi_datasets[i].mem_type_id, multi_datasets[i].mem_space_id, multi_datasets[i].dset_space_id, dxplid_coll, multi_datasets[i].u.wbuf);
@@ -350,7 +348,6 @@ int flush_multidatasets() {
         }
 
     }
-*/
 #endif
     //printf("rank %d number of hyperslab called %d\n", rank, hyperslab_count);
 
@@ -497,7 +494,6 @@ int hdf5_put_vara_mpi (
         H5Sclose (dsid);
         printf("rank %d put vara checkpoint 0, ndim = %d, dims[0] = %lld, sizeof(dims) = %d, vid = %d\n", rank, ndim, (long long int) dims[0], H5S_MAX_RANK, vid);
         herr = H5Dset_extent (did, dims);
-        return 0;
         //printf("put vara checkpoint 1\n");
         CHECK_HERR
         dsid = H5Dget_space (did);
@@ -1262,6 +1258,7 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
     CHECK_HID (dcplid)
 
     for (i = 0; i < ndim; i++) { dims[i] = mdims[i] = f_dims[dimids[i]]; }
+/*
     if (ndim) {
         if (dims[0] == H5S_UNLIMITED) {
             dims[0] = 1;
@@ -1271,8 +1268,7 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
             dims[0] = 0;
         }
     }
-
-    //sid = H5Screate_simple (ndim, dims, mdims);
+*/
     sid = H5Screate_simple (ndim, dims, mdims);
     CHECK_HID (sid);
 /*

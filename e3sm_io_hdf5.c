@@ -903,7 +903,6 @@ int hdf5_put_varn_mpi (int vid,
     Index_order *index_order;
     int total_blocks;
     did = f_dids[vid];
-    return 0;
 /*
     if (cnt == 0) {
         memspace_size = 0;

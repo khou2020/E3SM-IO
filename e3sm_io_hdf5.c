@@ -948,7 +948,6 @@ int hdf5_put_varn_mpi (int vid,
 
     }
     text += MPI_Wtime () - ts;
-    return 0;
 
     ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
 

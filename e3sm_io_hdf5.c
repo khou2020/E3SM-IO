@@ -495,7 +495,8 @@ int hdf5_put_vara_mpi (
     if (dims[0] < start[0] + block[0]) {
         dims[0] = start[0] + block[0];
         H5Sclose (dsid);
-        //printf("rank %d put vara checkpoint 0, ndim = %d, dims[0] = %lld, sizeof(dims) = %d, vid = %d\n", rank, ndim, (long long int) dims[0], H5S_MAX_RANK, vid);
+        printf("rank %d put vara checkpoint 0, ndim = %d, dims[0] = %lld, sizeof(dims) = %d, vid = %d\n", rank, ndim, (long long int) dims[0], H5S_MAX_RANK, vid);
+        return 0;
         herr = H5Dset_extent (did, dims);
         //printf("put vara checkpoint 1\n");
         CHECK_HERR
@@ -905,6 +906,7 @@ int hdf5_put_varn_mpi (int vid,
     Index_order *index_order;
     int total_blocks;
     did = f_dids[vid];
+    return 0;
 /*
     if (cnt == 0) {
         memspace_size = 0;

@@ -937,7 +937,7 @@ int hdf5_put_varn_mpi (int vid,
             dims[0] = (hsize_t)max_rec;
 
             H5Sclose (dsid);
-            //herr = H5Dset_extent (did, dims);
+            herr = H5Dset_extent (did, dims);
             printf("reset dataset to %lld\n", (long long int)max_rec);
             CHECK_HERR
             dsid = H5Dget_space (did);

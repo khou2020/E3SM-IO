@@ -488,6 +488,7 @@ int hdf5_put_vara_mpi (
     }
 
     // Extend rec dim
+/*
     ts = MPI_Wtime ();
     if (dims[0] < start[0] + block[0]) {
         dims[0] = start[0] + block[0];
@@ -502,7 +503,7 @@ int hdf5_put_vara_mpi (
         CHECK_HID (dsid)
     }
     text = MPI_Wtime () - ts;
-
+*/
 #ifndef ENABLE_LOGVOL
     msid = H5Screate_simple (ndim, dims, dims);
     if ( rank != 0 ) {
@@ -922,9 +923,11 @@ int hdf5_put_varn_mpi (int vid,
     dsid = H5Dget_space (did);
     CHECK_HID (dsid)
 
+/*
     ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
     CHECK_HID (ndim)
     // Extend rec dim if needed
+
     ts = MPI_Wtime ();
     if (ndim && mdims[0] == H5S_UNLIMITED) {
         MPI_Offset max_rec = 0;
@@ -948,7 +951,7 @@ int hdf5_put_varn_mpi (int vid,
 
     }
     text += MPI_Wtime () - ts;
-
+*/
     ndim = H5Sget_simple_extent_dims (dsid, dims, mdims);
 
     count_data(cnt, ndim, mcounts, &total_blocks);
@@ -1269,7 +1272,6 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
 
             herr = H5Pset_chunk (dcplid, ndim, dims);
             CHECK_HERR
-            dims[0] = 0;
         }
     }
 

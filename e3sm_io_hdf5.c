@@ -1261,7 +1261,7 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
     CHECK_HID (dcplid)
 
     for (i = 0; i < ndim; i++) { dims[i] = mdims[i] = f_dims[dimids[i]]; }
-/*
+
     if (ndim) {
         if (dims[0] == H5S_UNLIMITED) {
             dims[0] = 1;
@@ -1271,7 +1271,7 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
             dims[0] = 0;
         }
     }
-*/
+
     sid = H5Screate_simple (ndim, dims, mdims);
     CHECK_HID (sid);
 /*

@@ -610,7 +610,7 @@ int run_varn_F_case_hdf5 (
         err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
         ERR
     }
-
+    return 0;
     /* exit define mode and enter data mode */
     err = HDF5_NOP1 (ncid);
     ERR

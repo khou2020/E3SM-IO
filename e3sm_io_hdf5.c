@@ -327,8 +327,8 @@ int flush_multidatasets() {
     uint32_t local_no_collective_cause, global_no_collective_cause;
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-
-    //printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
+/*
+    printf("Rank %d number of datasets to be written %d\n", rank, dataset_size);
 #if ENABLE_MULTIDATASET==1
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
@@ -350,7 +350,7 @@ int flush_multidatasets() {
     }
 #endif
     //printf("rank %d number of hyperslab called %d\n", rank, hyperslab_count);
-
+*/
     if (dataset_size) {
         free(multi_datasets);
     }

@@ -905,6 +905,7 @@ int run_varn_F_case_hdf5 (
 
     // err = HDF5_INQ_PUT_SIZE (ncid, &total_size); ERR
     // put_size = total_size - metadata_size;
+    MPI_Barrier (io_comm);
     stat (outfname, &file_stat);
     total_size = file_stat.st_size;
     put_size   = total_size - metadata_size;

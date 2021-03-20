@@ -1207,7 +1207,9 @@ int hdf5_put_att (
     htri_t exists;
     int rank;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-
+    if (!rank) {
+        goto fn_exit;
+    }
     asize = (size_t)nelems;
     asid  = H5Screate_simple (1, &asize, &asize);
     CHECK_HID (asid)
@@ -1225,10 +1227,6 @@ int hdf5_put_att (
         aid = H5Aopen (did, name, H5P_DEFAULT);
     }
     CHECK_HID (aid)
-
-    if (!rank) {
-        goto fn_exit;
-    }
     herr = H5Awrite (aid, atype, buf);
     CHECK_HERR
 

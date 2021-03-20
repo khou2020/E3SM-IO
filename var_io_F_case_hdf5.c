@@ -589,10 +589,12 @@ int run_varn_F_case_hdf5 (
     err = hdf5_wrap_init ();
     ERR;
 
-    faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
-    fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
+
+    // We are going to let rank 0 to handle dataset init and attributes alone. This could be faster.
     if (!rank) {
-        double start = MPI_Wtime();        
+        double start = MPI_Wtime();
+        faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
+        fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
         ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, fcplid_indp, faplid_indp);
         if (nvars == 414) {
             /* for h0 file */
@@ -608,7 +610,28 @@ int run_varn_F_case_hdf5 (
         /* exit define mode and enter data mode */
         err = HDF5_NOP1 (ncid);
         ERR
+        herr = hdf5_close_vars (ncid);
+        H5Pclose(faplid_indp);
+        H5Pclose(fcplid_indp);
+        H5Fclose(ncid);
     }
+    // Now collectively open the datasets just created
+    faplid = H5Pcreate (H5P_FILE_ACCESS);
+    H5Pset_fapl_mpio (faplid, io_comm, info);
+    H5Pset_all_coll_metadata_ops (faplid, 1);
+    ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, H5P_DEFAULT, faplid);
+    if (nvars == 414) {
+        /* for h0 file */
+        err = def_F_case_h0_hdf5_mpi (ncid, dims[2], nvars, varids);
+        ERR
+    } else {
+        /* for h1 file */
+        err = def_F_case_h1_hdf5_mpi (ncid, dims[2], nvars, varids);
+        ERR
+    }
+    err = HDF5_NOP1 (ncid);
+    ERR
+    CHECK_HID (ncid)
 /*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL

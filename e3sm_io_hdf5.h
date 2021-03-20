@@ -366,4 +366,11 @@ int hdf5_inq_file_info (hid_t fid, MPI_Info *info);
 int hdf5_inq_put_size (hid_t fid, size_t *size);
 int hdf5_inq_get_size (hid_t fid, size_t *size);
 
+int hdf5_def_dim_mpi (MPI_Offset msize, int *did);
+int hdf5_def_var_mpi (hid_t fid, const char *name, int *vid);
+int def_F_case_h0_hdf5_mpi (hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids);
+
 int hdf5_close_vars (hid_t fid);

@@ -16,6 +16,2193 @@
 #define NOP2(A, B, D, E, F, C)    NC_NOERR
 
 /*----< def_F_case_h0() >----------------------------------------------------*/
+int def_F_case_h0_hdf5_mpi (hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids)  /* variable IDs */
+{
+    /* Total 414 variables */
+    int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date,
+        datesec, time_bnds, date_written, time_written, ndbase, nsbase, nbdate,
+        nbsec, mdt, ndcur, nscur, co2vmr, ch4vmr, n2ovmr, f11vmr, f12vmr,
+        sol_tsi, nsteph, AEROD_v, ANRAIN, ANSNOW, AODABS, AODABSBC, AODALL, AODBC,
+        AODDUST, AODDUST1, AODDUST3, AODDUST4, AODMODE1, AODMODE2, AODMODE3,
+        AODMODE4, AODNIR, AODPOM, AODSO4, AODSOA, AODSS, AODUV, AODVIS, AQRAIN,
+        AQSNOW, AQ_DMS, AQ_H2O2, AQ_H2SO4, AQ_O3, AQ_SO2, AQ_SOAG, AREI, AREL,
+        AWNC, AWNI, BURDEN1, BURDEN2, BURDEN3, BURDEN4, CCN3, CDNUMC, CLDHGH, CLDICE, CLDLIQ, CLDLOW, CLDMED,
+        CLDTOT, CLOUD, CLOUDFRAC_CLUBB, CONCLD, DCQ, DF_DMS, DF_H2O2, DF_H2SO4,
+        DF_O3, DF_SO2, DF_SOAG, DMS_SRF, DP_KCLDBASE, DP_MFUP_MAX, DP_WCLDBASE,
+        DSTSFMBL, DTCOND, DTENDTH, DTENDTQ, EXTINCT, FICE, FLDS, FLNS, FLNSC,
+        FLNT, FLNTC, FLUT, FLUTC, FREQI, FREQL, FREQR, FREQS, FSDS, FSDSC,
+        FSNS, FSNSC, FSNT, FSNTC, FSNTOA, FSNTOAC, FSUTOA, FSUTOAC, F_eff,
+        H2O2_SRF, H2SO4_SRF, H2SO4_sfgaex1, ICEFRAC, ICIMR, ICWMR, IWC,
+        LANDFRAC, LHFLX, LINOZ_DO3, LINOZ_DO3_PSC, LINOZ_O3CLIM, LINOZ_O3COL,
+        LINOZ_SFCSINK, LINOZ_SSO3, LINOZ_SZA, LND_MBL, LWCF, Mass_bc, Mass_dst, Mass_mom,
+        Mass_ncl, Mass_pom, Mass_so4, Mass_soa, NUMICE, NUMLIQ, NUMRAI, NUMSNO,
+        O3, O3_SRF, OCNFRAC, OMEGA, OMEGA500, OMEGAT, PBLH, PHIS, PRECC, PRECL,
+        PRECSC, PRECSL, PS, PSL, Q, QFLX, QREFHT, QRL, QRS, RAINQM, RAM1,
+        RELHUM, SFDMS, SFH2O2, SFH2SO4, SFO3, SFSO2, SFSOAG, SFbc_a1, SFbc_a3,
+        SFbc_a4, SFdst_a1, SFdst_a3, SFmom_a1, SFmom_a2, SFmom_a3, SFmom_a4,
+        SFncl_a1, SFncl_a2, SFncl_a3, SFnum_a1, SFnum_a2, SFnum_a3, SFnum_a4,
+        SFpom_a1, SFpom_a3, SFpom_a4, SFso4_a1, SFso4_a2, SFso4_a3, SFsoa_a1,
+        SFsoa_a2, SFsoa_a3, SHFLX, SH_KCLDBASE, SH_MFUP_MAX, SH_WCLDBASE,
+        SNOWHICE, SNOWHLND, SNOWQM, SO2, SO2_CLXF, SO2_SRF, SOAG_CLXF,
+        SOAG_SRF, SOAG_sfgaex1, SOLIN, SSAVIS, SSTSFMBL, SSTSFMBL_OM, SWCF, T,
+        TAUGWX, TAUGWY, TAUX, TAUY, TGCLDCWP, TGCLDIWP, TGCLDLWP, TH7001000,
+        TMQ, TREFHT, TROP_P, TROP_T, TS, TSMN, TSMX, TUH, TUQ, TVH, TVQ, U,
+        U10, UU, V, VQ, VT, VU, VV, WD_H2O2, WD_H2SO4, WD_SO2, WSUB, Z3,
+        aero_water, airFV, bc_a1DDF, bc_a1SFWET, bc_a1_SRF, bc_a1_sfgaex1,
+        bc_a3DDF, bc_a3SFWET, bc_a3_SRF, bc_a4DDF, bc_a4SFWET, bc_a4_CLXF,
+        bc_a4_SRF, bc_a4_sfgaex1, bc_c1DDF, bc_c1SFWET, bc_c3DDF, bc_c3SFWET,
+        bc_c4DDF, bc_c4SFWET, chla, dst_a1DDF, dst_a1SF, dst_a1SFWET,
+        dst_a1_SRF, dst_a3DDF, dst_a3SF, dst_a3SFWET, dst_a3_SRF, dst_c1DDF,
+        dst_c1SFWET, dst_c3DDF, dst_c3SFWET, hstobie_linoz, mlip, mom_a1DDF,
+        mom_a1SF, mom_a1SFWET, mom_a1_SRF, mom_a1_sfgaex1, mom_a2DDF, mom_a2SF,
+        mom_a2SFWET, mom_a2_SRF, mom_a3DDF, mom_a3SFWET, mom_a3_SRF, mom_a4DDF,
+        mom_a4SF, mom_a4SFWET, mom_a4_SRF, mom_a4_sfgaex1, mom_c1DDF,
+        mom_c1SFWET, mom_c2DDF, mom_c2SFWET, mom_c3DDF, mom_c3SFWET, mom_c4DDF,
+        mom_c4SFWET, mpoly, mprot, ncl_a1DDF, ncl_a1SF, ncl_a1SFWET,
+        ncl_a1_SRF, ncl_a2DDF, ncl_a2SF, ncl_a2SFWET, ncl_a2_SRF, ncl_a3DDF,
+        ncl_a3SF, ncl_a3SFWET, ncl_a3_SRF, ncl_c1DDF, ncl_c1SFWET, ncl_c2DDF,
+        ncl_c2SFWET, ncl_c3DDF, ncl_c3SFWET, num_a1DDF, num_a1SF, num_a1SFWET,
+        num_a1_CLXF, num_a1_SRF, num_a1_sfgaex1, num_a2DDF, num_a2SFWET,
+        num_a2_CLXF, num_a2_SRF, num_a3DDF, num_a3SF, num_a3SFWET, num_a3_SRF,
+        num_a4DDF, num_a4SFWET, num_a4_CLXF, num_a4_SRF, num_a4_sfgaex1,
+        num_c1DDF, num_c1SFWET, num_c2DDF, num_c2SFWET, num_c3DDF, num_c3SFWET,
+        num_c4DDF, num_c4SFWET, pom_a1DDF, pom_a1SFWET, pom_a1_SRF,
+        pom_a1_sfgaex1, pom_a3DDF, pom_a3SFWET, pom_a3_SRF, pom_a4DDF,
+        pom_a4SFWET, pom_a4_CLXF, pom_a4_SRF, pom_a4_sfgaex1, pom_c1DDF,
+        pom_c1SFWET, pom_c3DDF, pom_c3SFWET, pom_c4DDF, pom_c4SFWET, so4_a1DDF,
+        so4_a1SFWET, so4_a1_CLXF, so4_a1_SRF, so4_a1_sfgaex1, so4_a2DDF,
+        so4_a2SFWET, so4_a2_CLXF, so4_a2_SRF, so4_a2_sfgaex1, so4_a3DDF,
+        so4_a3SFWET, so4_a3_SRF, so4_a3_sfgaex1, so4_c1DDF, so4_c1SFWET,
+        so4_c2DDF, so4_c2SFWET, so4_c3DDF, so4_c3SFWET, soa_a1DDF, soa_a1SFWET,
+        soa_a1_SRF, soa_a1_sfgaex1, soa_a2DDF, soa_a2SFWET, soa_a2_SRF,
+        soa_a2_sfgaex1, soa_a3DDF, soa_a3SFWET, soa_a3_SRF, soa_a3_sfgaex1,
+        soa_c1DDF, soa_c1SFWET, soa_c2DDF, soa_c2SFWET, soa_c3DDF, soa_c3SFWET;
+
+    int i, err, nerrs=0, dimids[3], iattr, mdims=1;
+    int dim_ncol, dim_time, dim_nbnd, dim_chars, dim_lev, dim_ilev;
+    float fillv=1.e+36f, missv = 1.e+36f;
+
+    /* define dimensions */
+    err = hdf5_def_dim_mpi(dims[1],      &dim_ncol); ERR
+    err = hdf5_def_dim_mpi(NC_UNLIMITED, &dim_time); ERR
+    err = hdf5_def_dim_mpi(2,           &dim_nbnd); ERR
+    err = hdf5_def_dim_mpi(8,           &dim_chars); ERR
+    err = hdf5_def_dim_mpi(dims[0],     &dim_lev); ERR
+    err = hdf5_def_dim_mpi(dims[0]+1,   &dim_ilev); ERR
+
+    i = 0;
+
+    /* define variables */
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "lat", &lat); ERR
+    varids[i++] = lat;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "lon", &lon); ERR
+    varids[i++] = lon;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "area", &area); ERR
+    varids[i++] = area;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "lev", &lev); ERR
+    varids[i++] = lev;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "hyam", &hyam); ERR
+    varids[i++] = hyam;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "hybm", &hybm); ERR
+    varids[i++] = hybm;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "P0", &P0); ERR
+    varids[i++] = P0;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "ilev", &ilev); ERR
+    varids[i++] = ilev;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "hyai", &hyai); ERR
+    varids[i++] = hyai;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "hybi", &hybi); ERR
+    varids[i++] = hybi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "time", &time); ERR
+    varids[i++] = time;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "date", &date); ERR
+    varids[i++] = date;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "datesec", &datesec); ERR
+    varids[i++] = datesec;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_nbnd;
+    err = hdf5_def_var_mpi(ncid, "time_bnds", &time_bnds); ERR
+    varids[i++] = time_bnds;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var_mpi(ncid, "date_written", &date_written); ERR
+    varids[i++] = date_written;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var_mpi(ncid, "time_written", &time_written); ERR
+    varids[i++] = time_written;
+
+    err = hdf5_def_var_mpi(ncid, "ndbase", &ndbase); ERR
+    varids[i++] = ndbase;
+    err = hdf5_def_var_mpi(ncid, "nsbase", &nsbase); ERR
+    varids[i++] = nsbase;
+
+    err = hdf5_def_var_mpi(ncid, "nbdate", &nbdate); ERR
+    varids[i++] = nbdate;
+
+    err = hdf5_def_var_mpi(ncid, "nbsec", &nbsec); ERR
+    varids[i++] = nbsec;
+
+    err = hdf5_def_var_mpi(ncid, "mdt", &mdt); ERR
+    varids[i++] = mdt;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "ndcur", &ndcur); ERR
+    varids[i++] = ndcur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "nscur", &nscur); ERR
+    varids[i++] = nscur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "co2vmr", &co2vmr); ERR
+    varids[i++] = co2vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "ch4vmr", &ch4vmr); ERR
+    varids[i++] = ch4vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "n2ovmr", &n2ovmr); ERR
+    varids[i++] = n2ovmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "f11vmr", &f11vmr); ERR
+    varids[i++] = f11vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "f12vmr", &f12vmr); ERR
+    varids[i++] = f12vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "sol_tsi", &sol_tsi); ERR
+    varids[i++] = sol_tsi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "nsteph", &nsteph); ERR
+    varids[i++] = nsteph;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AEROD_v", &AEROD_v); ERR
+    varids[i++] = AEROD_v;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ANRAIN", &ANRAIN); ERR
+    varids[i++] = ANRAIN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ANSNOW", &ANSNOW); ERR
+    varids[i++] = ANSNOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODABS", &AODABS); ERR
+    varids[i++] = AODABS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODABSBC", &AODABSBC); ERR
+    varids[i++] = AODABSBC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODALL", &AODALL); ERR
+    varids[i++] = AODALL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODBC", &AODBC); ERR
+    varids[i++] = AODBC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST", &AODDUST); ERR
+    varids[i++] = AODDUST;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST1", &AODDUST1); ERR
+    varids[i++] = AODDUST1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST3", &AODDUST3); ERR
+    varids[i++] = AODDUST3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST4", &AODDUST4); ERR
+    varids[i++] = AODDUST4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE1", &AODMODE1); ERR
+    varids[i++] = AODMODE1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE2", &AODMODE2); ERR
+    varids[i++] = AODMODE2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE3", &AODMODE3); ERR
+    varids[i++] = AODMODE3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE4", &AODMODE4); ERR
+    varids[i++] = AODMODE4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODNIR", &AODNIR); ERR
+    varids[i++] = AODNIR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODPOM", &AODPOM); ERR
+    varids[i++] = AODPOM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODSO4", &AODSO4); ERR
+    varids[i++] = AODSO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODSOA", &AODSOA); ERR
+    varids[i++] = AODSOA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODSS", &AODSS); ERR
+    varids[i++] = AODSS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODUV", &AODUV); ERR
+    varids[i++] = AODUV;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODVIS", &AODVIS); ERR
+    varids[i++] = AODVIS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQRAIN", &AQRAIN); ERR
+    varids[i++] = AQRAIN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQSNOW", &AQSNOW); ERR
+    varids[i++] = AQSNOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_DMS", &AQ_DMS); ERR
+    varids[i++] = AQ_DMS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_H2O2", &AQ_H2O2); ERR
+    varids[i++] = AQ_H2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_H2SO4", &AQ_H2SO4); ERR
+    varids[i++] = AQ_H2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_O3", &AQ_O3); ERR
+    varids[i++] = AQ_O3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_SO2", &AQ_SO2); ERR
+    varids[i++] = AQ_SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_SOAG", &AQ_SOAG); ERR
+    varids[i++] = AQ_SOAG;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AREI", &AREI); ERR
+    varids[i++] = AREI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AREL", &AREL); ERR
+    varids[i++] = AREL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AWNC", &AWNC); ERR
+    varids[i++] = AWNC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AWNI", &AWNI); ERR
+    varids[i++] = AWNI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN1", &BURDEN1); ERR
+    varids[i++] = BURDEN1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN2", &BURDEN2); ERR
+    varids[i++] = BURDEN2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN3", &BURDEN3); ERR
+    varids[i++] = BURDEN3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN4", &BURDEN4); ERR
+    varids[i++] = BURDEN4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CCN3", &CCN3); ERR
+    varids[i++] = CCN3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CDNUMC", &CDNUMC); ERR
+    varids[i++] = CDNUMC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDHGH", &CLDHGH); ERR
+    varids[i++] = CLDHGH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDICE", &CLDICE); ERR
+    varids[i++] = CLDICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDLIQ", &CLDLIQ); ERR
+    varids[i++] = CLDLIQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDLOW", &CLDLOW); ERR
+    varids[i++] = CLDLOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDMED", &CLDMED); ERR
+    varids[i++] = CLDMED;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDTOT", &CLDTOT); ERR
+    varids[i++] = CLDTOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLOUD", &CLOUD); ERR
+    varids[i++] = CLOUD;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLOUDFRAC_CLUBB", &CLOUDFRAC_CLUBB); ERR
+    varids[i++] = CLOUDFRAC_CLUBB;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CONCLD", &CONCLD); ERR
+    varids[i++] = CONCLD;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DCQ", &DCQ); ERR
+    varids[i++] = DCQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_DMS", &DF_DMS); ERR
+    varids[i++] = DF_DMS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_H2O2", &DF_H2O2); ERR
+    varids[i++] = DF_H2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_H2SO4", &DF_H2SO4); ERR
+    varids[i++] = DF_H2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_O3", &DF_O3); ERR
+    varids[i++] = DF_O3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_SO2", &DF_SO2); ERR
+    varids[i++] = DF_SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_SOAG", &DF_SOAG); ERR
+    varids[i++] = DF_SOAG;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DMS_SRF", &DMS_SRF); ERR
+    varids[i++] = DMS_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DP_KCLDBASE", &DP_KCLDBASE); ERR
+    varids[i++] = DP_KCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DP_MFUP_MAX", &DP_MFUP_MAX); ERR
+    varids[i++] = DP_MFUP_MAX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DP_WCLDBASE", &DP_WCLDBASE); ERR
+    varids[i++] = DP_WCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DSTSFMBL", &DSTSFMBL); ERR
+    varids[i++] = DSTSFMBL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DTCOND", &DTCOND); ERR
+    varids[i++] = DTCOND;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DTENDTH", &DTENDTH); ERR
+    varids[i++] = DTENDTH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DTENDTQ", &DTENDTQ); ERR
+    varids[i++] = DTENDTQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "EXTINCT", &EXTINCT); ERR
+    varids[i++] = EXTINCT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FICE", &FICE); ERR
+    varids[i++] = FICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLDS", &FLDS); ERR
+    varids[i++] = FLDS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNS", &FLNS); ERR
+    varids[i++] = FLNS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNSC", &FLNSC); ERR
+    varids[i++] = FLNSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNT", &FLNT); ERR
+    varids[i++] = FLNT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNTC", &FLNTC); ERR
+    varids[i++] = FLNTC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLUT", &FLUT); ERR
+    varids[i++] = FLUT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLUTC", &FLUTC); ERR
+    varids[i++] = FLUTC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQI", &FREQI); ERR
+    varids[i++] = FREQI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQL", &FREQL); ERR
+    varids[i++] = FREQL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQR", &FREQR); ERR
+    varids[i++] = FREQR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQS", &FREQS); ERR
+    varids[i++] = FREQS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSDS", &FSDS); ERR
+    varids[i++] = FSDS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSDSC", &FSDSC); ERR
+    varids[i++] = FSDSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNS", &FSNS); ERR
+    varids[i++] = FSNS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNSC", &FSNSC); ERR
+    varids[i++] = FSNSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNT", &FSNT); ERR
+    varids[i++] = FSNT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNTC", &FSNTC); ERR
+    varids[i++] = FSNTC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNTOA", &FSNTOA); ERR
+    varids[i++] = FSNTOA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNTOAC", &FSNTOAC); ERR
+    varids[i++] = FSNTOAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSUTOA", &FSUTOA); ERR
+    varids[i++] = FSUTOA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSUTOAC", &FSUTOAC); ERR
+    varids[i++] = FSUTOAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "F_eff", &F_eff); ERR
+    varids[i++] = F_eff;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "H2O2_SRF", &H2O2_SRF); ERR
+    varids[i++] = H2O2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "H2SO4_SRF", &H2SO4_SRF); ERR
+    varids[i++] = H2SO4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "H2SO4_sfgaex1", &H2SO4_sfgaex1); ERR
+    varids[i++] = H2SO4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ICEFRAC", &ICEFRAC); ERR
+    varids[i++] = ICEFRAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ICIMR", &ICIMR); ERR
+    varids[i++] = ICIMR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ICWMR", &ICWMR); ERR
+    varids[i++] = ICWMR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "IWC", &IWC); ERR
+    varids[i++] = IWC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LANDFRAC", &LANDFRAC); ERR
+    varids[i++] = LANDFRAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LHFLX", &LHFLX); ERR
+    varids[i++] = LHFLX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_DO3", &LINOZ_DO3); ERR
+    varids[i++] = LINOZ_DO3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_DO3_PSC", &LINOZ_DO3_PSC); ERR
+    varids[i++] = LINOZ_DO3_PSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_O3CLIM", &LINOZ_O3CLIM); ERR
+    varids[i++] = LINOZ_O3CLIM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_O3COL", &LINOZ_O3COL); ERR
+    varids[i++] = LINOZ_O3COL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_SFCSINK", &LINOZ_SFCSINK); ERR
+    varids[i++] = LINOZ_SFCSINK;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_SSO3", &LINOZ_SSO3); ERR
+    varids[i++] = LINOZ_SSO3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_SZA", &LINOZ_SZA); ERR
+    varids[i++] = LINOZ_SZA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LND_MBL", &LND_MBL); ERR
+    varids[i++] = LND_MBL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LWCF", &LWCF); ERR
+    varids[i++] = LWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_bc", &Mass_bc); ERR
+    varids[i++] = Mass_bc;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_dst", &Mass_dst); ERR
+    varids[i++] = Mass_dst;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_mom", &Mass_mom); ERR
+    varids[i++] = Mass_mom;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_ncl", &Mass_ncl); ERR
+    varids[i++] = Mass_ncl;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_pom", &Mass_pom); ERR
+    varids[i++] = Mass_pom;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_so4", &Mass_so4); ERR
+    varids[i++] = Mass_so4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_soa", &Mass_soa); ERR
+    varids[i++] = Mass_soa;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMICE", &NUMICE); ERR
+    varids[i++] = NUMICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMLIQ", &NUMLIQ); ERR
+    varids[i++] = NUMLIQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMRAI", &NUMRAI); ERR
+    varids[i++] = NUMRAI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMSNO", &NUMSNO); ERR
+    varids[i++] = NUMSNO;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "O3", &O3); ERR
+    varids[i++] = O3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "O3_SRF", &O3_SRF); ERR
+    varids[i++] = O3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OCNFRAC", &OCNFRAC); ERR
+    varids[i++] = OCNFRAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGA", &OMEGA); ERR
+    varids[i++] = OMEGA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGA500", &OMEGA500); ERR
+    varids[i++] = OMEGA500;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGAT", &OMEGAT); ERR
+    varids[i++] = OMEGAT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PBLH", &PBLH); ERR
+    varids[i++] = PBLH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PHIS", &PHIS); ERR
+    varids[i++] = PHIS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECC", &PRECC); ERR
+    varids[i++] = PRECC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECL", &PRECL); ERR
+    varids[i++] = PRECL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECSC", &PRECSC); ERR
+    varids[i++] = PRECSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECSL", &PRECSL); ERR
+    varids[i++] = PRECSL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PS", &PS); ERR
+    varids[i++] = PS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PSL", &PSL); ERR
+    varids[i++] = PSL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Q", &Q); ERR
+    varids[i++] = Q;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QFLX", &QFLX); ERR
+    varids[i++] = QFLX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QREFHT", &QREFHT); ERR
+    varids[i++] = QREFHT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QRL", &QRL); ERR
+    varids[i++] = QRL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QRS", &QRS); ERR
+    varids[i++] = QRS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "RAINQM", &RAINQM); ERR
+    varids[i++] = RAINQM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "RAM1", &RAM1); ERR
+    varids[i++] = RAM1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "RELHUM", &RELHUM); ERR
+    varids[i++] = RELHUM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFDMS", &SFDMS); ERR
+    varids[i++] = SFDMS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFH2O2", &SFH2O2); ERR
+    varids[i++] = SFH2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFH2SO4", &SFH2SO4); ERR
+    varids[i++] = SFH2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFO3", &SFO3); ERR
+    varids[i++] = SFO3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFSO2", &SFSO2); ERR
+    varids[i++] = SFSO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFSOAG", &SFSOAG); ERR
+    varids[i++] = SFSOAG;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFbc_a1", &SFbc_a1); ERR
+    varids[i++] = SFbc_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFbc_a3", &SFbc_a3); ERR
+    varids[i++] = SFbc_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFbc_a4", &SFbc_a4); ERR
+    varids[i++] = SFbc_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFdst_a1", &SFdst_a1); ERR
+    varids[i++] = SFdst_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFdst_a3", &SFdst_a3); ERR
+    varids[i++] = SFdst_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a1", &SFmom_a1); ERR
+    varids[i++] = SFmom_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a2", &SFmom_a2); ERR
+    varids[i++] = SFmom_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a3", &SFmom_a3); ERR
+    varids[i++] = SFmom_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a4", &SFmom_a4); ERR
+    varids[i++] = SFmom_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFncl_a1", &SFncl_a1); ERR
+    varids[i++] = SFncl_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFncl_a2", &SFncl_a2); ERR
+    varids[i++] = SFncl_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFncl_a3", &SFncl_a3); ERR
+    varids[i++] = SFncl_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a1", &SFnum_a1); ERR
+    varids[i++] = SFnum_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a2", &SFnum_a2); ERR
+    varids[i++] = SFnum_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a3", &SFnum_a3); ERR
+    varids[i++] = SFnum_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a4", &SFnum_a4); ERR
+    varids[i++] = SFnum_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFpom_a1", &SFpom_a1); ERR
+    varids[i++] = SFpom_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFpom_a3", &SFpom_a3); ERR
+    varids[i++] = SFpom_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFpom_a4", &SFpom_a4); ERR
+    varids[i++] = SFpom_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFso4_a1", &SFso4_a1); ERR
+    varids[i++] = SFso4_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFso4_a2", &SFso4_a2); ERR
+    varids[i++] = SFso4_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFso4_a3", &SFso4_a3); ERR
+    varids[i++] = SFso4_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFsoa_a1", &SFsoa_a1); ERR
+    varids[i++] = SFsoa_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFsoa_a2", &SFsoa_a2); ERR
+    varids[i++] = SFsoa_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFsoa_a3", &SFsoa_a3); ERR
+    varids[i++] = SFsoa_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SHFLX", &SHFLX); ERR
+    varids[i++] = SHFLX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SH_KCLDBASE", &SH_KCLDBASE); ERR
+    varids[i++] = SH_KCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SH_MFUP_MAX", &SH_MFUP_MAX); ERR
+    varids[i++] = SH_MFUP_MAX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SH_WCLDBASE", &SH_WCLDBASE); ERR
+    varids[i++] = SH_WCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SNOWHICE", &SNOWHICE); ERR
+    varids[i++] = SNOWHICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SNOWHLND", &SNOWHLND); ERR
+    varids[i++] = SNOWHLND;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SNOWQM", &SNOWQM); ERR
+    varids[i++] = SNOWQM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SO2", &SO2); ERR
+    varids[i++] = SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SO2_CLXF", &SO2_CLXF); ERR
+    varids[i++] = SO2_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SO2_SRF", &SO2_SRF); ERR
+    varids[i++] = SO2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOAG_CLXF", &SOAG_CLXF); ERR
+    varids[i++] = SOAG_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOAG_SRF", &SOAG_SRF); ERR
+    varids[i++] = SOAG_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOAG_sfgaex1", &SOAG_sfgaex1); ERR
+    varids[i++] = SOAG_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOLIN", &SOLIN); ERR
+    varids[i++] = SOLIN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SSAVIS", &SSAVIS); ERR
+    varids[i++] = SSAVIS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SSTSFMBL", &SSTSFMBL); ERR
+    varids[i++] = SSTSFMBL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SSTSFMBL_OM", &SSTSFMBL_OM); ERR
+    varids[i++] = SSTSFMBL_OM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SWCF", &SWCF); ERR
+    varids[i++] = SWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "T", &T); ERR
+    varids[i++] = T;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUGWX", &TAUGWX); ERR
+    varids[i++] = TAUGWX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUGWY", &TAUGWY); ERR
+    varids[i++] = TAUGWY;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUX", &TAUX); ERR
+    varids[i++] = TAUX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUY", &TAUY); ERR
+    varids[i++] = TAUY;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TGCLDCWP", &TGCLDCWP); ERR
+    varids[i++] = TGCLDCWP;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TGCLDIWP", &TGCLDIWP); ERR
+    varids[i++] = TGCLDIWP;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TGCLDLWP", &TGCLDLWP); ERR
+    varids[i++] = TGCLDLWP;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TH7001000", &TH7001000); ERR
+    varids[i++] = TH7001000;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TMQ", &TMQ); ERR
+    varids[i++] = TMQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TREFHT", &TREFHT); ERR
+    varids[i++] = TREFHT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TROP_P", &TROP_P); ERR
+    varids[i++] = TROP_P;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TROP_T", &TROP_T); ERR
+    varids[i++] = TROP_T;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TS", &TS); ERR
+    varids[i++] = TS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TSMN", &TSMN); ERR
+    varids[i++] = TSMN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TSMX", &TSMX); ERR
+    varids[i++] = TSMX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TUH", &TUH); ERR
+    varids[i++] = TUH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TUQ", &TUQ); ERR
+    varids[i++] = TUQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TVH", &TVH); ERR
+    varids[i++] = TVH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TVQ", &TVQ); ERR
+    varids[i++] = TVQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "U", &U); ERR
+    varids[i++] = U;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "U10", &U10); ERR
+    varids[i++] = U10;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "UU", &UU); ERR
+    varids[i++] = UU;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "V", &V); ERR
+    varids[i++] = V;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VQ", &VQ); ERR
+    varids[i++] = VQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VT", &VT); ERR
+    varids[i++] = VT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VU", &VU); ERR
+    varids[i++] = VU;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VV", &VV); ERR
+    varids[i++] = VV;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WD_H2O2", &WD_H2O2); ERR
+    varids[i++] = WD_H2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WD_H2SO4", &WD_H2SO4); ERR
+    varids[i++] = WD_H2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WD_SO2", &WD_SO2); ERR
+    varids[i++] = WD_SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WSUB", &WSUB); ERR
+    varids[i++] = WSUB;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Z3", &Z3); ERR
+    varids[i++] = Z3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "aero_water", &aero_water); ERR
+    varids[i++] = aero_water;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "airFV", &airFV); ERR
+    varids[i++] = airFV;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1DDF", &bc_a1DDF); ERR
+    varids[i++] = bc_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1SFWET", &bc_a1SFWET); ERR
+    varids[i++] = bc_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1_SRF", &bc_a1_SRF); ERR
+    varids[i++] = bc_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1_sfgaex1", &bc_a1_sfgaex1); ERR
+    varids[i++] = bc_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a3DDF", &bc_a3DDF); ERR
+    varids[i++] = bc_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a3SFWET", &bc_a3SFWET); ERR
+    varids[i++] = bc_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a3_SRF", &bc_a3_SRF); ERR
+    varids[i++] = bc_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4DDF", &bc_a4DDF); ERR
+    varids[i++] = bc_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4SFWET", &bc_a4SFWET); ERR
+    varids[i++] = bc_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4_CLXF", &bc_a4_CLXF); ERR
+    varids[i++] = bc_a4_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4_SRF", &bc_a4_SRF); ERR
+    varids[i++] = bc_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4_sfgaex1", &bc_a4_sfgaex1); ERR
+    varids[i++] = bc_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c1DDF", &bc_c1DDF); ERR
+    varids[i++] = bc_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c1SFWET", &bc_c1SFWET); ERR
+    varids[i++] = bc_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c3DDF", &bc_c3DDF); ERR
+    varids[i++] = bc_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c3SFWET", &bc_c3SFWET); ERR
+    varids[i++] = bc_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c4DDF", &bc_c4DDF); ERR
+    varids[i++] = bc_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c4SFWET", &bc_c4SFWET); ERR
+    varids[i++] = bc_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "chla", &chla); ERR
+    varids[i++] = chla;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1DDF", &dst_a1DDF); ERR
+    varids[i++] = dst_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1SF", &dst_a1SF); ERR
+    varids[i++] = dst_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1SFWET", &dst_a1SFWET); ERR
+    varids[i++] = dst_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1_SRF", &dst_a1_SRF); ERR
+    varids[i++] = dst_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3DDF", &dst_a3DDF); ERR
+    varids[i++] = dst_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3SF", &dst_a3SF); ERR
+    varids[i++] = dst_a3SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3SFWET", &dst_a3SFWET); ERR
+    varids[i++] = dst_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3_SRF", &dst_a3_SRF); ERR
+    varids[i++] = dst_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c1DDF", &dst_c1DDF); ERR
+    varids[i++] = dst_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c1SFWET", &dst_c1SFWET); ERR
+    varids[i++] = dst_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c3DDF", &dst_c3DDF); ERR
+    varids[i++] = dst_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c3SFWET", &dst_c3SFWET); ERR
+    varids[i++] = dst_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "hstobie_linoz", &hstobie_linoz); ERR
+    varids[i++] = hstobie_linoz;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    varids[i++] = mlip;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1DDF", &mom_a1DDF); ERR
+    varids[i++] = mom_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1SF", &mom_a1SF); ERR
+    varids[i++] = mom_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1SFWET", &mom_a1SFWET); ERR
+    varids[i++] = mom_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1_SRF", &mom_a1_SRF); ERR
+    varids[i++] = mom_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1_sfgaex1", &mom_a1_sfgaex1); ERR
+    varids[i++] = mom_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2DDF", &mom_a2DDF); ERR
+    varids[i++] = mom_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2SF", &mom_a2SF); ERR
+    varids[i++] = mom_a2SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2SFWET", &mom_a2SFWET); ERR
+    varids[i++] = mom_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2_SRF", &mom_a2_SRF); ERR
+    varids[i++] = mom_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a3DDF", &mom_a3DDF); ERR
+    varids[i++] = mom_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a3SFWET", &mom_a3SFWET); ERR
+    varids[i++] = mom_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a3_SRF", &mom_a3_SRF); ERR
+    varids[i++] = mom_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4DDF", &mom_a4DDF); ERR
+    varids[i++] = mom_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4SF", &mom_a4SF); ERR
+    varids[i++] = mom_a4SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4SFWET", &mom_a4SFWET); ERR
+    varids[i++] = mom_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4_SRF", &mom_a4_SRF); ERR
+    varids[i++] = mom_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4_sfgaex1", &mom_a4_sfgaex1); ERR
+    varids[i++] = mom_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c1DDF", &mom_c1DDF); ERR
+    varids[i++] = mom_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c1SFWET", &mom_c1SFWET); ERR
+    varids[i++] = mom_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c2DDF", &mom_c2DDF); ERR
+    varids[i++] = mom_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c2SFWET", &mom_c2SFWET); ERR
+    varids[i++] = mom_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c3DDF", &mom_c3DDF); ERR
+    varids[i++] = mom_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c3SFWET", &mom_c3SFWET); ERR
+    varids[i++] = mom_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c4DDF", &mom_c4DDF); ERR
+    varids[i++] = mom_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c4SFWET", &mom_c4SFWET); ERR
+    varids[i++] = mom_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mpoly", &mpoly); ERR
+    varids[i++] = mpoly;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mprot", &mprot); ERR
+    varids[i++] = mprot;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1DDF", &ncl_a1DDF); ERR
+    varids[i++] = ncl_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1SF", &ncl_a1SF); ERR
+    varids[i++] = ncl_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1SFWET", &ncl_a1SFWET); ERR
+    varids[i++] = ncl_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1_SRF", &ncl_a1_SRF); ERR
+    varids[i++] = ncl_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2DDF", &ncl_a2DDF); ERR
+    varids[i++] = ncl_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2SF", &ncl_a2SF); ERR
+    varids[i++] = ncl_a2SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2SFWET", &ncl_a2SFWET); ERR
+    varids[i++] = ncl_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2_SRF", &ncl_a2_SRF); ERR
+    varids[i++] = ncl_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3DDF", &ncl_a3DDF); ERR
+    varids[i++] = ncl_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3SF", &ncl_a3SF); ERR
+    varids[i++] = ncl_a3SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3SFWET", &ncl_a3SFWET); ERR
+    varids[i++] = ncl_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3_SRF", &ncl_a3_SRF); ERR
+    varids[i++] = ncl_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c1DDF", &ncl_c1DDF); ERR
+    varids[i++] = ncl_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c1SFWET", &ncl_c1SFWET); ERR
+    varids[i++] = ncl_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c2DDF", &ncl_c2DDF); ERR
+    varids[i++] = ncl_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c2SFWET", &ncl_c2SFWET); ERR
+    varids[i++] = ncl_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c3DDF", &ncl_c3DDF); ERR
+    varids[i++] = ncl_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c3SFWET", &ncl_c3SFWET); ERR
+    varids[i++] = ncl_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1DDF", &num_a1DDF); ERR
+    varids[i++] = num_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1SF", &num_a1SF); ERR
+    varids[i++] = num_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1SFWET", &num_a1SFWET); ERR
+    varids[i++] = num_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1_CLXF", &num_a1_CLXF); ERR
+    varids[i++] = num_a1_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1_SRF", &num_a1_SRF); ERR
+    varids[i++] = num_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1_sfgaex1", &num_a1_sfgaex1); ERR
+    varids[i++] = num_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2DDF", &num_a2DDF); ERR
+    varids[i++] = num_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2SFWET", &num_a2SFWET); ERR
+    varids[i++] = num_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2_CLXF", &num_a2_CLXF); ERR
+    varids[i++] = num_a2_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2_SRF", &num_a2_SRF); ERR
+    varids[i++] = num_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3DDF", &num_a3DDF); ERR
+    varids[i++] = num_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3SF", &num_a3SF); ERR
+    varids[i++] = num_a3SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3SFWET", &num_a3SFWET); ERR
+    varids[i++] = num_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3_SRF", &num_a3_SRF); ERR
+    varids[i++] = num_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4DDF", &num_a4DDF); ERR
+    varids[i++] = num_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4SFWET", &num_a4SFWET); ERR
+    varids[i++] = num_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4_CLXF", &num_a4_CLXF); ERR
+    varids[i++] = num_a4_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4_SRF", &num_a4_SRF); ERR
+    varids[i++] = num_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4_sfgaex1", &num_a4_sfgaex1); ERR
+    varids[i++] = num_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c1DDF", &num_c1DDF); ERR
+    varids[i++] = num_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c1SFWET", &num_c1SFWET); ERR
+    varids[i++] = num_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c2DDF", &num_c2DDF); ERR
+    varids[i++] = num_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c2SFWET", &num_c2SFWET); ERR
+    varids[i++] = num_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c3DDF", &num_c3DDF); ERR
+    varids[i++] = num_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c3SFWET", &num_c3SFWET); ERR
+    varids[i++] = num_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c4DDF", &num_c4DDF); ERR
+    varids[i++] = num_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c4SFWET", &num_c4SFWET); ERR
+    varids[i++] = num_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1DDF", &pom_a1DDF); ERR
+    varids[i++] = pom_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1SFWET", &pom_a1SFWET); ERR
+    varids[i++] = pom_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1_SRF", &pom_a1_SRF); ERR
+    varids[i++] = pom_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1_sfgaex1", &pom_a1_sfgaex1); ERR
+    varids[i++] = pom_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a3DDF", &pom_a3DDF); ERR
+    varids[i++] = pom_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a3SFWET", &pom_a3SFWET); ERR
+    varids[i++] = pom_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a3_SRF", &pom_a3_SRF); ERR
+    varids[i++] = pom_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4DDF", &pom_a4DDF); ERR
+    varids[i++] = pom_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4SFWET", &pom_a4SFWET); ERR
+    varids[i++] = pom_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4_CLXF", &pom_a4_CLXF); ERR
+    varids[i++] = pom_a4_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4_SRF", &pom_a4_SRF); ERR
+    varids[i++] = pom_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4_sfgaex1", &pom_a4_sfgaex1); ERR
+    varids[i++] = pom_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c1DDF", &pom_c1DDF); ERR
+    varids[i++] = pom_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c1SFWET", &pom_c1SFWET); ERR
+    varids[i++] = pom_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c3DDF", &pom_c3DDF); ERR
+    varids[i++] = pom_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c3SFWET", &pom_c3SFWET); ERR
+    varids[i++] = pom_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c4DDF", &pom_c4DDF); ERR
+    varids[i++] = pom_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c4SFWET", &pom_c4SFWET); ERR
+    varids[i++] = pom_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1DDF", &so4_a1DDF); ERR
+    varids[i++] = so4_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1SFWET", &so4_a1SFWET); ERR
+    varids[i++] = so4_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1_CLXF", &so4_a1_CLXF); ERR
+    varids[i++] = so4_a1_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1_SRF", &so4_a1_SRF); ERR
+    varids[i++] = so4_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1_sfgaex1", &so4_a1_sfgaex1); ERR
+    varids[i++] = so4_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2DDF", &so4_a2DDF); ERR
+    varids[i++] = so4_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2SFWET", &so4_a2SFWET); ERR
+    varids[i++] = so4_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2_CLXF", &so4_a2_CLXF); ERR
+    varids[i++] = so4_a2_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2_SRF", &so4_a2_SRF); ERR
+    varids[i++] = so4_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2_sfgaex1", &so4_a2_sfgaex1); ERR
+    varids[i++] = so4_a2_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3DDF", &so4_a3DDF); ERR
+    varids[i++] = so4_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3SFWET", &so4_a3SFWET); ERR
+    varids[i++] = so4_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3_SRF", &so4_a3_SRF); ERR
+    varids[i++] = so4_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3_sfgaex1", &so4_a3_sfgaex1); ERR
+    varids[i++] = so4_a3_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c1DDF", &so4_c1DDF); ERR
+    varids[i++] = so4_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c1SFWET", &so4_c1SFWET); ERR
+    varids[i++] = so4_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c2DDF", &so4_c2DDF); ERR
+    varids[i++] = so4_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c2SFWET", &so4_c2SFWET); ERR
+    varids[i++] = so4_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c3DDF", &so4_c3DDF); ERR
+    varids[i++] = so4_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c3SFWET", &so4_c3SFWET); ERR
+    varids[i++] = so4_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1DDF", &soa_a1DDF); ERR
+    varids[i++] = soa_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1SFWET", &soa_a1SFWET); ERR
+    varids[i++] = soa_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1_SRF", &soa_a1_SRF); ERR
+    varids[i++] = soa_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1_sfgaex1", &soa_a1_sfgaex1); ERR
+    varids[i++] = soa_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2DDF", &soa_a2DDF); ERR
+    varids[i++] = soa_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2SFWET", &soa_a2SFWET); ERR
+    varids[i++] = soa_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2_SRF", &soa_a2_SRF); ERR
+    varids[i++] = soa_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2_sfgaex1", &soa_a2_sfgaex1); ERR
+    varids[i++] = soa_a2_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3DDF", &soa_a3DDF); ERR
+    varids[i++] = soa_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3SFWET", &soa_a3SFWET); ERR
+    varids[i++] = soa_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3_SRF", &soa_a3_SRF); ERR
+    varids[i++] = soa_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3_sfgaex1", &soa_a3_sfgaex1); ERR
+    varids[i++] = soa_a3_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c1DDF", &soa_c1DDF); ERR
+    varids[i++] = soa_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c1SFWET", &soa_c1SFWET); ERR
+    varids[i++] = soa_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c2DDF", &soa_c2DDF); ERR
+    varids[i++] = soa_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c2SFWET", &soa_c2SFWET); ERR
+    varids[i++] = soa_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c3DDF", &soa_c3DDF); ERR
+    varids[i++] = soa_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c3SFWET", &soa_c3SFWET); ERR
+    varids[i++] = soa_c3SFWET;
+
+    assert(i == nvars);
+
+fn_exit:
+    return nerrs;
+}
+
+
+/*----< def_F_case_h0() >----------------------------------------------------*/
 int def_F_case_h0_hdf5(hid_t               ncid,    /* file ID */
                   const MPI_Offset  dims[2], /* dimension sizes */
                   int               nvars,   /* number of variables */
@@ -7089,6 +9276,263 @@ fn_exit:
 }
 
 /*----< def_F_case_h1() >----------------------------------------------------*/
+int def_F_case_h1_hdf5_mpi(hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids)  /* variable IDs */
+{
+    /* Total 51 variables */
+    int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date,
+        datesec, time_bnds, date_written, time_written, ndbase, nsbase, nbdate,
+        nbsec, mdt, ndcur, nscur, co2vmr, ch4vmr, n2ovmr, f11vmr, f12vmr,
+	sol_tsi, nsteph, CLDHGH, CLDLOW, CLDMED, FLNT, LWCF, OMEGA500,
+	OMEGA850, PRECT, PS, SWCF, T850, TMQ, TS, U, U250, U850, UBOT, V250,
+        V850, VBOT, Z500;
+
+    int i, err, nerrs=0, dimids[3], iattr, mdims=1;
+    int dim_ncol, dim_time, dim_nbnd, dim_chars, dim_lev, dim_ilev;
+
+    /* define dimensions */
+    err = hdf5_def_dim_mpi(dims[1],      &dim_ncol); ERR
+    err = hdf5_def_dim_mpi(NC_UNLIMITED, &dim_time); ERR
+    err = hdf5_def_dim_mpi(2,           &dim_nbnd); ERR
+    err = hdf5_def_dim_mpi(8,           &dim_chars); ERR
+    err = hdf5_def_dim_mpi(dims[0],     &dim_lev); ERR
+    err = hdf5_def_dim_mpi(dims[0]+1,   &dim_ilev); ERR
+
+    i = 0;
+
+    /* define variables */
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var(ncid, "lat", &lat); ERR
+    varids[i++] = lat;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var(ncid, "lon", &lon); ERR
+    varids[i++] = lon;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var(ncid, "area", &area); ERR
+    varids[i++] = area;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "lev", &lev); ERR
+    varids[i++] = lev;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "hyam", &hyam); ERR
+    varids[i++] = hyam;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "hybm", &hybm); ERR
+    varids[i++] = hybm;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "P0", &P0); ERR
+    varids[i++] = P0;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var(ncid, "ilev", N&ilev); ERR
+    varids[i++] = ilev;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var(ncid, "hyai", &hyai); ERR
+    varids[i++] = hyai;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var(ncid, "hybi", &hybi); ERR
+    varids[i++] = hybi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "time", time); ERR
+    varids[i++] = time;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "date", &date); ERR
+    varids[i++] = date;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "datesec", &datesec); ERR
+    varids[i++] = datesec;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_nbnd;
+    err = hdf5_def_var(ncid, "time_bnds", &time_bnds); ERR
+    varids[i++] = time_bnds;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var(ncid, "date_written", &date_written); ERR
+    varids[i++] = date_written;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var(ncid, "time_written", &time_written); ERR
+    varids[i++] = time_written;
+
+    err = hdf5_def_var(ncid, "ndbase", &ndbase); ERR
+    varids[i++] = ndbase;
+    err = hdf5_def_var(ncid, "nsbase", &nsbase); ERR
+    varids[i++] = nsbase;
+
+    err = hdf5_def_var(ncid, "nbdate", &nbdate); ERR
+    varids[i++] = nbdate;
+
+    err = hdf5_def_var(ncid, "nbsec", &nbsec); ERR
+    varids[i++] = nbsec;
+
+    err = hdf5_def_var(ncid, "mdt", &mdt); ERR
+    varids[i++] = mdt;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "ndcur", &ndcur); ERR
+    varids[i++] = ndcur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "nscur", &nscur); ERR
+    varids[i++] = nscur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "co2vmr", &co2vmr); ERR
+    varids[i++] = co2vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "ch4vmr", &ch4vmr); ERR
+    varids[i++] = ch4vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "n2ovmr", &n2ovmr); ERR
+    varids[i++] = n2ovmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "f11vmr", &f11vmr); ERR
+    varids[i++] = f11vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "f12vmr", &f12vmr); ERR
+    varids[i++] = f12vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "sol_tsi", &sol_tsi); ERR
+    varids[i++] = sol_tsi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "nsteph", &nsteph); ERR
+    varids[i++] = nsteph;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "CLDHGH", &CLDHGH); ERR
+    varids[i++] = CLDHGH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "CLDLOW", &CLDLOW); ERR
+    varids[i++] = CLDLOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "CLDMED", &CLDMED); ERR
+    varids[i++] = CLDMED;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "FLNT", &FLNT); ERR
+    varids[i++] = FLNT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "LWCF", &LWCF); ERR
+    varids[i++] = LWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "OMEGA500", &OMEGA500); ERR
+    varids[i++] = OMEGA500;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "OMEGA850", &OMEGA850); ERR
+    varids[i++] = OMEGA850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "PRECT", &PRECT); ERR
+    varids[i++] = PRECT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "PS", &PS); ERR
+    varids[i++] = PS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "SWCF", &SWCF); ERR
+    varids[i++] = SWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "T850", &T850); ERR
+    varids[i++] = T850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "TMQ", &TMQ); ERR
+    varids[i++] = TMQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "TS", &TS); ERR
+    varids[i++] = TS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var(ncid, "U", &U); ERR
+    varids[i++] = U;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "U250", &U250); ERR
+    varids[i++] = U250;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "U850", &U850); ERR
+    varids[i++] = U850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "UBOT", &UBOT); ERR
+    varids[i++] = UBOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "V250", &V250); ERR
+    varids[i++] = V250;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "V850", &V850); ERR
+    varids[i++] = V850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "VBOT", &VBOT); ERR
+    varids[i++] = VBOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "Z500", &Z500); ERR
+    varids[i++] = Z500;
+
+    assert(i == nvars);
+
+fn_exit:
+    return nerrs;
+}
+
+/*----< def_F_case_h1() >----------------------------------------------------*/
 int def_F_case_h1_hdf5(hid_t               ncid,    /* file ID */
                   const MPI_Offset  dims[2], /* dimension sizes */
                   int               nvars,   /* number of variables */
@@ -7135,317 +9579,228 @@ int def_F_case_h1_hdf5(hid_t               ncid,    /* file ID */
 
     /* define variables */
     dimids[0] = dim_ncol;
-    err = hdf5_def_var(ncid, "lat", NC_DOUBLE, 1, dimids, &lat); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lat, "long_name", 8, "latitude"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lat, "units", 13, "degrees_north"); ERR
+    err = hdf5_def_var_mpi(ncid, "lat", &lat); ERR
     varids[i++] = lat;
 
     dimids[0] = dim_ncol;
-    err = hdf5_def_var(ncid, "lon", NC_DOUBLE, 1, dimids, &lon); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lon, "long_name", 9, "longitude"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lon, "units", 12, "degrees_east"); ERR
+    err = hdf5_def_var_mpi(ncid, "lon", &lon); ERR
     varids[i++] = lon;
 
     dimids[0] = dim_ncol;
-    err = hdf5_def_var(ncid, "area", NC_DOUBLE, 1, dimids, &area); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, area, "long_name", 14, "gll grid areas"); ERR
+    err = hdf5_def_var_mpi(ncid, "area", &area); ERR
     varids[i++] = area;
 
     dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "lev", NC_DOUBLE, 1, dimids, &lev); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lev, "long_name", 38, "hybrid level at midpoints (1000*(A+B))"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lev, "units", 3, "hPa"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lev, "positive", 4, "down"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lev, "standard_name", 43, "atmosphere_hybrid_sigma_pressure_coordinate"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, lev, "formula_terms", 29, "a: hyam b: hybm p0: P0 ps: PS"); ERR
+    err = hdf5_def_var_mpi(ncid, "lev", &lev); ERR
     varids[i++] = lev;
 
     dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "hyam", NC_DOUBLE, 1, dimids, &hyam); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, hyam, "long_name", 39, "hybrid A coefficient at layer midpoints"); ERR
+    err = hdf5_def_var_mpi(ncid, "hyam", &hyam); ERR
     varids[i++] = hyam;
 
     dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "hybm", NC_DOUBLE, 1, dimids, &hybm); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, hybm, "long_name", 39, "hybrid B coefficient at layer midpoints"); ERR
+    err = hdf5_def_var_mpi(ncid, "hybm", &hybm); ERR
     varids[i++] = hybm;
 
     dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "P0", NC_DOUBLE, 0, NULL, &P0); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, P0, "long_name", 18, "reference pressure"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, P0, "units", 2, "Pa"); ERR
+    err = hdf5_def_var_mpi(ncid, "P0", &P0); ERR
     varids[i++] = P0;
 
     dimids[0] = dim_ilev;
-    err = hdf5_def_var(ncid, "ilev", NC_DOUBLE, 1, dimids, &ilev); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "long_name", 39, "hybrid level at interfaces (1000*(A+B))"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "units", 3, "hPa"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "positive", 4, "down"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "standard_name", 43, "atmosphere_hybrid_sigma_pressure_coordinate"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "formula_terms", 29, "a: hyai b: hybi p0: P0 ps: PS"); ERR
+    err = hdf5_def_var_mpi(ncid, "ilev", N&ilev); ERR
     varids[i++] = ilev;
 
     dimids[0] = dim_ilev;
-    err = hdf5_def_var(ncid, "hyai", NC_DOUBLE, 1, dimids, &hyai); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, hyai, "long_name", 40, "hybrid A coefficient at layer interfaces"); ERR
+    err = hdf5_def_var_mpi(ncid, "hyai", &hyai); ERR
     varids[i++] = hyai;
 
     dimids[0] = dim_ilev;
-    err = hdf5_def_var(ncid, "hybi", NC_DOUBLE, 1, dimids, &hybi); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, hybi, "long_name", 40, "hybrid B coefficient at layer interfaces"); ERR
+    err = hdf5_def_var_mpi(ncid, "hybi", &hybi); ERR
     varids[i++] = hybi;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "time", NC_DOUBLE, 1, dimids, &time); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, time, "long_name", 4, "time"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, time, "units", 30, "days since 0001-01-01 00:00:00"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, time, "calendar", 6, "noleap"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, time, "bounds", 9, "time_bnds"); ERR
+    err = hdf5_def_var_mpi(ncid, "time", time); ERR
     varids[i++] = time;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "date", NC_INT, 1, dimids, &date); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, date, "long_name", 23, "current date (YYYYMMDD)"); ERR
+    err = hdf5_def_var_mpi(ncid, "date", &date); ERR
     varids[i++] = date;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "datesec", NC_INT, 1, dimids, &datesec); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, datesec, "long_name", 31, "current seconds of current date"); ERR
+    err = hdf5_def_var_mpi(ncid, "datesec", &datesec); ERR
     varids[i++] = datesec;
 
     dimids[0] = dim_time;
     dimids[1] = dim_nbnd;
-    err = hdf5_def_var(ncid, "time_bnds", NC_DOUBLE, 2, dimids, &time_bnds); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, time_bnds, "long_name", 23, "time interval endpoints"); ERR
+    err = hdf5_def_var_mpi(ncid, "time_bnds", &time_bnds); ERR
     varids[i++] = time_bnds;
 
     dimids[0] = dim_time;
     dimids[1] = dim_chars;
-    err = hdf5_def_var(ncid, "date_written", NC_CHAR, 2, dimids, &date_written); ERR
+    err = hdf5_def_var_mpi(ncid, "date_written", &date_written); ERR
     varids[i++] = date_written;
 
     dimids[0] = dim_time;
     dimids[1] = dim_chars;
-    err = hdf5_def_var(ncid, "time_written", NC_CHAR, 2, dimids, &time_written); ERR
+    err = hdf5_def_var_mpi(ncid, "time_written", &time_written); ERR
     varids[i++] = time_written;
 
-    err = hdf5_def_var(ncid, "ndbase", NC_INT, 0, NULL, &ndbase); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ndbase, "long_name", 8, "base day"); ERR
+    err = hdf5_def_var_mpi(ncid, "ndbase", &ndbase); ERR
     varids[i++] = ndbase;
-    err = hdf5_def_var(ncid, "nsbase", NC_INT, 0, NULL, &nsbase); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, nsbase, "long_name", 19, "seconds of base day"); ERR
+    err = hdf5_def_var_mpi(ncid, "nsbase", &nsbase); ERR
     varids[i++] = nsbase;
 
-    err = hdf5_def_var(ncid, "nbdate", NC_INT, 0, NULL, &nbdate); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, nbdate, "long_name", 20, "base date (YYYYMMDD)"); ERR
+    err = hdf5_def_var_mpi(ncid, "nbdate", &nbdate); ERR
     varids[i++] = nbdate;
 
-    err = hdf5_def_var(ncid, "nbsec", NC_INT, 0, NULL, &nbsec); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, nbsec, "long_name", 20, "seconds of base date"); ERR
+    err = hdf5_def_var_mpi(ncid, "nbsec", &nbsec); ERR
     varids[i++] = nbsec;
 
-    err = hdf5_def_var(ncid, "mdt", NC_INT, 0, NULL, &mdt); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, mdt, "long_name", 8, "timestep"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, mdt, "units", 1, "s"); ERR
+    err = hdf5_def_var_mpi(ncid, "mdt", &mdt); ERR
     varids[i++] = mdt;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "ndcur", NC_INT, 1, dimids, &ndcur); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ndcur, "long_name", 27, "current day (from base day)"); ERR
+    err = hdf5_def_var_mpi(ncid, "ndcur", &ndcur); ERR
     varids[i++] = ndcur;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "nscur", NC_INT, 1, dimids, &nscur); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, nscur, "long_name", 30, "current seconds of current day"); ERR
+    err = hdf5_def_var_mpi(ncid, "nscur", &nscur); ERR
     varids[i++] = nscur;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "co2vmr", NC_DOUBLE, 1, dimids, &co2vmr); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, co2vmr, "long_name", 23, "co2 volume mixing ratio"); ERR
+    err = hdf5_def_var_mpi(ncid, "co2vmr", &co2vmr); ERR
     varids[i++] = co2vmr;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "ch4vmr", NC_DOUBLE, 1, dimids, &ch4vmr); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, ch4vmr, "long_name", 23, "ch4 volume mixing ratio"); ERR
+    err = hdf5_def_var_mpi(ncid, "ch4vmr", &ch4vmr); ERR
     varids[i++] = ch4vmr;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "n2ovmr", NC_DOUBLE, 1, dimids, &n2ovmr); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, n2ovmr, "long_name", 23, "n2o volume mixing ratio"); ERR
+    err = hdf5_def_var_mpi(ncid, "n2ovmr", &n2ovmr); ERR
     varids[i++] = n2ovmr;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "f11vmr", NC_DOUBLE, 1, dimids, &f11vmr); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, f11vmr, "long_name", 23, "f11 volume mixing ratio"); ERR
+    err = hdf5_def_var_mpi(ncid, "f11vmr", &f11vmr); ERR
     varids[i++] = f11vmr;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "f12vmr", NC_DOUBLE, 1, dimids, &f12vmr); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, f12vmr, "long_name", 23, "f12 volume mixing ratio"); ERR
+    err = hdf5_def_var_mpi(ncid, "f12vmr", &f12vmr); ERR
     varids[i++] = f12vmr;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "sol_tsi", NC_DOUBLE, 1, dimids, &sol_tsi); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, sol_tsi, "long_name", 22, "total solar irradiance"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, sol_tsi, "units", 4, "W/m2"); ERR
+    err = hdf5_def_var_mpi(ncid, "sol_tsi", &sol_tsi); ERR
     varids[i++] = sol_tsi;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "nsteph", NC_INT, 1, dimids, &nsteph); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, nsteph, "long_name", 16, "current timestep"); ERR
+    err = hdf5_def_var_mpi(ncid, "nsteph", &nsteph); ERR
     varids[i++] = nsteph;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "CLDHGH", NC_FLOAT, 2, dimids, &CLDHGH); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, CLDHGH, "units", 8, "fraction"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, CLDHGH, "long_name", 32, "Vertically-integrated high cloud"); ERR
+    err = hdf5_def_var_mpi(ncid, "CLDHGH", &CLDHGH); ERR
     varids[i++] = CLDHGH;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "CLDLOW", NC_FLOAT, 2, dimids, &CLDLOW); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, CLDLOW, "units", 8, "fraction"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, CLDLOW, "long_name", 31, "Vertically-integrated low cloud"); ERR
+    err = hdf5_def_var_mpi(ncid, "CLDLOW", &CLDLOW); ERR
     varids[i++] = CLDLOW;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "CLDMED", NC_FLOAT, 2, dimids, &CLDMED); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, CLDMED, "units", 8, "fraction"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, CLDMED, "long_name", 37, "Vertically-integrated mid-level cloud"); ERR
+    err = hdf5_def_var_mpi(ncid, "CLDMED", &CLDMED); ERR
     varids[i++] = CLDMED;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "FLNT", NC_FLOAT, 2, dimids, &FLNT); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, FLNT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, FLNT, "units", 4, "W/m2"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, FLNT, "long_name", 33, "Net longwave flux at top of model"); ERR
+    err = hdf5_def_var_mpi(ncid, "FLNT", &FLNT); ERR
     varids[i++] = FLNT;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "LWCF", NC_FLOAT, 2, dimids, &LWCF); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, LWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, LWCF, "units", 4, "W/m2"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, LWCF, "long_name", 22, "Longwave cloud forcing"); ERR
+    err = hdf5_def_var_mpi(ncid, "LWCF", &LWCF); ERR
     varids[i++] = LWCF;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "OMEGA500", NC_FLOAT, 2, dimids, &OMEGA500); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA500, "units", 4, "Pa/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA500, "long_name", 46, "Vertical velocity at 500 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "OMEGA500", &OMEGA500); ERR
     varids[i++] = OMEGA500;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "OMEGA850", NC_FLOAT, 2, dimids, &OMEGA850); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA850, "units", 4, "Pa/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA850, "long_name", 46, "Vertical velocity at 850 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "OMEGA850", &OMEGA850); ERR
     varids[i++] = OMEGA850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "PRECT", NC_FLOAT, 2, dimids, &PRECT); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, PRECT, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, PRECT, "long_name", 65, "Total (convective and large-scale) precipitation rate (liq + ice)"); ERR
+    err = hdf5_def_var_mpi(ncid, "PRECT", &PRECT); ERR
     varids[i++] = PRECT;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "PS", NC_FLOAT, 2, dimids, &PS); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, PS, "units", 2, "Pa"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, PS, "long_name", 16, "Surface pressure"); ERR
+    err = hdf5_def_var_mpi(ncid, "PS", &PS); ERR
     varids[i++] = PS;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "SWCF", NC_FLOAT, 2, dimids, &SWCF); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, SWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, SWCF, "units", 4, "W/m2"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, SWCF, "long_name", 23, "Shortwave cloud forcing"); ERR
+    err = hdf5_def_var_mpi(ncid, "SWCF", &SWCF); ERR
     varids[i++] = SWCF;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "T850", NC_FLOAT, 2, dimids, &T850); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, T850, "units", 1, "K"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, T850, "long_name", 40, "Temperature at 850 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "T850", &T850); ERR
     varids[i++] = T850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "TMQ", NC_FLOAT, 2, dimids, &TMQ); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, TMQ, "units", 5, "kg/m2"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, TMQ, "long_name", 48, "Total (vertically integrated) precipitable water"); ERR
+    err = hdf5_def_var_mpi(ncid, "TMQ", &TMQ); ERR
     varids[i++] = TMQ;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "TS", NC_FLOAT, 2, dimids, &TS); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, TS, "units", 1, "K"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, TS, "long_name", 31, "Surface temperature (radiative)"); ERR
+    err = hdf5_def_var_mpi(ncid, "TS", &TS); ERR
     varids[i++] = TS;
 
     dimids[0] = dim_time;
     dimids[1] = dim_lev;
     dimids[2] = dim_ncol;
-    err = hdf5_def_var(ncid, "U", NC_FLOAT, 3, dimids, &U); ERR
-    err = HDF5_PUT_ATT_INT(ncid, U, "mdims", NC_INT, 1, &mdims); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, U, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, U, "long_name", 10, "Zonal wind"); ERR
+    err = hdf5_def_var_mpi(ncid, "U", &U); ERR
     varids[i++] = U;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "U250", NC_FLOAT, 2, dimids, &U250); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, U250, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, U250, "long_name", 39, "Zonal wind at 250 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "U250", &U250); ERR
     varids[i++] = U250;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "U850", NC_FLOAT, 2, dimids, &U850); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, U850, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, U850, "long_name", 39, "Zonal wind at 850 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "U850", &U850); ERR
     varids[i++] = U850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "UBOT", NC_FLOAT, 2, dimids, &UBOT); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, UBOT, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, UBOT, "long_name", 29, "Lowest model level zonal wind"); ERR
+    err = hdf5_def_var_mpi(ncid, "UBOT", &UBOT); ERR
     varids[i++] = UBOT;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "V250", NC_FLOAT, 2, dimids, &V250); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, V250, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, V250, "long_name", 44, "Meridional wind at 250 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "V250", &V250); ERR
     varids[i++] = V250;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "V850", NC_FLOAT, 2, dimids, &V850); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, V850, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, V850, "long_name", 44, "Meridional wind at 850 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "V850", &V850); ERR
     varids[i++] = V850;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "VBOT", NC_FLOAT, 2, dimids, &VBOT); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, VBOT, "units", 3, "m/s"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, VBOT, "long_name", 34, "Lowest model level meridional wind"); ERR
+    err = hdf5_def_var_mpi(ncid, "VBOT", &VBOT); ERR
     varids[i++] = VBOT;
 
     dimids[0] = dim_time;
     dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "Z500", NC_FLOAT, 2, dimids, &Z500); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, Z500, "units", 1, "m"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, Z500, "long_name", 43, "Geopotential Z at 500 mbar pressure surface"); ERR
+    err = hdf5_def_var_mpi(ncid, "Z500", &Z500); ERR
     varids[i++] = Z500;
+
 
     assert(i == nvars);
 

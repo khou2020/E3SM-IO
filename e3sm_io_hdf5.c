@@ -1257,6 +1257,20 @@ fn_exit:;
     return (int)herr;
 }
 
+int hdf5_def_var_mpi (hid_t fid, const char *name, int *vid) {
+    herr_t herr = 0;
+    hid_t did;
+
+    did = H5Dopen (fid, name);
+    CHECK_HID (did)
+
+    f_dids[f_nd] = did;
+    *vid         = f_nd++;
+
+fn_exit:;
+    return (int)herr;
+}
+
 int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *dimids, int *vid) {
     herr_t herr = 0;
     int i;
@@ -1281,12 +1295,6 @@ int hdf5_def_var (hid_t fid, const char *name, nc_type nctype, int ndim, int *di
 
     sid = H5Screate_simple (ndim, dims, dims);
     CHECK_HID (sid);
-/*
-    printf("------------------ %d\n", f_nd);
-        for ( i = 0; i < ndim; ++i ){
-            printf("creating dataset with dims[%d]=%lld, mdims[%d]=%lld , f_dims[dimids[%d]] = %lld\n",i,(long long int)dims[i], i, (long long int)mdims[i], i, (long long int) f_dims[dimids[i]]);
-        }
-*/
     did = H5Dcreate2 (fid, name, nc_type_to_hdf5_type (nctype), sid, H5P_DEFAULT, dcplid,
                       H5P_DEFAULT);
     CHECK_HID (did)
@@ -1312,6 +1320,14 @@ int hdf5_inq_varid (hid_t fid, const char *name, int *vid) {
 
 fn_exit:;
     return (int)herr;
+}
+
+int hdf5_def_dim_mpi (MPI_Offset msize, int *did) {
+    hsize_t size;
+    size = (hsize_t)msize;
+    if (size == NC_UNLIMITED) size = H5S_UNLIMITED;
+    f_dims[f_ndim] = size;
+    *did           = f_ndim++;
 }
 
 int hdf5_def_dim (hid_t fid, const char *name, MPI_Offset msize, int *did) {
@@ -1413,7 +1429,8 @@ int hdf5_close_vars (hid_t fid) {
         herr = H5Dclose (f_dids[i]);
         CHECK_HERR
     }
-
+    f_nd = 0;
+    f_ndim = 0;
 fn_exit:;
     return (int)herr;
 }

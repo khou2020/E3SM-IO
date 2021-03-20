@@ -298,7 +298,8 @@ extern hid_t f_dids[1048576];
 
 // ATT
 #define HDF5_PUT_ATT(A, B, C, D, E, F) hdf5_put_att(A, B, C, nc_type_to_hdf5_type(D), E, F)
-#define HDF5_PUT_ATT_TEXT(A, B, C, D, E)     hdf5_put_att (A, B, C, H5T_NATIVE_CHAR, D, E);
+//#define HDF5_PUT_ATT_TEXT(A, B, C, D, E)     hdf5_put_att (A, B, C, H5T_NATIVE_CHAR, D, E);
+#define HDF5_PUT_ATT_TEXT(A, B, C, D, E)     NC_NOERR
 #define HDF5_PUT_ATT_INT(A, B, C, D, E, F)   hdf5_put_att (A, B, C, H5T_NATIVE_INT, E, F);
 #define HDF5_PUT_ATT_FLOAT(A, B, C, D, E, F) hdf5_put_att (A, B, C, H5T_NATIVE_FLOAT, E, F);
 

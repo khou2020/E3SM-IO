@@ -1205,6 +1205,8 @@ int hdf5_put_att (
     hid_t did;
     hsize_t asize;
     htri_t exists;
+    int rank;
+    MPI_Comm_rank (comm, &rank);
 
     asize = (size_t)nelems;
     asid  = H5Screate_simple (1, &asize, &asize);
@@ -1224,6 +1226,9 @@ int hdf5_put_att (
     }
     CHECK_HID (aid)
 
+    if (!rank) {
+        goto fn_exit;
+    }
     herr = H5Awrite (aid, atype, buf);
     CHECK_HERR
 

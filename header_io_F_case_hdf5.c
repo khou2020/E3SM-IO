@@ -9332,7 +9332,7 @@ int def_F_case_h1_hdf5_mpi(hid_t               ncid,    /* file ID */
     varids[i++] = P0;
 
     dimids[0] = dim_ilev;
-    err = hdf5_def_var_mpi(ncid, "ilev", N&ilev); ERR
+    err = hdf5_def_var_mpi(ncid, "ilev", &ilev); ERR
     varids[i++] = ilev;
 
     dimids[0] = dim_ilev;
@@ -9344,7 +9344,7 @@ int def_F_case_h1_hdf5_mpi(hid_t               ncid,    /* file ID */
     varids[i++] = hybi;
 
     dimids[0] = dim_time;
-    err = hdf5_def_var_mpi(ncid, "time", time); ERR
+    err = hdf5_def_var_mpi(ncid, "time", &time); ERR
     varids[i++] = time;
 
     dimids[0] = dim_time;

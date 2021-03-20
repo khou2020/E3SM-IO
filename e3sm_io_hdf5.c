@@ -1259,15 +1259,17 @@ fn_exit:;
 
 int hdf5_def_var_mpi (hid_t fid, const char *name, int *vid) {
     herr_t herr = 0;
-    hid_t did;
+    hid_t did, dcplid;
+    dcplid = H5Pcreate (H5P_DATASET_ACCESS);
 
-    did = H5Dopen (fid, name);
+    did = H5Dopen (fid, name, dcplid);
     CHECK_HID (did)
 
     f_dids[f_nd] = did;
     *vid         = f_nd++;
 
-fn_exit:;
+fn_exit:
+    H5Pclose (dcplid);
     return (int)herr;
 }
 

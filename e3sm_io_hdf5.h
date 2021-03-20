@@ -373,4 +373,9 @@ int def_F_case_h0_hdf5_mpi (hid_t               ncid,    /* file ID */
                   int               nvars,   /* number of variables */
                   int              *varids);
 
+int def_F_case_h1_hdf5(hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids);  /* variable IDs */
+
 int hdf5_close_vars (hid_t fid);

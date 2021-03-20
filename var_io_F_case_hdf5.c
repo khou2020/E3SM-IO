@@ -592,7 +592,22 @@ int run_varn_F_case_hdf5 (
     faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
     fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
     if (!rank) {
+        double start = MPI_Wtime();        
         ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, fcplid_indp, faplid_indp);
+        if (nvars == 414) {
+            /* for h0 file */
+            err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);
+            ERR
+        } else {
+            /* for h1 file */
+            err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
+            ERR
+        }
+        start = MPI_Wtime() - start;
+        printf("dataset creation time %lf\n", start);
+        /* exit define mode and enter data mode */
+        err = HDF5_NOP1 (ncid);
+        ERR
     }
 /*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
@@ -607,20 +622,6 @@ int run_varn_F_case_hdf5 (
     CHECK_HID (ncid)
 */
     /* define dimensions, variables, and attributes */
-    if (!rank) {
-        if (nvars == 414) {
-            /* for h0 file */
-            err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);
-            ERR
-        } else {
-            /* for h1 file */
-            err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
-            ERR
-        }
-        /* exit define mode and enter data mode */
-        err = HDF5_NOP1 (ncid);
-        ERR
-    }
     return 0;
     /* I/O amount so far */
     // err = HDF5_INQ_PUT_SIZE (ncid, &metadata_size); ERR

@@ -1206,7 +1206,6 @@ int hdf5_put_att (
     hsize_t asize;
     htri_t exists;
     int rank;
-    return 0;
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
     asize = (size_t)nelems;
     asid  = H5Screate_simple (1, &asize, &asize);

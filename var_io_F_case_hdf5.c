@@ -613,7 +613,7 @@ int run_varn_F_case_hdf5 (
     /* exit define mode and enter data mode */
     err = HDF5_NOP1 (ncid);
     ERR
-
+    return 0;
     /* I/O amount so far */
     // err = HDF5_INQ_PUT_SIZE (ncid, &metadata_size); ERR
 

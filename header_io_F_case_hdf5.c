@@ -9304,281 +9304,6 @@ int def_F_case_h1_hdf5_mpi(hid_t               ncid,    /* file ID */
 
     /* define variables */
     dimids[0] = dim_ncol;
-    err = hdf5_def_var(ncid, "lat", &lat); ERR
-    varids[i++] = lat;
-
-    dimids[0] = dim_ncol;
-    err = hdf5_def_var(ncid, "lon", &lon); ERR
-    varids[i++] = lon;
-
-    dimids[0] = dim_ncol;
-    err = hdf5_def_var(ncid, "area", &area); ERR
-    varids[i++] = area;
-
-    dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "lev", &lev); ERR
-    varids[i++] = lev;
-
-    dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "hyam", &hyam); ERR
-    varids[i++] = hyam;
-
-    dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "hybm", &hybm); ERR
-    varids[i++] = hybm;
-
-    dimids[0] = dim_lev;
-    err = hdf5_def_var(ncid, "P0", &P0); ERR
-    varids[i++] = P0;
-
-    dimids[0] = dim_ilev;
-    err = hdf5_def_var(ncid, "ilev", N&ilev); ERR
-    varids[i++] = ilev;
-
-    dimids[0] = dim_ilev;
-    err = hdf5_def_var(ncid, "hyai", &hyai); ERR
-    varids[i++] = hyai;
-
-    dimids[0] = dim_ilev;
-    err = hdf5_def_var(ncid, "hybi", &hybi); ERR
-    varids[i++] = hybi;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "time", time); ERR
-    varids[i++] = time;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "date", &date); ERR
-    varids[i++] = date;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "datesec", &datesec); ERR
-    varids[i++] = datesec;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_nbnd;
-    err = hdf5_def_var(ncid, "time_bnds", &time_bnds); ERR
-    varids[i++] = time_bnds;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_chars;
-    err = hdf5_def_var(ncid, "date_written", &date_written); ERR
-    varids[i++] = date_written;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_chars;
-    err = hdf5_def_var(ncid, "time_written", &time_written); ERR
-    varids[i++] = time_written;
-
-    err = hdf5_def_var(ncid, "ndbase", &ndbase); ERR
-    varids[i++] = ndbase;
-    err = hdf5_def_var(ncid, "nsbase", &nsbase); ERR
-    varids[i++] = nsbase;
-
-    err = hdf5_def_var(ncid, "nbdate", &nbdate); ERR
-    varids[i++] = nbdate;
-
-    err = hdf5_def_var(ncid, "nbsec", &nbsec); ERR
-    varids[i++] = nbsec;
-
-    err = hdf5_def_var(ncid, "mdt", &mdt); ERR
-    varids[i++] = mdt;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "ndcur", &ndcur); ERR
-    varids[i++] = ndcur;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "nscur", &nscur); ERR
-    varids[i++] = nscur;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "co2vmr", &co2vmr); ERR
-    varids[i++] = co2vmr;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "ch4vmr", &ch4vmr); ERR
-    varids[i++] = ch4vmr;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "n2ovmr", &n2ovmr); ERR
-    varids[i++] = n2ovmr;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "f11vmr", &f11vmr); ERR
-    varids[i++] = f11vmr;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "f12vmr", &f12vmr); ERR
-    varids[i++] = f12vmr;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "sol_tsi", &sol_tsi); ERR
-    varids[i++] = sol_tsi;
-
-    dimids[0] = dim_time;
-    err = hdf5_def_var(ncid, "nsteph", &nsteph); ERR
-    varids[i++] = nsteph;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "CLDHGH", &CLDHGH); ERR
-    varids[i++] = CLDHGH;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "CLDLOW", &CLDLOW); ERR
-    varids[i++] = CLDLOW;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "CLDMED", &CLDMED); ERR
-    varids[i++] = CLDMED;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "FLNT", &FLNT); ERR
-    varids[i++] = FLNT;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "LWCF", &LWCF); ERR
-    varids[i++] = LWCF;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "OMEGA500", &OMEGA500); ERR
-    varids[i++] = OMEGA500;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "OMEGA850", &OMEGA850); ERR
-    varids[i++] = OMEGA850;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "PRECT", &PRECT); ERR
-    varids[i++] = PRECT;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "PS", &PS); ERR
-    varids[i++] = PS;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "SWCF", &SWCF); ERR
-    varids[i++] = SWCF;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "T850", &T850); ERR
-    varids[i++] = T850;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "TMQ", &TMQ); ERR
-    varids[i++] = TMQ;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "TS", &TS); ERR
-    varids[i++] = TS;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_lev;
-    dimids[2] = dim_ncol;
-    err = hdf5_def_var(ncid, "U", &U); ERR
-    varids[i++] = U;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "U250", &U250); ERR
-    varids[i++] = U250;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "U850", &U850); ERR
-    varids[i++] = U850;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "UBOT", &UBOT); ERR
-    varids[i++] = UBOT;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "V250", &V250); ERR
-    varids[i++] = V250;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "V850", &V850); ERR
-    varids[i++] = V850;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "VBOT", &VBOT); ERR
-    varids[i++] = VBOT;
-
-    dimids[0] = dim_time;
-    dimids[1] = dim_ncol;
-    err = hdf5_def_var(ncid, "Z500", &Z500); ERR
-    varids[i++] = Z500;
-
-    assert(i == nvars);
-
-fn_exit:
-    return nerrs;
-}
-
-/*----< def_F_case_h1() >----------------------------------------------------*/
-int def_F_case_h1_hdf5(hid_t               ncid,    /* file ID */
-                  const MPI_Offset  dims[2], /* dimension sizes */
-                  int               nvars,   /* number of variables */
-                  int              *varids)  /* variable IDs */
-{
-    /* Total 51 variables */
-    int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date,
-        datesec, time_bnds, date_written, time_written, ndbase, nsbase, nbdate,
-        nbsec, mdt, ndcur, nscur, co2vmr, ch4vmr, n2ovmr, f11vmr, f12vmr,
-	sol_tsi, nsteph, CLDHGH, CLDLOW, CLDMED, FLNT, LWCF, OMEGA500,
-	OMEGA850, PRECT, PS, SWCF, T850, TMQ, TS, U, U250, U850, UBOT, V250,
-        V850, VBOT, Z500;
-
-    int i, err, nerrs=0, dimids[3], iattr, mdims=1;
-    int dim_ncol, dim_time, dim_nbnd, dim_chars, dim_lev, dim_ilev;
-
-    /* global attributes: */
-    iattr = 4;
-    err = HDF5_PUT_ATT_INT(ncid, NC_GLOBAL, "ne", NC_INT, 1, &iattr); ERR
-    err = HDF5_PUT_ATT_INT(ncid, NC_GLOBAL, "np", NC_INT, 1, &iattr); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "Conventions", 6, "CF-1.0"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "source", 3, "CAM"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "case", 20, "FC5AV1C-H01B_ne4_ne4"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "title", 5, "UNSET"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "logname", 6, "wkliao"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "host", 10, "compute001"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "Version", 6, "$Name$"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "revision_Id", 4, "$Id$"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "initial_file", 86,
-    "/home/climate1/acme/inputdata/atm/cam/inic/homme/cami_mam3_Linoz_ne4np4_L72_c160909.nc"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "topography_file", 79,
-    "/home/climate1/acme/inputdata/atm/cam/topo/USGS-gtopo30_ne4np4_16x.c20160612.nc"); ERR
-    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "time_period_freq", 6, "hour_2"); ERR
-
-    /* define dimensions */
-    err = hdf5_def_dim(ncid, "ncol", dims[1],      &dim_ncol); ERR
-    err = hdf5_def_dim(ncid, "time", NC_UNLIMITED, &dim_time); ERR
-    err = hdf5_def_dim(ncid, "nbnd",  2,           &dim_nbnd); ERR
-    err = hdf5_def_dim(ncid, "chars", 8,           &dim_chars); ERR
-    err = hdf5_def_dim(ncid, "lev",   dims[0],     &dim_lev); ERR
-    err = hdf5_def_dim(ncid, "ilev",  dims[0]+1,   &dim_ilev); ERR
-
-    i = 0;
-
-    /* define variables */
-    dimids[0] = dim_ncol;
     err = hdf5_def_var_mpi(ncid, "lat", &lat); ERR
     varids[i++] = lat;
 
@@ -9801,6 +9526,370 @@ int def_F_case_h1_hdf5(hid_t               ncid,    /* file ID */
     err = hdf5_def_var_mpi(ncid, "Z500", &Z500); ERR
     varids[i++] = Z500;
 
+    assert(i == nvars);
+
+fn_exit:
+    return nerrs;
+}
+
+/*----< def_F_case_h1() >----------------------------------------------------*/
+int def_F_case_h1_hdf5(hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids)  /* variable IDs */
+{
+    /* Total 51 variables */
+    int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date,
+        datesec, time_bnds, date_written, time_written, ndbase, nsbase, nbdate,
+        nbsec, mdt, ndcur, nscur, co2vmr, ch4vmr, n2ovmr, f11vmr, f12vmr,
+	sol_tsi, nsteph, CLDHGH, CLDLOW, CLDMED, FLNT, LWCF, OMEGA500,
+	OMEGA850, PRECT, PS, SWCF, T850, TMQ, TS, U, U250, U850, UBOT, V250,
+        V850, VBOT, Z500;
+
+    int i, err, nerrs=0, dimids[3], iattr, mdims=1;
+    int dim_ncol, dim_time, dim_nbnd, dim_chars, dim_lev, dim_ilev;
+
+    /* global attributes: */
+    iattr = 4;
+    err = HDF5_PUT_ATT_INT(ncid, NC_GLOBAL, "ne", NC_INT, 1, &iattr); ERR
+    err = HDF5_PUT_ATT_INT(ncid, NC_GLOBAL, "np", NC_INT, 1, &iattr); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "Conventions", 6, "CF-1.0"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "source", 3, "CAM"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "case", 20, "FC5AV1C-H01B_ne4_ne4"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "title", 5, "UNSET"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "logname", 6, "wkliao"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "host", 10, "compute001"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "Version", 6, "$Name$"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "revision_Id", 4, "$Id$"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "initial_file", 86,
+    "/home/climate1/acme/inputdata/atm/cam/inic/homme/cami_mam3_Linoz_ne4np4_L72_c160909.nc"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "topography_file", 79,
+    "/home/climate1/acme/inputdata/atm/cam/topo/USGS-gtopo30_ne4np4_16x.c20160612.nc"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, NC_GLOBAL, "time_period_freq", 6, "hour_2"); ERR
+
+    /* define dimensions */
+    err = hdf5_def_dim(ncid, "ncol", dims[1],      &dim_ncol); ERR
+    err = hdf5_def_dim(ncid, "time", NC_UNLIMITED, &dim_time); ERR
+    err = hdf5_def_dim(ncid, "nbnd",  2,           &dim_nbnd); ERR
+    err = hdf5_def_dim(ncid, "chars", 8,           &dim_chars); ERR
+    err = hdf5_def_dim(ncid, "lev",   dims[0],     &dim_lev); ERR
+    err = hdf5_def_dim(ncid, "ilev",  dims[0]+1,   &dim_ilev); ERR
+
+    i = 0;
+
+    /* define variables */
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var(ncid, "lat", NC_DOUBLE, 1, dimids, &lat); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lat, "long_name", 8, "latitude"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lat, "units", 13, "degrees_north"); ERR
+    varids[i++] = lat;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var(ncid, "lon", NC_DOUBLE, 1, dimids, &lon); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lon, "long_name", 9, "longitude"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lon, "units", 12, "degrees_east"); ERR
+    varids[i++] = lon;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var(ncid, "area", NC_DOUBLE, 1, dimids, &area); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, area, "long_name", 14, "gll grid areas"); ERR
+    varids[i++] = area;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "lev", NC_DOUBLE, 1, dimids, &lev); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lev, "long_name", 38, "hybrid level at midpoints (1000*(A+B))"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lev, "units", 3, "hPa"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lev, "positive", 4, "down"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lev, "standard_name", 43, "atmosphere_hybrid_sigma_pressure_coordinate"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, lev, "formula_terms", 29, "a: hyam b: hybm p0: P0 ps: PS"); ERR
+    varids[i++] = lev;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "hyam", NC_DOUBLE, 1, dimids, &hyam); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, hyam, "long_name", 39, "hybrid A coefficient at layer midpoints"); ERR
+    varids[i++] = hyam;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "hybm", NC_DOUBLE, 1, dimids, &hybm); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, hybm, "long_name", 39, "hybrid B coefficient at layer midpoints"); ERR
+    varids[i++] = hybm;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var(ncid, "P0", NC_DOUBLE, 0, NULL, &P0); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, P0, "long_name", 18, "reference pressure"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, P0, "units", 2, "Pa"); ERR
+    varids[i++] = P0;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var(ncid, "ilev", NC_DOUBLE, 1, dimids, &ilev); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "long_name", 39, "hybrid level at interfaces (1000*(A+B))"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "units", 3, "hPa"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "positive", 4, "down"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "standard_name", 43, "atmosphere_hybrid_sigma_pressure_coordinate"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ilev, "formula_terms", 29, "a: hyai b: hybi p0: P0 ps: PS"); ERR
+    varids[i++] = ilev;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var(ncid, "hyai", NC_DOUBLE, 1, dimids, &hyai); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, hyai, "long_name", 40, "hybrid A coefficient at layer interfaces"); ERR
+    varids[i++] = hyai;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var(ncid, "hybi", NC_DOUBLE, 1, dimids, &hybi); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, hybi, "long_name", 40, "hybrid B coefficient at layer interfaces"); ERR
+    varids[i++] = hybi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "time", NC_DOUBLE, 1, dimids, &time); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, time, "long_name", 4, "time"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, time, "units", 30, "days since 0001-01-01 00:00:00"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, time, "calendar", 6, "noleap"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, time, "bounds", 9, "time_bnds"); ERR
+    varids[i++] = time;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "date", NC_INT, 1, dimids, &date); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, date, "long_name", 23, "current date (YYYYMMDD)"); ERR
+    varids[i++] = date;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "datesec", NC_INT, 1, dimids, &datesec); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, datesec, "long_name", 31, "current seconds of current date"); ERR
+    varids[i++] = datesec;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_nbnd;
+    err = hdf5_def_var(ncid, "time_bnds", NC_DOUBLE, 2, dimids, &time_bnds); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, time_bnds, "long_name", 23, "time interval endpoints"); ERR
+    varids[i++] = time_bnds;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var(ncid, "date_written", NC_CHAR, 2, dimids, &date_written); ERR
+    varids[i++] = date_written;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var(ncid, "time_written", NC_CHAR, 2, dimids, &time_written); ERR
+    varids[i++] = time_written;
+
+    err = hdf5_def_var(ncid, "ndbase", NC_INT, 0, NULL, &ndbase); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ndbase, "long_name", 8, "base day"); ERR
+    varids[i++] = ndbase;
+    err = hdf5_def_var(ncid, "nsbase", NC_INT, 0, NULL, &nsbase); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, nsbase, "long_name", 19, "seconds of base day"); ERR
+    varids[i++] = nsbase;
+
+    err = hdf5_def_var(ncid, "nbdate", NC_INT, 0, NULL, &nbdate); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, nbdate, "long_name", 20, "base date (YYYYMMDD)"); ERR
+    varids[i++] = nbdate;
+
+    err = hdf5_def_var(ncid, "nbsec", NC_INT, 0, NULL, &nbsec); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, nbsec, "long_name", 20, "seconds of base date"); ERR
+    varids[i++] = nbsec;
+
+    err = hdf5_def_var(ncid, "mdt", NC_INT, 0, NULL, &mdt); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, mdt, "long_name", 8, "timestep"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, mdt, "units", 1, "s"); ERR
+    varids[i++] = mdt;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "ndcur", NC_INT, 1, dimids, &ndcur); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ndcur, "long_name", 27, "current day (from base day)"); ERR
+    varids[i++] = ndcur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "nscur", NC_INT, 1, dimids, &nscur); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, nscur, "long_name", 30, "current seconds of current day"); ERR
+    varids[i++] = nscur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "co2vmr", NC_DOUBLE, 1, dimids, &co2vmr); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, co2vmr, "long_name", 23, "co2 volume mixing ratio"); ERR
+    varids[i++] = co2vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "ch4vmr", NC_DOUBLE, 1, dimids, &ch4vmr); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, ch4vmr, "long_name", 23, "ch4 volume mixing ratio"); ERR
+    varids[i++] = ch4vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "n2ovmr", NC_DOUBLE, 1, dimids, &n2ovmr); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, n2ovmr, "long_name", 23, "n2o volume mixing ratio"); ERR
+    varids[i++] = n2ovmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "f11vmr", NC_DOUBLE, 1, dimids, &f11vmr); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, f11vmr, "long_name", 23, "f11 volume mixing ratio"); ERR
+    varids[i++] = f11vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "f12vmr", NC_DOUBLE, 1, dimids, &f12vmr); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, f12vmr, "long_name", 23, "f12 volume mixing ratio"); ERR
+    varids[i++] = f12vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "sol_tsi", NC_DOUBLE, 1, dimids, &sol_tsi); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, sol_tsi, "long_name", 22, "total solar irradiance"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, sol_tsi, "units", 4, "W/m2"); ERR
+    varids[i++] = sol_tsi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var(ncid, "nsteph", NC_INT, 1, dimids, &nsteph); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, nsteph, "long_name", 16, "current timestep"); ERR
+    varids[i++] = nsteph;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "CLDHGH", NC_FLOAT, 2, dimids, &CLDHGH); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, CLDHGH, "units", 8, "fraction"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, CLDHGH, "long_name", 32, "Vertically-integrated high cloud"); ERR
+    varids[i++] = CLDHGH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "CLDLOW", NC_FLOAT, 2, dimids, &CLDLOW); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, CLDLOW, "units", 8, "fraction"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, CLDLOW, "long_name", 31, "Vertically-integrated low cloud"); ERR
+    varids[i++] = CLDLOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "CLDMED", NC_FLOAT, 2, dimids, &CLDMED); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, CLDMED, "units", 8, "fraction"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, CLDMED, "long_name", 37, "Vertically-integrated mid-level cloud"); ERR
+    varids[i++] = CLDMED;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "FLNT", NC_FLOAT, 2, dimids, &FLNT); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, FLNT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, FLNT, "units", 4, "W/m2"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, FLNT, "long_name", 33, "Net longwave flux at top of model"); ERR
+    varids[i++] = FLNT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "LWCF", NC_FLOAT, 2, dimids, &LWCF); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, LWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, LWCF, "units", 4, "W/m2"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, LWCF, "long_name", 22, "Longwave cloud forcing"); ERR
+    varids[i++] = LWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "OMEGA500", NC_FLOAT, 2, dimids, &OMEGA500); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA500, "units", 4, "Pa/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA500, "long_name", 46, "Vertical velocity at 500 mbar pressure surface"); ERR
+    varids[i++] = OMEGA500;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "OMEGA850", NC_FLOAT, 2, dimids, &OMEGA850); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA850, "units", 4, "Pa/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, OMEGA850, "long_name", 46, "Vertical velocity at 850 mbar pressure surface"); ERR
+    varids[i++] = OMEGA850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "PRECT", NC_FLOAT, 2, dimids, &PRECT); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, PRECT, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, PRECT, "long_name", 65, "Total (convective and large-scale) precipitation rate (liq + ice)"); ERR
+    varids[i++] = PRECT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "PS", NC_FLOAT, 2, dimids, &PS); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, PS, "units", 2, "Pa"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, PS, "long_name", 16, "Surface pressure"); ERR
+    varids[i++] = PS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "SWCF", NC_FLOAT, 2, dimids, &SWCF); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, SWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, SWCF, "units", 4, "W/m2"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, SWCF, "long_name", 23, "Shortwave cloud forcing"); ERR
+    varids[i++] = SWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "T850", NC_FLOAT, 2, dimids, &T850); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, T850, "units", 1, "K"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, T850, "long_name", 40, "Temperature at 850 mbar pressure surface"); ERR
+    varids[i++] = T850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "TMQ", NC_FLOAT, 2, dimids, &TMQ); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, TMQ, "units", 5, "kg/m2"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, TMQ, "long_name", 48, "Total (vertically integrated) precipitable water"); ERR
+    varids[i++] = TMQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "TS", NC_FLOAT, 2, dimids, &TS); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, TS, "units", 1, "K"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, TS, "long_name", 31, "Surface temperature (radiative)"); ERR
+    varids[i++] = TS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var(ncid, "U", NC_FLOAT, 3, dimids, &U); ERR
+    err = HDF5_PUT_ATT_INT(ncid, U, "mdims", NC_INT, 1, &mdims); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, U, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, U, "long_name", 10, "Zonal wind"); ERR
+    varids[i++] = U;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "U250", NC_FLOAT, 2, dimids, &U250); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, U250, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, U250, "long_name", 39, "Zonal wind at 250 mbar pressure surface"); ERR
+    varids[i++] = U250;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "U850", NC_FLOAT, 2, dimids, &U850); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, U850, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, U850, "long_name", 39, "Zonal wind at 850 mbar pressure surface"); ERR
+    varids[i++] = U850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "UBOT", NC_FLOAT, 2, dimids, &UBOT); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, UBOT, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, UBOT, "long_name", 29, "Lowest model level zonal wind"); ERR
+    varids[i++] = UBOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "V250", NC_FLOAT, 2, dimids, &V250); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, V250, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, V250, "long_name", 44, "Meridional wind at 250 mbar pressure surface"); ERR
+    varids[i++] = V250;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "V850", NC_FLOAT, 2, dimids, &V850); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, V850, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, V850, "long_name", 44, "Meridional wind at 850 mbar pressure surface"); ERR
+    varids[i++] = V850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "VBOT", NC_FLOAT, 2, dimids, &VBOT); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, VBOT, "units", 3, "m/s"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, VBOT, "long_name", 34, "Lowest model level meridional wind"); ERR
+    varids[i++] = VBOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var(ncid, "Z500", NC_FLOAT, 2, dimids, &Z500); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, Z500, "units", 1, "m"); ERR
+    err = HDF5_PUT_ATT_TEXT(ncid, Z500, "long_name", 43, "Geopotential Z at 500 mbar pressure surface"); ERR
+    varids[i++] = Z500;
 
     assert(i == nvars);
 

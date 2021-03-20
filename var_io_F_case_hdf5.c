@@ -510,7 +510,7 @@ int run_varn_F_case_hdf5 (
 {
     char outfname[512], *txt_buf_ptr;
     herr_t herr;
-    hid_t ncid, faplid;
+    hid_t ncid, faplid, faplid_indp, fcplid_indp;
     int i, j, k, err, nerrs = 0, rank, cmode, *varids, nvars_D[3];
     int rec_no, gap = 0, my_nreqs, *int_buf_ptr, xnreqs[3], max_cnt[3];
     size_t dbl_buflen, rec_buflen, nelems[3];
@@ -589,6 +589,12 @@ int run_varn_F_case_hdf5 (
     err = hdf5_wrap_init ();
     ERR;
 
+    faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
+    fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
+    if (!rank) {
+        ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, fcplid_indp, faplid_indp);
+    }
+/*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL
     H5Pset_fapl_mpio (faplid, io_comm, info);
@@ -599,20 +605,22 @@ int run_varn_F_case_hdf5 (
     // Create file
     ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, H5P_DEFAULT, faplid);
     CHECK_HID (ncid)
-
+*/
     /* define dimensions, variables, and attributes */
-    if (nvars == 414) {
-        /* for h0 file */
-        err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);
-        ERR
-    } else {
-        /* for h1 file */
-        err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
+    if (!rank) {
+        if (nvars == 414) {
+            /* for h0 file */
+            err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);
+            ERR
+        } else {
+            /* for h1 file */
+            err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
+            ERR
+        }
+        /* exit define mode and enter data mode */
+        err = HDF5_NOP1 (ncid);
         ERR
     }
-    /* exit define mode and enter data mode */
-    err = HDF5_NOP1 (ncid);
-    ERR
     return 0;
     /* I/O amount so far */
     // err = HDF5_INQ_PUT_SIZE (ncid, &metadata_size); ERR

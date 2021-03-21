@@ -635,7 +635,7 @@ int run_varn_F_case_hdf5 (
     err = HDF5_NOP1 (ncid);
     ERR
     CHECK_HID (ncid)
-
+/*
     herr = hdf5_close_vars (ncid);
     HERR;
 
@@ -645,6 +645,8 @@ int run_varn_F_case_hdf5 (
     HERR;
     hdf5_wrap_finalize ();
     return 0;
+*/
+
 /*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL

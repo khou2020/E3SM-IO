@@ -516,7 +516,7 @@ int run_varn_F_case_hdf5 (
     size_t dbl_buflen, rec_buflen, nelems[3];
     itype *rec_buf  = NULL, *rec_buf_ptr;
     double *dbl_buf = NULL, *dbl_buf_ptr;
-    double pre_timing, open_timing, metadata_time, post_timing, wait_timing, close_timing, small_write_timing;
+    double pre_timing, open_timing, metadata_timing, post_timing, wait_timing, close_timing, small_write_timing;
     double timing, total_timing, max_timing;
     MPI_Offset tmp, metadata_size, put_size, total_size, max_nreqs, total_nreqs;
     MPI_Offset **starts_D2 = NULL, **counts_D2 = NULL;

@@ -1330,6 +1330,7 @@ int hdf5_def_dim_mpi (MPI_Offset msize, int *did) {
     if (size == NC_UNLIMITED) size = H5S_UNLIMITED;
     f_dims[f_ndim] = size;
     *did           = f_ndim++;
+    return 0;
 }
 
 int hdf5_def_dim (hid_t fid, const char *name, MPI_Offset msize, int *did) {

@@ -615,11 +615,12 @@ int run_varn_F_case_hdf5 (
         H5Pclose(fcplid_indp);
         H5Fclose(ncid);
     }
+    MPI_Barrier(io_comm);
     // Now collectively open the datasets just created
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);
-    ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, H5P_DEFAULT, faplid);
+    ncid = H5Fopen (outfname, H5F_ACC_RDWR, faplid);
     if (nvars == 414) {
         /* for h0 file */
         err = def_F_case_h0_hdf5_mpi (ncid, dims[2], nvars, varids);

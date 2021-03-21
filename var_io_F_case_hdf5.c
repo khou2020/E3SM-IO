@@ -614,6 +614,7 @@ int run_varn_F_case_hdf5 (
     }
     MPI_Barrier(io_comm);
     // Now collectively open the datasets just created
+    start = MPI_Wtime();
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);
@@ -630,7 +631,6 @@ int run_varn_F_case_hdf5 (
     err = HDF5_NOP1 (ncid);
     ERR
     CHECK_HID (ncid)
-
 /*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL
@@ -644,7 +644,6 @@ int run_varn_F_case_hdf5 (
     CHECK_HID (ncid)
 */
     /* define dimensions, variables, and attributes */
-    return 0;
     /* I/O amount so far */
     // err = HDF5_INQ_PUT_SIZE (ncid, &metadata_size); ERR
 

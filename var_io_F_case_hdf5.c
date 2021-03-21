@@ -516,7 +516,7 @@ int run_varn_F_case_hdf5 (
     size_t dbl_buflen, rec_buflen, nelems[3];
     itype *rec_buf  = NULL, *rec_buf_ptr;
     double *dbl_buf = NULL, *dbl_buf_ptr;
-    double pre_timing, open_timing, post_timing, wait_timing, close_timing, small_write_timing;
+    double pre_timing, open_timing, metadata_time, post_timing, wait_timing, close_timing, small_write_timing;
     double timing, total_timing, max_timing;
     MPI_Offset tmp, metadata_size, put_size, total_size, max_nreqs, total_nreqs;
     MPI_Offset **starts_D2 = NULL, **counts_D2 = NULL;
@@ -590,7 +590,7 @@ int run_varn_F_case_hdf5 (
     ERR;
 
 
-    // We are going to let rank 0 to handle dataset init and attributes alone. This could be faster.
+    // We are going to let rank 0 to handle datasets init and attributes alone.
     if (!rank) {
         faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
         fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
@@ -612,9 +612,12 @@ int run_varn_F_case_hdf5 (
         H5Pclose(fcplid_indp);
         H5Fclose(ncid);
     }
-    return 0;
+    metadata_time += MPI_Wtime() - timing;
     MPI_Barrier(io_comm);
+
     // Now collectively open the datasets just created
+
+    timing = MPI_Wtime ();
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);
@@ -646,13 +649,14 @@ int run_varn_F_case_hdf5 (
     /* define dimensions, variables, and attributes */
     /* I/O amount so far */
     // err = HDF5_INQ_PUT_SIZE (ncid, &metadata_size); ERR
+    open_timing += MPI_Wtime () - timing;
 
     stat (outfname, &file_stat);
     metadata_size = file_stat.st_size;
 
     err = HDF5_INQ_FILE_INFO (ncid, &info_used);
     ERR
-    open_timing += MPI_Wtime () - timing;
+
 
     MPI_Barrier (io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime ();
@@ -962,6 +966,8 @@ int run_varn_F_case_hdf5 (
     // total_size = tmp;
     MPI_Reduce (&open_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     open_timing = max_timing;
+    MPI_Reduce (&metadata_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
+    open_timing = metadata_timing;
     MPI_Reduce (&pre_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     pre_timing = max_timing;
     MPI_Reduce (&post_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
@@ -994,7 +1000,8 @@ int run_varn_F_case_hdf5 (
                 (double)total_size / 1048576, (double)total_size / 1073741824);
         printf ("Total number of requests           = %lld\n", total_nreqs);
         printf ("Max number of requests             = %lld\n", max_nreqs);
-        printf ("Max Time of open + metadata define = %.4f sec\n", open_timing);
+        printf ("Max Time of metadata define        = %.4f sec\n", metadata_timing);
+        printf ("Max Time of open                   = %.4f sec\n", open_timing);
         printf ("Max Time of I/O preparing          = %.4f sec\n", pre_timing);
         printf ("Max Time of HDF5_IPUT_VARN        = %.4f sec\n", post_timing);
         printf ("Max Time of HDF5 small writes        = %.4f sec\n", small_write_timing);

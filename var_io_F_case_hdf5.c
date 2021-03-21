@@ -617,7 +617,7 @@ int run_varn_F_case_hdf5 (
 
     // Now collectively open the datasets just created
 
-    timing = MPI_Wtime ();
+
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);
@@ -649,14 +649,14 @@ int run_varn_F_case_hdf5 (
     /* define dimensions, variables, and attributes */
     /* I/O amount so far */
     // err = HDF5_INQ_PUT_SIZE (ncid, &metadata_size); ERR
-    open_timing += MPI_Wtime () - timing;
 
+    timing = MPI_Wtime ();
     stat (outfname, &file_stat);
     metadata_size = file_stat.st_size;
 
     err = HDF5_INQ_FILE_INFO (ncid, &info_used);
     ERR
-
+    open_timing += MPI_Wtime () - timing;
 
     MPI_Barrier (io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime ();

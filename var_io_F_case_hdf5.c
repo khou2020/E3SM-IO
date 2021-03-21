@@ -591,8 +591,8 @@ int run_varn_F_case_hdf5 (
 
 
     // We are going to let rank 0 to handle dataset init and attributes alone. This could be faster.
+    double start = MPI_Wtime();
     if (!rank) {
-        double start = MPI_Wtime();
         faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
         fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
         ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, fcplid_indp, faplid_indp);
@@ -617,6 +617,7 @@ int run_varn_F_case_hdf5 (
     }
     MPI_Barrier(io_comm);
     // Now collectively open the datasets just created
+    start = MPI_Wtime();
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);
@@ -639,6 +640,9 @@ int run_varn_F_case_hdf5 (
     herr = H5Fclose (ncid);
     HERR;
     herr = H5Pclose (faplid);
+    start = MPI_Wtime() - start;
+    printf("dataset open time %lf\n", start);
+
 /*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL

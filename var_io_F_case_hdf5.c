@@ -612,7 +612,7 @@ int run_varn_F_case_hdf5 (
         H5Pclose(fcplid_indp);
         H5Fclose(ncid);
     }
-    metadata_time += MPI_Wtime() - timing;
+    metadata_timing += MPI_Wtime() - timing;
     MPI_Barrier(io_comm);
 
     // Now collectively open the datasets just created

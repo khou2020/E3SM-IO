@@ -1,8 +1,8 @@
 #include "e3sm_io_hdf5.h"
 #include <stdlib.h>
 #include <string.h>
-#define ENABLE_MULTIDATASET 1
-#define MULTIDATASET_DEFINE 0
+#define ENABLE_MULTIDATASET 0
+#define MULTIDATASET_DEFINE 1
 
 // hid_t dxplid_nb  = -1;
 hid_t dxplid_coll     = -1;

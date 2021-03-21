@@ -516,7 +516,7 @@ int run_varn_F_case_hdf5 (
     size_t dbl_buflen, rec_buflen, nelems[3];
     itype *rec_buf  = NULL, *rec_buf_ptr;
     double *dbl_buf = NULL, *dbl_buf_ptr;
-    double pre_timing, open_timing, metadata_timing, post_timing, wait_timing, close_timing, small_write_timing;
+    double pre_timing, open_timing, metadata_timing, post_timing, small_coll_timing, wait_timing, close_timing, small_write_timing;
     double timing, total_timing, max_timing;
     MPI_Offset tmp, metadata_size, put_size, total_size, max_nreqs, total_nreqs;
     MPI_Offset **starts_D2 = NULL, **counts_D2 = NULL;
@@ -762,7 +762,7 @@ int run_varn_F_case_hdf5 (
         REC_3D_VAR_STARTS_COUNTS (0, starts_D3, counts_D3, xnreqs[2], disps[2], blocklens[2],
                                   dims[2][1])
 
-    post_timing += MPI_Wtime () - timing;
+    small_coll_timing += MPI_Wtime () - timing;
 
     for (rec_no = 0; rec_no < num_recs; rec_no++) {
         MPI_Barrier (io_comm); /*-----------------------------------------*/
@@ -783,16 +783,15 @@ int run_varn_F_case_hdf5 (
 
             ERR
         //}
-        small_write_timing = MPI_Wtime () - timing;
 
-        timing = MPI_Wtime ();
         flush_multidatasets();
+        small_write_timing += MPI_Wtime () - timing;
         i += 27;
-        post_timing += MPI_Wtime () - timing;
 
-        //MPI_Barrier (io_comm); /*-----------------------------------------*/
+        MPI_Barrier (io_comm); /*-----------------------------------------*/
 
         /* flush fixed-size and small variables */
+        timing = MPI_Wtime ();
         err = HDF5_WAIT_ALL (ncid, NC_REQ_ALL, NULL, NULL);
         ERR
 
@@ -981,13 +980,15 @@ int run_varn_F_case_hdf5 (
     MPI_Reduce (&open_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     open_timing = max_timing;
     MPI_Reduce (&metadata_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
-    open_timing = metadata_timing;
+    metadata_timing = max_timing;
     MPI_Reduce (&pre_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     pre_timing = max_timing;
     MPI_Reduce (&post_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     post_timing = max_timing;
     MPI_Reduce (&small_write_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     small_write_timing = max_timing;
+    MPI_Reduce (&small_coll_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
+    small_coll_timing = max_timing;
     MPI_Reduce (&wait_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     wait_timing = max_timing;
     MPI_Reduce (&close_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);

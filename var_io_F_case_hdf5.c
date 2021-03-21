@@ -622,12 +622,13 @@ int run_varn_F_case_hdf5 (
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);
     ncid = H5Fopen (outfname, H5F_ACC_RDWR, faplid);
+/*
     if (nvars == 414) {
-        /* for h0 file */
+        //for h0 file
         err = def_F_case_h0_hdf5_mpi (ncid, dims[2], nvars, varids);
         ERR
     } else {
-        /* for h1 file */
+        //for h1 file
         err = def_F_case_h1_hdf5_mpi (ncid, dims[2], nvars, varids);
         ERR
     }
@@ -637,6 +638,7 @@ int run_varn_F_case_hdf5 (
 
     herr = hdf5_close_vars (ncid);
     HERR;
+*/
     herr = H5Fclose (ncid);
     HERR;
     herr = H5Pclose (faplid);
@@ -780,12 +782,13 @@ int run_varn_F_case_hdf5 (
             ERR
         //}
         small_write_timing = MPI_Wtime () - timing;
+
+        timing = MPI_Wtime ();
         flush_multidatasets();
         i += 27;
         post_timing += MPI_Wtime () - timing;
 
-        MPI_Barrier (io_comm); /*-----------------------------------------*/
-        timing = MPI_Wtime ();
+        //MPI_Barrier (io_comm); /*-----------------------------------------*/
 
         /* flush fixed-size and small variables */
         err = HDF5_WAIT_ALL (ncid, NC_REQ_ALL, NULL, NULL);
@@ -793,7 +796,7 @@ int run_varn_F_case_hdf5 (
 
         wait_timing += MPI_Wtime () - timing;
 
-        MPI_Barrier (io_comm); /*-----------------------------------------*/
+        //MPI_Barrier (io_comm); /*-----------------------------------------*/
         timing = MPI_Wtime ();
 
         rec_buf_ptr = rec_buf;

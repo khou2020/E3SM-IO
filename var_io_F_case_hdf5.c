@@ -612,6 +612,7 @@ int run_varn_F_case_hdf5 (
         H5Pclose(fcplid_indp);
         H5Fclose(ncid);
     }
+    return 0;
     MPI_Barrier(io_comm);
     // Now collectively open the datasets just created
     faplid = H5Pcreate (H5P_FILE_ACCESS);

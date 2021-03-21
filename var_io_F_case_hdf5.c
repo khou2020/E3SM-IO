@@ -1018,9 +1018,10 @@ int run_varn_F_case_hdf5 (
         printf ("Max Time of metadata define        = %.4f sec\n", metadata_timing);
         printf ("Max Time of open                   = %.4f sec\n", open_timing);
         printf ("Max Time of I/O preparing          = %.4f sec\n", pre_timing);
-        printf ("Max Time of HDF5_IPUT_VARN        = %.4f sec\n", post_timing);
-        printf ("Max Time of HDF5 small writes        = %.4f sec\n", small_write_timing);
-        printf ("Max Time of HDF5_WAIT_ALL         = %.4f sec\n", wait_timing);
+        printf ("Max Time of HDF5_IPUT_VARN         = %.4f sec\n", post_timing);
+        printf ("Max Time of HDF5 small writes      = %.4f sec\n", small_write_timing);
+        printf ("Max Time of HDF5 coll writes       = %.4f sec\n", small_coll_timing);
+        printf ("Max Time of HDF5_WAIT_ALL          = %.4f sec\n", wait_timing);
         printf ("Max Time of close                  = %.4f sec\n", close_timing);
         printf ("Max Time of TOTAL                  = %.4f sec\n", total_timing);
         printf ("I/O bandwidth (open-to-close)      = %.4f MiB/sec\n",

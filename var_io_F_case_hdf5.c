@@ -614,7 +614,7 @@ int run_varn_F_case_hdf5 (
     }
     metadata_timing += MPI_Wtime() - timing;
     MPI_Barrier(io_comm);
-    return 0;
+
     // Now collectively open the datasets just created
 
     timing = MPI_Wtime ();
@@ -634,6 +634,15 @@ int run_varn_F_case_hdf5 (
     err = HDF5_NOP1 (ncid);
     ERR
     CHECK_HID (ncid)
+
+    herr = hdf5_close_vars (ncid);
+    HERR;
+    herr = H5Fclose (ncid);
+    HERR;
+    herr = H5Pclose (faplid);
+    HERR;
+    hdf5_wrap_finalize ();
+    return 0;
 /*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL

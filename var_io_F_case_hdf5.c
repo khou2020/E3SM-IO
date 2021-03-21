@@ -614,7 +614,6 @@ int run_varn_F_case_hdf5 (
     }
     MPI_Barrier(io_comm);
     // Now collectively open the datasets just created
-    start = MPI_Wtime();
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);

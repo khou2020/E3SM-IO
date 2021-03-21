@@ -591,7 +591,6 @@ int run_varn_F_case_hdf5 (
 
 
     // We are going to let rank 0 to handle dataset init and attributes alone. This could be faster.
-    double start = MPI_Wtime();
     if (!rank) {
         faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
         fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
@@ -605,8 +604,6 @@ int run_varn_F_case_hdf5 (
             err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
             ERR
         }
-        start = MPI_Wtime() - start;
-        printf("dataset creation time %lf\n", start);
         /* exit define mode and enter data mode */
         err = HDF5_NOP1 (ncid);
         ERR
@@ -617,7 +614,6 @@ int run_varn_F_case_hdf5 (
     }
     MPI_Barrier(io_comm);
     // Now collectively open the datasets just created
-    start = MPI_Wtime();
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     H5Pset_fapl_mpio (faplid, io_comm, info);
     H5Pset_all_coll_metadata_ops (faplid, 1);
@@ -634,14 +630,6 @@ int run_varn_F_case_hdf5 (
     err = HDF5_NOP1 (ncid);
     ERR
     CHECK_HID (ncid)
-
-    herr = hdf5_close_vars (ncid);
-    HERR;
-    herr = H5Fclose (ncid);
-    HERR;
-    herr = H5Pclose (faplid);
-    start = MPI_Wtime() - start;
-    printf("dataset open time %lf\n", start);
 
 /*
     faplid = H5Pcreate (H5P_FILE_ACCESS);

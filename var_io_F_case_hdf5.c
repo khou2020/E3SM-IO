@@ -635,10 +635,10 @@ int run_varn_F_case_hdf5 (
     err = HDF5_NOP1 (ncid);
     ERR
     CHECK_HID (ncid)
-/*
+
     herr = hdf5_close_vars (ncid);
     HERR;
-*/
+
     herr = H5Fclose (ncid);
     HERR;
     herr = H5Pclose (faplid);

@@ -1262,8 +1262,8 @@ int hdf5_def_var_mpi (hid_t fid, const char *name, int *vid) {
     hid_t did, dcplid;
     dcplid = H5Pcreate (H5P_DATASET_ACCESS);
 
-    //did = H5Dopen (fid, name, dcplid);
-    //CHECK_HID (did)
+    did = H5Dopen (fid, name, dcplid);
+    CHECK_HID (did)
 
     f_dids[f_nd] = did;
     *vid         = f_nd++;

@@ -1258,6 +1258,7 @@ fn_exit:;
 }
 
 int hdf5_def_var_mpi (hid_t fid, const char *name, int *vid) {
+    return 0;
     herr_t herr = 0;
     hid_t did, dcplid;
     dcplid = H5Pcreate (H5P_DATASET_ACCESS);

@@ -1200,6 +1200,7 @@ fn_exit:;
 
 int hdf5_put_att (
     hid_t fid, int vid, const char *name, hid_t atype, MPI_Offset nelems, const void *buf) {
+    return 0;
     herr_t herr = 0;
     hid_t asid = -1, aid = -1;
     hid_t did;

@@ -16,10 +16,3522 @@
 #define NOP2(A, B, D, E, F, C)    NC_NOERR
 
 /*----< def_F_case_h0() >----------------------------------------------------*/
-int def_F_case_h0_hdf5 (hid_t ncid,               /* file ID */
-                        const MPI_Offset dims[2], /* dimension sizes */
-                        int nvars,                /* number of variables */
-                        int *varids)              /* variable IDs */
+int def_F_case_h0_hdf5_mpi (hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids)  /* variable IDs */
+{
+    /* Total 414 variables */
+    int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date,
+        datesec, time_bnds, date_written, time_written, ndbase, nsbase, nbdate,
+        nbsec, mdt, ndcur, nscur, co2vmr, ch4vmr, n2ovmr, f11vmr, f12vmr,
+        sol_tsi, nsteph, AEROD_v, ANRAIN, ANSNOW, AODABS, AODABSBC, AODALL, AODBC,
+        AODDUST, AODDUST1, AODDUST3, AODDUST4, AODMODE1, AODMODE2, AODMODE3,
+        AODMODE4, AODNIR, AODPOM, AODSO4, AODSOA, AODSS, AODUV, AODVIS, AQRAIN,
+        AQSNOW, AQ_DMS, AQ_H2O2, AQ_H2SO4, AQ_O3, AQ_SO2, AQ_SOAG, AREI, AREL,
+        AWNC, AWNI, BURDEN1, BURDEN2, BURDEN3, BURDEN4, CCN3, CDNUMC, CLDHGH, CLDICE, CLDLIQ, CLDLOW, CLDMED,
+        CLDTOT, CLOUD, CLOUDFRAC_CLUBB, CONCLD, DCQ, DF_DMS, DF_H2O2, DF_H2SO4,
+        DF_O3, DF_SO2, DF_SOAG, DMS_SRF, DP_KCLDBASE, DP_MFUP_MAX, DP_WCLDBASE,
+        DSTSFMBL, DTCOND, DTENDTH, DTENDTQ, EXTINCT, FICE, FLDS, FLNS, FLNSC,
+        FLNT, FLNTC, FLUT, FLUTC, FREQI, FREQL, FREQR, FREQS, FSDS, FSDSC,
+        FSNS, FSNSC, FSNT, FSNTC, FSNTOA, FSNTOAC, FSUTOA, FSUTOAC, F_eff,
+        H2O2_SRF, H2SO4_SRF, H2SO4_sfgaex1, ICEFRAC, ICIMR, ICWMR, IWC,
+        LANDFRAC, LHFLX, LINOZ_DO3, LINOZ_DO3_PSC, LINOZ_O3CLIM, LINOZ_O3COL,
+        LINOZ_SFCSINK, LINOZ_SSO3, LINOZ_SZA, LND_MBL, LWCF, Mass_bc, Mass_dst, Mass_mom,
+        Mass_ncl, Mass_pom, Mass_so4, Mass_soa, NUMICE, NUMLIQ, NUMRAI, NUMSNO,
+        O3, O3_SRF, OCNFRAC, OMEGA, OMEGA500, OMEGAT, PBLH, PHIS, PRECC, PRECL,
+        PRECSC, PRECSL, PS, PSL, Q, QFLX, QREFHT, QRL, QRS, RAINQM, RAM1,
+        RELHUM, SFDMS, SFH2O2, SFH2SO4, SFO3, SFSO2, SFSOAG, SFbc_a1, SFbc_a3,
+        SFbc_a4, SFdst_a1, SFdst_a3, SFmom_a1, SFmom_a2, SFmom_a3, SFmom_a4,
+        SFncl_a1, SFncl_a2, SFncl_a3, SFnum_a1, SFnum_a2, SFnum_a3, SFnum_a4,
+        SFpom_a1, SFpom_a3, SFpom_a4, SFso4_a1, SFso4_a2, SFso4_a3, SFsoa_a1,
+        SFsoa_a2, SFsoa_a3, SHFLX, SH_KCLDBASE, SH_MFUP_MAX, SH_WCLDBASE,
+        SNOWHICE, SNOWHLND, SNOWQM, SO2, SO2_CLXF, SO2_SRF, SOAG_CLXF,
+        SOAG_SRF, SOAG_sfgaex1, SOLIN, SSAVIS, SSTSFMBL, SSTSFMBL_OM, SWCF, T,
+        TAUGWX, TAUGWY, TAUX, TAUY, TGCLDCWP, TGCLDIWP, TGCLDLWP, TH7001000,
+        TMQ, TREFHT, TROP_P, TROP_T, TS, TSMN, TSMX, TUH, TUQ, TVH, TVQ, U,
+        U10, UU, V, VQ, VT, VU, VV, WD_H2O2, WD_H2SO4, WD_SO2, WSUB, Z3,
+        aero_water, airFV, bc_a1DDF, bc_a1SFWET, bc_a1_SRF, bc_a1_sfgaex1,
+        bc_a3DDF, bc_a3SFWET, bc_a3_SRF, bc_a4DDF, bc_a4SFWET, bc_a4_CLXF,
+        bc_a4_SRF, bc_a4_sfgaex1, bc_c1DDF, bc_c1SFWET, bc_c3DDF, bc_c3SFWET,
+        bc_c4DDF, bc_c4SFWET, chla, dst_a1DDF, dst_a1SF, dst_a1SFWET,
+        dst_a1_SRF, dst_a3DDF, dst_a3SF, dst_a3SFWET, dst_a3_SRF, dst_c1DDF,
+        dst_c1SFWET, dst_c3DDF, dst_c3SFWET, hstobie_linoz, mlip, mom_a1DDF,
+        mom_a1SF, mom_a1SFWET, mom_a1_SRF, mom_a1_sfgaex1, mom_a2DDF, mom_a2SF,
+        mom_a2SFWET, mom_a2_SRF, mom_a3DDF, mom_a3SFWET, mom_a3_SRF, mom_a4DDF,
+        mom_a4SF, mom_a4SFWET, mom_a4_SRF, mom_a4_sfgaex1, mom_c1DDF,
+        mom_c1SFWET, mom_c2DDF, mom_c2SFWET, mom_c3DDF, mom_c3SFWET, mom_c4DDF,
+        mom_c4SFWET, mpoly, mprot, ncl_a1DDF, ncl_a1SF, ncl_a1SFWET,
+        ncl_a1_SRF, ncl_a2DDF, ncl_a2SF, ncl_a2SFWET, ncl_a2_SRF, ncl_a3DDF,
+        ncl_a3SF, ncl_a3SFWET, ncl_a3_SRF, ncl_c1DDF, ncl_c1SFWET, ncl_c2DDF,
+        ncl_c2SFWET, ncl_c3DDF, ncl_c3SFWET, num_a1DDF, num_a1SF, num_a1SFWET,
+        num_a1_CLXF, num_a1_SRF, num_a1_sfgaex1, num_a2DDF, num_a2SFWET,
+        num_a2_CLXF, num_a2_SRF, num_a3DDF, num_a3SF, num_a3SFWET, num_a3_SRF,
+        num_a4DDF, num_a4SFWET, num_a4_CLXF, num_a4_SRF, num_a4_sfgaex1,
+        num_c1DDF, num_c1SFWET, num_c2DDF, num_c2SFWET, num_c3DDF, num_c3SFWET,
+        num_c4DDF, num_c4SFWET, pom_a1DDF, pom_a1SFWET, pom_a1_SRF,
+        pom_a1_sfgaex1, pom_a3DDF, pom_a3SFWET, pom_a3_SRF, pom_a4DDF,
+        pom_a4SFWET, pom_a4_CLXF, pom_a4_SRF, pom_a4_sfgaex1, pom_c1DDF,
+        pom_c1SFWET, pom_c3DDF, pom_c3SFWET, pom_c4DDF, pom_c4SFWET, so4_a1DDF,
+        so4_a1SFWET, so4_a1_CLXF, so4_a1_SRF, so4_a1_sfgaex1, so4_a2DDF,
+        so4_a2SFWET, so4_a2_CLXF, so4_a2_SRF, so4_a2_sfgaex1, so4_a3DDF,
+        so4_a3SFWET, so4_a3_SRF, so4_a3_sfgaex1, so4_c1DDF, so4_c1SFWET,
+        so4_c2DDF, so4_c2SFWET, so4_c3DDF, so4_c3SFWET, soa_a1DDF, soa_a1SFWET,
+        soa_a1_SRF, soa_a1_sfgaex1, soa_a2DDF, soa_a2SFWET, soa_a2_SRF,
+        soa_a2_sfgaex1, soa_a3DDF, soa_a3SFWET, soa_a3_SRF, soa_a3_sfgaex1,
+        soa_c1DDF, soa_c1SFWET, soa_c2DDF, soa_c2SFWET, soa_c3DDF, soa_c3SFWET;
+
+    int i, err, nerrs=0, dimids[3], iattr, mdims=1;
+    int dim_ncol, dim_time, dim_nbnd, dim_chars, dim_lev, dim_ilev;
+    float fillv=1.e+36f, missv = 1.e+36f;
+
+    /* define dimensions */
+    err = hdf5_def_dim_mpi(dims[1],      &dim_ncol); ERR
+    err = hdf5_def_dim_mpi(NC_UNLIMITED, &dim_time); ERR
+    err = hdf5_def_dim_mpi(2,           &dim_nbnd); ERR
+    err = hdf5_def_dim_mpi(8,           &dim_chars); ERR
+    err = hdf5_def_dim_mpi(dims[0],     &dim_lev); ERR
+    err = hdf5_def_dim_mpi(dims[0]+1,   &dim_ilev); ERR
+
+    i = 0;
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "lat", &lat); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lat, "long_name", 8, "latitude"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lat, "units", 13, "degrees_north"); ERR
+    varids[i++] = lat;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "lon", &lon); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lon, "long_name", 9, "longitude"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lon, "units", 12, "degrees_east"); ERR
+    varids[i++] = lon;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "area", &area); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, area, "long_name", 14, "gll grid areas"); ERR
+    varids[i++] = area;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "lev", &lev); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lev, "long_name", 38, "hybrid level at midpoints (1000*(A+B))"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lev, "units", 3, "hPa"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lev, "positive", 4, "down"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lev, "standard_name", 43, "atmosphere_hybrid_sigma_pressure_coordinate"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, lev, "formula_terms", 29, "a: hyam b: hybm p0: P0 ps: PS"); ERR
+    varids[i++] = lev;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "hyam", &hyam); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, hyam, "long_name", 39, "hybrid A coefficient at layer midpoints"); ERR
+    varids[i++] = hyam;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "hybm", &hybm); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, hybm, "long_name", 39, "hybrid B coefficient at layer midpoints"); ERR
+    varids[i++] = hybm;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "P0", &P0); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, P0, "long_name", 18, "reference pressure"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, P0, "units", 2, "Pa"); ERR
+    varids[i++] = P0;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "ilev", &ilev); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ilev, "long_name", 39, "hybrid level at interfaces (1000*(A+B))"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ilev, "units", 3, "hPa"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ilev, "positive", 4, "down"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ilev, "standard_name", 43, "atmosphere_hybrid_sigma_pressure_coordinate"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ilev, "formula_terms", 29, "a: hyai b: hybi p0: P0 ps: PS"); ERR
+    varids[i++] = ilev;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "hyai", &hyai); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, hyai, "long_name", 40, "hybrid A coefficient at layer interfaces"); ERR
+    varids[i++] = hyai;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "hybi", &hybi); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, hybi, "long_name", 40, "hybrid B coefficient at layer interfaces"); ERR
+    varids[i++] = hybi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "time", &time); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, time, "long_name", 4, "time"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, time, "units", 30, "days since 0001-01-01 00:00:00"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, time, "calendar", 6, "noleap"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, time, "bounds", 9, "time_bnds"); ERR
+    varids[i++] = time;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "date", &date); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, date, "long_name", 23, "current date (YYYYMMDD)"); ERR
+    varids[i++] = date;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "datesec", &datesec); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, datesec, "long_name", 31, "current seconds of current date"); ERR
+    varids[i++] = datesec;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_nbnd;
+    err = hdf5_def_var_mpi(ncid, "time_bnds", &time_bnds); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, time_bnds, "long_name", 23, "time interval endpoints"); ERR
+    varids[i++] = time_bnds;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var_mpi(ncid, "date_written", &date_written); ERR
+    varids[i++] = date_written;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var_mpi(ncid, "time_written", &time_written); ERR
+    varids[i++] = time_written;
+
+    err = hdf5_def_var_mpi(ncid, "ndbase", &ndbase); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ndbase, "long_name", 8, "base day"); ERR
+    varids[i++] = ndbase;
+    err = hdf5_def_var_mpi(ncid, "nsbase", &nsbase); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, nsbase, "long_name", 19, "seconds of base day"); ERR
+    varids[i++] = nsbase;
+
+    err = hdf5_def_var_mpi(ncid, "nbdate", &nbdate); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, nbdate, "long_name", 20, "base date (YYYYMMDD)"); ERR
+    varids[i++] = nbdate;
+
+    err = hdf5_def_var_mpi(ncid, "nbsec", &nbsec); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, nbsec, "long_name", 20, "seconds of base date"); ERR
+    varids[i++] = nbsec;
+
+    err = hdf5_def_var_mpi(ncid, "mdt", &mdt); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mdt, "long_name", 8, "timestep"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mdt, "units", 1, "s"); ERR
+    varids[i++] = mdt;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "ndcur", &ndcur); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ndcur, "long_name", 27, "current day (from base day)"); ERR
+    varids[i++] = ndcur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "nscur", &nscur); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, nscur, "long_name", 30, "current seconds of current day"); ERR
+    varids[i++] = nscur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "co2vmr", &co2vmr); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, co2vmr, "long_name", 23, "co2 volume mixing ratio"); ERR
+    varids[i++] = co2vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "ch4vmr", &ch4vmr); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ch4vmr, "long_name", 23, "ch4 volume mixing ratio"); ERR
+    varids[i++] = ch4vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "n2ovmr", &n2ovmr); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, n2ovmr, "long_name", 23, "n2o volume mixing ratio"); ERR
+    varids[i++] = n2ovmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "f11vmr", &f11vmr); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, f11vmr, "long_name", 23, "f11 volume mixing ratio"); ERR
+    varids[i++] = f11vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "f12vmr", &f12vmr); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, f12vmr, "long_name", 23, "f12 volume mixing ratio"); ERR
+    varids[i++] = f12vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "sol_tsi", &sol_tsi); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, sol_tsi, "long_name", 22, "total solar irradiance"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, sol_tsi, "units", 4, "W/m2"); ERR
+    varids[i++] = sol_tsi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "nsteph", &nsteph); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, nsteph, "long_name", 16, "current timestep"); ERR
+    varids[i++] = nsteph;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AEROD_v", &AEROD_v); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AEROD_v, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AEROD_v, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AEROD_v, "units", 1, "1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AEROD_v, "long_name", 43, "Total Aerosol Optical Depth in visible band"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AEROD_v, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AEROD_v;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ANRAIN", &ANRAIN); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, ANRAIN, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ANRAIN, "units", 3, "m-3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ANRAIN, "long_name", 24, "Average rain number conc"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ANRAIN, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ANRAIN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ANSNOW", &ANSNOW); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, ANSNOW, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ANSNOW, "units", 3, "m-3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ANSNOW, "long_name", 24, "Average snow number conc"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ANSNOW, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ANSNOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODABS", &AODABS); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODABS, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODABS, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODABS, "long_name", 39, "Aerosol absorption optical depth 550 nm"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODABS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODABS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODABSBC", &AODABSBC); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODABSBC, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODABSBC, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODABSBC, "long_name", 47, "Aerosol absorption optical depth 550 nm from BC"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODABSBC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODABSBC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODALL", &AODALL); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODALL, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODALL, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODALL, "long_name", 35, "AOD 550 nm for all time and species"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODALL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODALL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODBC", &AODBC); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODBC, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODBC, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODBC, "long_name", 36, "Aerosol optical depth 550 nm from BC"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODBC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODBC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST", &AODDUST); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST, "long_name", 38, "Aerosol optical depth 550 nm from dust"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODDUST;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST1", &AODDUST1); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST1, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST1, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST1, "long_name", 46, "Aerosol optical depth 550 nm model 1 from dust"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODDUST1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST3", &AODDUST3); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST3, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST3, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST3, "long_name", 46, "Aerosol optical depth 550 nm model 3 from dust"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODDUST3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODDUST4", &AODDUST4); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST4, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODDUST4, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST4, "long_name", 46, "Aerosol optical depth 550 nm model 4 from dust"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODDUST4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODDUST4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE1", &AODMODE1); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE1, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE1, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE1, "long_name", 35, "Aerosol optical depth 550 nm mode 1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODMODE1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE2", &AODMODE2); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE2, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE2, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE2, "long_name", 35, "Aerosol optical depth 550 nm mode 2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODMODE2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE3", &AODMODE3); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE3, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE3, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE3, "long_name", 35, "Aerosol optical depth 550 nm mode 3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODMODE3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODMODE4", &AODMODE4); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE4, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODMODE4, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE4, "long_name", 35, "Aerosol optical depth 550 nm mode 4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODMODE4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODMODE4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODNIR", &AODNIR); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODNIR, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODNIR, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODNIR, "long_name", 28, "Aerosol optical depth 850 nm"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODNIR, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODNIR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODPOM", &AODPOM); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODPOM, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODPOM, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODPOM, "long_name", 37, "Aerosol optical depth 550 nm from POM"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODPOM, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODPOM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODSO4", &AODSO4); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODSO4, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODSO4, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODSO4, "long_name", 37, "Aerosol optical depth 550 nm from SO4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODSO4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODSO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODSOA", &AODSOA); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODSOA, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODSOA, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODSOA, "long_name", 37, "Aerosol optical depth 550 nm from SOA"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODSOA, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODSOA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODSS", &AODSS); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODSS, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODSS, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODSS, "long_name", 41, "Aerosol optical depth 550 nm from seasalt"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODSS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODSS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODUV", &AODUV); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODUV, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODUV, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODUV, "long_name", 28, "Aerosol optical depth 350 nm"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODUV, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODUV;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AODVIS", &AODVIS); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODVIS, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, AODVIS, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODVIS, "long_name", 28, "Aerosol optical depth 550 nm"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AODVIS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AODVIS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQRAIN", &AQRAIN); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, AQRAIN, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQRAIN, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQRAIN, "long_name", 25, "Average rain mixing ratio"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQRAIN, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQRAIN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQSNOW", &AQSNOW); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, AQSNOW, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQSNOW, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQSNOW, "long_name", 25, "Average snow mixing ratio"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQSNOW, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQSNOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_DMS", &AQ_DMS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_DMS, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_DMS, "long_name", 39, "DMS aqueous chemistry (for gas species)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_DMS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQ_DMS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_H2O2", &AQ_H2O2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_H2O2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_H2O2, "long_name", 40, "H2O2 aqueous chemistry (for gas species)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_H2O2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQ_H2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_H2SO4", &AQ_H2SO4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_H2SO4, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_H2SO4, "long_name", 41, "H2SO4 aqueous chemistry (for gas species)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_H2SO4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQ_H2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_O3", &AQ_O3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_O3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_O3, "long_name", 38, "O3 aqueous chemistry (for gas species)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_O3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQ_O3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_SO2", &AQ_SO2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_SO2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_SO2, "long_name", 39, "SO2 aqueous chemistry (for gas species)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_SO2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQ_SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AQ_SOAG", &AQ_SOAG); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_SOAG, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_SOAG, "long_name", 40, "SOAG aqueous chemistry (for gas species)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AQ_SOAG, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AQ_SOAG;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AREI", &AREI); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, AREI, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AREI, "units", 6, "Micron"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AREI, "long_name", 28, "Average ice effective radius"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AREI, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AREI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AREL", &AREL); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, AREL, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AREL, "units", 6, "Micron"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AREL, "long_name", 32, "Average droplet effective radius"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AREL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AREL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AWNC", &AWNC); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, AWNC, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AWNC, "units", 3, "m-3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AWNC, "long_name", 31, "Average cloud water number conc"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AWNC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AWNC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "AWNI", &AWNI); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, AWNI, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AWNI, "units", 3, "m-3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AWNI, "long_name", 29, "Average cloud ice number conc"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, AWNI, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = AWNI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN1", &BURDEN1); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN1, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN1, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN1, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN1, "long_name", 21, "Aerosol burden mode 1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = BURDEN1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN2", &BURDEN2); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN2, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN2, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN2, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN2, "long_name", 21, "Aerosol burden mode 2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = BURDEN2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN3", &BURDEN3); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN3, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN3, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN3, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN3, "long_name", 21, "Aerosol burden mode 3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = BURDEN3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "BURDEN4", &BURDEN4); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN4, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, BURDEN4, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN4, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN4, "long_name", 21, "Aerosol burden mode 4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, BURDEN4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = BURDEN4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CCN3", &CCN3); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, CCN3, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CCN3, "units", 5, "#/cm3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CCN3, "long_name", 27, "CCN concentration at S=0.1%"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CCN3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CCN3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CDNUMC", &CDNUMC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CDNUMC, "units", 4, "1/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CDNUMC, "long_name", 43, "Vertically-integrated droplet concentration"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CDNUMC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CDNUMC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDHGH", &CLDHGH); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDHGH, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDHGH, "long_name", 32, "Vertically-integrated high cloud"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDHGH, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLDHGH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDICE", &CLDICE); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, CLDICE, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDICE, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDICE, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDICE, "long_name", 34, "Grid box averaged cloud ice amount"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDICE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLDICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDLIQ", &CLDLIQ); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, CLDLIQ, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDLIQ, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDLIQ, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDLIQ, "long_name", 37, "Grid box averaged cloud liquid amount"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDLIQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLDLIQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDLOW", &CLDLOW); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDLOW, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDLOW, "long_name", 31, "Vertically-integrated low cloud"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDLOW, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLDLOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDMED", &CLDMED); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDMED, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDMED, "long_name", 37, "Vertically-integrated mid-level cloud"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDMED, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLDMED;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDTOT", &CLDTOT); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDTOT, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDTOT, "long_name", 33, "Vertically-integrated total cloud"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLDTOT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLDTOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLOUD", &CLOUD); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, CLOUD, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLOUD, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLOUD, "long_name", 14, "Cloud fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLOUD, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLOUD;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLOUDFRAC_CLUBB", &CLOUDFRAC_CLUBB); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, CLOUDFRAC_CLUBB, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLOUDFRAC_CLUBB, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLOUDFRAC_CLUBB, "long_name", 14, "Cloud Fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CLOUDFRAC_CLUBB, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CLOUDFRAC_CLUBB;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CONCLD", &CONCLD); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, CONCLD, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CONCLD, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CONCLD, "long_name", 22, "Convective cloud cover"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, CONCLD, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = CONCLD;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DCQ", &DCQ); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, DCQ, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DCQ, "units", 7, "kg/kg/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DCQ, "long_name", 33, "Q tendency due to moist processes"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DCQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DCQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_DMS", &DF_DMS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_DMS, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_DMS, "long_name", 19, "dry deposition flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_DMS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DF_DMS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_H2O2", &DF_H2O2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_H2O2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_H2O2, "long_name", 19, "dry deposition flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_H2O2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DF_H2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_H2SO4", &DF_H2SO4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_H2SO4, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_H2SO4, "long_name", 19, "dry deposition flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_H2SO4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DF_H2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_O3", &DF_O3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_O3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_O3, "long_name", 19, "dry deposition flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_O3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DF_O3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_SO2", &DF_SO2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_SO2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_SO2, "long_name", 19, "dry deposition flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_SO2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DF_SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DF_SOAG", &DF_SOAG); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_SOAG, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_SOAG, "long_name", 19, "dry deposition flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DF_SOAG, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DF_SOAG;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DMS_SRF", &DMS_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DMS_SRF, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DMS_SRF, "long_name", 19, "DMS in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DMS_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DMS_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DP_KCLDBASE", &DP_KCLDBASE); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_KCLDBASE, "units", 1, "1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_KCLDBASE, "long_name", 32, "Deep conv. cloudbase level index"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_KCLDBASE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DP_KCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DP_MFUP_MAX", &DP_MFUP_MAX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_MFUP_MAX, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_MFUP_MAX, "long_name", 39, "Deep conv. column-max updraft mass flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_MFUP_MAX, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DP_MFUP_MAX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DP_WCLDBASE", &DP_WCLDBASE); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_WCLDBASE, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_WCLDBASE, "long_name", 38, "Deep conv. cloudbase vertical velocity"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DP_WCLDBASE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DP_WCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DSTSFMBL", &DSTSFMBL); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DSTSFMBL, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DSTSFMBL, "long_name", 28, "Mobilization flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DSTSFMBL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DSTSFMBL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DTCOND", &DTCOND); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, DTCOND, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTCOND, "units", 3, "K/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTCOND, "long_name", 28, "T tendency - moist processes"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTCOND, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DTCOND;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DTENDTH", &DTENDTH); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTENDTH, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTENDTH, "long_name", 69, "Dynamic Tendency of Total (vertically integrated) moist static energy"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTENDTH, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DTENDTH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "DTENDTQ", &DTENDTQ); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTENDTQ, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTENDTQ, "long_name", 67, "Dynamic Tendency of Total (vertically integrated) specific humidity"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, DTENDTQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = DTENDTQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "EXTINCT", &EXTINCT); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, EXTINCT, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, EXTINCT, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, EXTINCT, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, EXTINCT, "units", 2, "/m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, EXTINCT, "long_name", 18, "Aerosol extinction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, EXTINCT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = EXTINCT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FICE", &FICE); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, FICE, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FICE, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FICE, "long_name", 35, "Fractional ice content within cloud"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FICE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLDS", &FLDS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLDS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLDS, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLDS, "long_name", 36, "Downwelling longwave flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLDS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FLDS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNS", &FLNS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNS, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNS, "long_name", 28, "Net longwave flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FLNS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNSC", &FLNSC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNSC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNSC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNSC, "long_name", 37, "Clearsky net longwave flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNSC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FLNSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNT", &FLNT); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNT, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNT, "long_name", 33, "Net longwave flux at top of model"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FLNT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNTC", &FLNTC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNTC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNTC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNTC, "long_name", 42, "Clearsky net longwave flux at top of model"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLNTC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FLNTC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLUT", &FLUT); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUT, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUT, "long_name", 39, "Upwelling longwave flux at top of model"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FLUT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLUTC", &FLUTC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUTC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUTC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUTC, "long_name", 48, "Clearsky upwelling longwave flux at top of model"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FLUTC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FLUTC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQI", &FREQI); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, FREQI, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQI, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQI, "long_name", 28, "Fractional occurrence of ice"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQI, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FREQI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQL", &FREQL); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, FREQL, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQL, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQL, "long_name", 31, "Fractional occurrence of liquid"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FREQL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQR", &FREQR); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, FREQR, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQR, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQR, "long_name", 29, "Fractional occurrence of rain"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQR, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FREQR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FREQS", &FREQS); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, FREQS, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQS, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQS, "long_name", 29, "Fractional occurrence of snow"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FREQS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FREQS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSDS", &FSDS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDS, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDS, "long_name", 33, "Downwelling solar flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSDS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSDSC", &FSDSC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDSC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDSC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDSC, "long_name", 42, "Clearsky downwelling solar flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSDSC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSDSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNS", &FSNS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNS, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNS, "long_name", 25, "Net solar flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSNS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNSC", &FSNSC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNSC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNSC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNSC, "long_name", 34, "Clearsky net solar flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNSC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSNSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNT", &FSNT); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNT, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNT, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNT, "long_name", 30, "Net solar flux at top of model"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSNT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNTC", &FSNTC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTC, "long_name", 39, "Clearsky net solar flux at top of model"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSNTC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNTOA", &FSNTOA); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOA, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOA, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOA, "long_name", 35, "Net solar flux at top of atmosphere"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOA, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSNTOA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSNTOAC", &FSNTOAC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOAC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOAC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOAC, "long_name", 44, "Clearsky net solar flux at top of atmosphere"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSNTOAC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSNTOAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSUTOA", &FSUTOA); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOA, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOA, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOA, "long_name", 41, "Upwelling solar flux at top of atmosphere"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOA, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSUTOA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FSUTOAC", &FSUTOAC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOAC, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOAC, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOAC, "long_name", 50, "Clearsky upwelling solar flux at top of atmosphere"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, FSUTOAC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = FSUTOAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "F_eff", &F_eff); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, F_eff, "units", 1, "1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, F_eff, "long_name", 52, "Effective enrichment factor of marine organic matter"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, F_eff, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = F_eff;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "H2O2_SRF", &H2O2_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2O2_SRF, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2O2_SRF, "long_name", 20, "H2O2 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2O2_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = H2O2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "H2SO4_SRF", &H2SO4_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2SO4_SRF, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2SO4_SRF, "long_name", 21, "H2SO4 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2SO4_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = H2SO4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "H2SO4_sfgaex1", &H2SO4_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2SO4_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2SO4_sfgaex1, "long_name", 50, "H2SO4 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, H2SO4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = H2SO4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ICEFRAC", &ICEFRAC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICEFRAC, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICEFRAC, "long_name", 39, "Fraction of sfc area covered by sea-ice"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICEFRAC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ICEFRAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ICIMR", &ICIMR); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, ICIMR, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICIMR, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICIMR, "long_name", 36, "Prognostic in-cloud ice mixing ratio"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICIMR, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ICIMR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ICWMR", &ICWMR); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, ICWMR, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICWMR, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICWMR, "long_name", 38, "Prognostic in-cloud water mixing ratio"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ICWMR, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ICWMR;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "IWC", &IWC); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, IWC, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, IWC, "units", 5, "kg/m3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, IWC, "long_name", 34, "Grid box average ice water content"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, IWC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = IWC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LANDFRAC", &LANDFRAC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LANDFRAC, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LANDFRAC, "long_name", 36, "Fraction of sfc area covered by land"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LANDFRAC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LANDFRAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LHFLX", &LHFLX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LHFLX, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LHFLX, "long_name", 24, "Surface latent heat flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LHFLX, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LHFLX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_DO3", &LINOZ_DO3); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, LINOZ_DO3, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_DO3, "units", 2, "/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_DO3, "long_name", 48, "ozone vmr tendency by linearized ozone chemistry"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_DO3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LINOZ_DO3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_DO3_PSC", &LINOZ_DO3_PSC); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, LINOZ_DO3_PSC, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_DO3_PSC, "units", 2, "/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_DO3_PSC, "long_name", 50, "ozone vmr loss by PSCs using Carille et al. (1990)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_DO3_PSC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LINOZ_DO3_PSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_O3CLIM", &LINOZ_O3CLIM); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, LINOZ_O3CLIM, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_O3CLIM, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_O3CLIM, "long_name", 29, "climatology of ozone in LINOZ"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_O3CLIM, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LINOZ_O3CLIM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_O3COL", &LINOZ_O3COL); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, LINOZ_O3COL, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_O3COL, "units", 2, "DU"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_O3COL, "long_name", 18, "ozone column above"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_O3COL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LINOZ_O3COL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_SFCSINK", &LINOZ_SFCSINK); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SFCSINK, "units", 8, "Tg/yr/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SFCSINK, "long_name", 64, "surface o3 sink in LINOZ with an e-fold to a fixed concentration"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SFCSINK, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LINOZ_SFCSINK;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_SSO3", &LINOZ_SSO3); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, LINOZ_SSO3, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SSO3, "units", 2, "kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SSO3, "long_name", 27, "steady state ozone in LINOZ"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SSO3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LINOZ_SSO3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LINOZ_SZA", &LINOZ_SZA); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SZA, "units", 7, "degrees"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SZA, "long_name", 27, "solar zenith angle in LINOZ"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LINOZ_SZA, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LINOZ_SZA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LND_MBL", &LND_MBL); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LND_MBL, "units", 4, "frac"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LND_MBL, "long_name", 23, "Soil erodibility factor"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LND_MBL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LND_MBL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LWCF", &LWCF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LWCF, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LWCF, "long_name", 22, "Longwave cloud forcing"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, LWCF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = LWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_bc", &Mass_bc); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Mass_bc, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_bc, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_bc, "long_name", 64, "sum of bc mass concentration bc_a1+bc_c1+bc_a3+bc_c3+bc_a4+bc_c4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_bc, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Mass_bc;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_dst", &Mass_dst); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Mass_dst, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_dst, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_dst, "long_name", 57, "sum of dst mass concentration dst_a1+dst_c1+dst_a3+dst_c3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_dst, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Mass_dst;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_mom", &Mass_mom); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Mass_mom, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_mom, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_mom, "long_name", 85, "sum of mom mass concentration mom_a1+mom_c1+mom_a2+mom_c2+mom_a3+mom_c3+mom_a4+mom_c4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_mom, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Mass_mom;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_ncl", &Mass_ncl); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Mass_ncl, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_ncl, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_ncl, "long_name", 71, "sum of ncl mass concentration ncl_a1+ncl_c1+ncl_a2+ncl_c2+ncl_a3+ncl_c3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_ncl, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Mass_ncl;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_pom", &Mass_pom); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Mass_pom, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_pom, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_pom, "long_name", 71, "sum of pom mass concentration pom_a1+pom_c1+pom_a3+pom_c3+pom_a4+pom_c4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_pom, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Mass_pom;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_so4", &Mass_so4); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Mass_so4, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_so4, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_so4, "long_name", 71, "sum of so4 mass concentration so4_a1+so4_c1+so4_a2+so4_c2+so4_a3+so4_c3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_so4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Mass_so4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Mass_soa", &Mass_soa); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Mass_soa, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_soa, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_soa, "long_name", 71, "sum of soa mass concentration soa_a1+soa_c1+soa_a2+soa_c2+soa_a3+soa_c3"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Mass_soa, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Mass_soa;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMICE", &NUMICE); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, NUMICE, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMICE, "units", 4, "1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMICE, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMICE, "long_name", 34, "Grid box averaged cloud ice number"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMICE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = NUMICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMLIQ", &NUMLIQ); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, NUMLIQ, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMLIQ, "units", 4, "1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMLIQ, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMLIQ, "long_name", 37, "Grid box averaged cloud liquid number"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMLIQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = NUMLIQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMRAI", &NUMRAI); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, NUMRAI, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMRAI, "units", 4, "1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMRAI, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMRAI, "long_name", 29, "Grid box averaged rain number"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMRAI, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = NUMRAI;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "NUMSNO", &NUMSNO); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, NUMSNO, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMSNO, "units", 4, "1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMSNO, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMSNO, "long_name", 29, "Grid box averaged snow number"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, NUMSNO, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = NUMSNO;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "O3", &O3); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, O3, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, O3, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, O3, "mixing_ratio", 3, "dry"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, O3, "long_name", 16, "O3 concentration"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, O3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = O3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "O3_SRF", &O3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, O3_SRF, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, O3_SRF, "long_name", 18, "O3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, O3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = O3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OCNFRAC", &OCNFRAC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OCNFRAC, "units", 8, "fraction"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OCNFRAC, "long_name", 37, "Fraction of sfc area covered by ocean"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OCNFRAC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = OCNFRAC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGA", &OMEGA); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, OMEGA, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGA, "units", 4, "Pa/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGA, "long_name", 28, "Vertical velocity (pressure)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGA, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = OMEGA;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGA500", &OMEGA500); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGA500, "units", 4, "Pa/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGA500, "long_name", 46, "Vertical velocity at 500 mbar pressure surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGA500, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = OMEGA500;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGAT", &OMEGAT); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, OMEGAT, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGAT, "units", 6, "K Pa/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGAT, "long_name", 18, "Vertical heat flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, OMEGAT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = OMEGAT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PBLH", &PBLH); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PBLH, "units", 1, "m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PBLH, "long_name", 10, "PBL height"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PBLH, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = PBLH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PHIS", &PHIS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PHIS, "units", 5, "m2/s2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PHIS, "long_name", 20, "Surface geopotential"); ERR
+    varids[i++] = PHIS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECC", &PRECC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECC, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECC, "long_name", 41, "Convective precipitation rate (liq + ice)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = PRECC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECL", &PRECL); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECL, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECL, "long_name", 51, "Large-scale (stable) precipitation rate (liq + ice)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = PRECL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECSC", &PRECSC); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECSC, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECSC, "long_name", 39, "Convective snow rate (water equivalent)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECSC, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = PRECSC;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECSL", &PRECSL); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECSL, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECSL, "long_name", 49, "Large-scale (stable) snow rate (water equivalent)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PRECSL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = PRECSL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PS", &PS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PS, "units", 2, "Pa"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PS, "long_name", 16, "Surface pressure"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = PS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PSL", &PSL); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PSL, "units", 2, "Pa"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PSL, "long_name", 18, "Sea level pressure"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, PSL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = PSL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Q", &Q); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Q, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Q, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Q, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Q, "long_name", 17, "Specific humidity"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Q, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Q;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QFLX", &QFLX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QFLX, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QFLX, "long_name", 18, "Surface water flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QFLX, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = QFLX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QREFHT", &QREFHT); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QREFHT, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QREFHT, "long_name", 25, "Reference height humidity"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QREFHT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = QREFHT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QRL", &QRL); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, QRL, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRL, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRL, "units", 3, "K/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRL, "long_name", 21, "Longwave heating rate"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = QRL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "QRS", &QRS); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, QRS, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRS, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRS, "units", 3, "K/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRS, "long_name", 18, "Solar heating rate"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, QRS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = QRS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "RAINQM", &RAINQM); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, RAINQM, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RAINQM, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RAINQM, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RAINQM, "long_name", 29, "Grid box averaged rain amount"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RAINQM, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = RAINQM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "RAM1", &RAM1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RAM1, "units", 4, "frac"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RAM1, "long_name", 4, "RAM1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RAM1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = RAM1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "RELHUM", &RELHUM); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, RELHUM, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RELHUM, "units", 7, "percent"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RELHUM, "long_name", 17, "Relative humidity"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, RELHUM, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = RELHUM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFDMS", &SFDMS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFDMS, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFDMS, "long_name", 16, "DMS surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFDMS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFDMS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFH2O2", &SFH2O2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFH2O2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFH2O2, "long_name", 17, "H2O2 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFH2O2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFH2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFH2SO4", &SFH2SO4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFH2SO4, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFH2SO4, "long_name", 18, "H2SO4 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFH2SO4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFH2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFO3", &SFO3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFO3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFO3, "long_name", 15, "O3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFO3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFO3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFSO2", &SFSO2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFSO2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFSO2, "long_name", 16, "SO2 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFSO2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFSO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFSOAG", &SFSOAG); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFSOAG, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFSOAG, "long_name", 17, "SOAG surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFSOAG, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFSOAG;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFbc_a1", &SFbc_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a1, "long_name", 18, "bc_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFbc_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFbc_a3", &SFbc_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a3, "long_name", 18, "bc_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFbc_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFbc_a4", &SFbc_a4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a4, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a4, "long_name", 18, "bc_a4 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFbc_a4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFbc_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFdst_a1", &SFdst_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFdst_a1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFdst_a1, "long_name", 19, "dst_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFdst_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFdst_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFdst_a3", &SFdst_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFdst_a3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFdst_a3, "long_name", 19, "dst_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFdst_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFdst_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a1", &SFmom_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a1, "long_name", 19, "mom_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFmom_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a2", &SFmom_a2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a2, "long_name", 19, "mom_a2 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFmom_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a3", &SFmom_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a3, "long_name", 19, "mom_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFmom_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFmom_a4", &SFmom_a4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a4, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a4, "long_name", 19, "mom_a4 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFmom_a4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFmom_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFncl_a1", &SFncl_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a1, "long_name", 19, "ncl_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFncl_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFncl_a2", &SFncl_a2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a2, "long_name", 19, "ncl_a2 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFncl_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFncl_a3", &SFncl_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a3, "long_name", 19, "ncl_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFncl_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFncl_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a1", &SFnum_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a1, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a1, "long_name", 19, "num_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFnum_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a2", &SFnum_a2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a2, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a2, "long_name", 19, "num_a2 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFnum_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a3", &SFnum_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a3, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a3, "long_name", 19, "num_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFnum_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFnum_a4", &SFnum_a4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a4, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a4, "long_name", 19, "num_a4 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFnum_a4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFnum_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFpom_a1", &SFpom_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a1, "long_name", 19, "pom_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFpom_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFpom_a3", &SFpom_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a3, "long_name", 19, "pom_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFpom_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFpom_a4", &SFpom_a4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a4, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a4, "long_name", 19, "pom_a4 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFpom_a4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFpom_a4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFso4_a1", &SFso4_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a1, "long_name", 19, "so4_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFso4_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFso4_a2", &SFso4_a2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a2, "long_name", 19, "so4_a2 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFso4_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFso4_a3", &SFso4_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a3, "long_name", 19, "so4_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFso4_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFso4_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFsoa_a1", &SFsoa_a1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a1, "long_name", 19, "soa_a1 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFsoa_a1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFsoa_a2", &SFsoa_a2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a2, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a2, "long_name", 19, "soa_a2 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFsoa_a2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SFsoa_a3", &SFsoa_a3); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a3, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a3, "long_name", 19, "soa_a3 surface flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SFsoa_a3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SFsoa_a3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SHFLX", &SHFLX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SHFLX, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SHFLX, "long_name", 26, "Surface sensible heat flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SHFLX, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SHFLX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SH_KCLDBASE", &SH_KCLDBASE); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_KCLDBASE, "units", 1, "1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_KCLDBASE, "long_name", 35, "Shallow conv. cloudbase level index"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_KCLDBASE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SH_KCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SH_MFUP_MAX", &SH_MFUP_MAX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_MFUP_MAX, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_MFUP_MAX, "long_name", 42, "Shallow conv. column-max updraft mass flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_MFUP_MAX, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SH_MFUP_MAX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SH_WCLDBASE", &SH_WCLDBASE); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_WCLDBASE, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_WCLDBASE, "long_name", 41, "Shallow conv. cloudbase vertical velocity"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SH_WCLDBASE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SH_WCLDBASE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SNOWHICE", &SNOWHICE); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWHICE, "units", 1, "m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWHICE, "long_name", 19, "Snow depth over ice"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWHICE, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SNOWHICE;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SNOWHLND", &SNOWHLND); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWHLND, "units", 1, "m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWHLND, "long_name", 27, "Water equivalent snow depth"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWHLND, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SNOWHLND;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SNOWQM", &SNOWQM); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, SNOWQM, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWQM, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWQM, "mixing_ratio", 3, "wet"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWQM, "long_name", 29, "Grid box averaged snow amount"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SNOWQM, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SNOWQM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SO2", &SO2); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, SO2, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2, "mixing_ratio", 3, "dry"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2, "long_name", 17, "SO2 concentration"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SO2_CLXF", &SO2_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2_CLXF, "long_name", 47, "vertically intergrated external forcing for SO2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SO2_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SO2_SRF", &SO2_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2_SRF, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2_SRF, "long_name", 19, "SO2 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SO2_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SO2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOAG_CLXF", &SOAG_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_CLXF, "long_name", 48, "vertically intergrated external forcing for SOAG"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SOAG_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOAG_SRF", &SOAG_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_SRF, "units", 7, "mol/mol"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_SRF, "long_name", 20, "SOAG in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SOAG_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOAG_sfgaex1", &SOAG_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_sfgaex1, "long_name", 49, "SOAG gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOAG_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SOAG_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SOLIN", &SOLIN); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOLIN, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOLIN, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOLIN, "long_name", 16, "Solar insolation"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SOLIN, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SOLIN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SSAVIS", &SSAVIS); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, SSAVIS, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, SSAVIS, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSAVIS, "long_name", 29, "Aerosol singel-scatter albedo"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSAVIS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SSAVIS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SSTSFMBL", &SSTSFMBL); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSTSFMBL, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSTSFMBL, "long_name", 28, "Mobilization flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSTSFMBL, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SSTSFMBL;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SSTSFMBL_OM", &SSTSFMBL_OM); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSTSFMBL_OM, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSTSFMBL_OM, "long_name", 53, "Mobilization flux of marine organic matter at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SSTSFMBL_OM, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SSTSFMBL_OM;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SWCF", &SWCF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SWCF, "Sampling_Sequence", 8, "rad_lwsw"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SWCF, "units", 4, "W/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SWCF, "long_name", 23, "Shortwave cloud forcing"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, SWCF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = SWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "T", &T); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, T, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, T, "units", 1, "K"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, T, "long_name", 11, "Temperature"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, T, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = T;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUGWX", &TAUGWX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUGWX, "units", 4, "N/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUGWX, "long_name", 33, "Zonal gravity wave surface stress"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUGWX, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TAUGWX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUGWY", &TAUGWY); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUGWY, "units", 4, "N/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUGWY, "long_name", 38, "Meridional gravity wave surface stress"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUGWY, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TAUGWY;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUX", &TAUX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUX, "units", 4, "N/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUX, "long_name", 20, "Zonal surface stress"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUX, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TAUX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TAUY", &TAUY); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUY, "units", 4, "N/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUY, "long_name", 25, "Meridional surface stress"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TAUY, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TAUY;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TGCLDCWP", &TGCLDCWP); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDCWP, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDCWP, "long_name", 48, "Total grid-box cloud water path (liquid and ice)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDCWP, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TGCLDCWP;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TGCLDIWP", &TGCLDIWP); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDIWP, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDIWP, "long_name", 35, "Total grid-box cloud ice water path"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDIWP, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TGCLDIWP;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TGCLDLWP", &TGCLDLWP); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDLWP, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDLWP, "long_name", 38, "Total grid-box cloud liquid water path"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TGCLDLWP, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TGCLDLWP;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TH7001000", &TH7001000); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TH7001000, "units", 1, "K"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TH7001000, "long_name", 33, "Theta difference 700 mb - 1000 mb"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TH7001000, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TH7001000;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TMQ", &TMQ); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TMQ, "units", 5, "kg/m2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TMQ, "long_name", 48, "Total (vertically integrated) precipitable water"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TMQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TMQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TREFHT", &TREFHT); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TREFHT, "units", 1, "K"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TREFHT, "long_name", 28, "Reference height temperature"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TREFHT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TREFHT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TROP_P", &TROP_P); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, TROP_P, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, TROP_P, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TROP_P, "units", 2, "Pa"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TROP_P, "long_name", 19, "Tropopause Pressure"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TROP_P, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TROP_P;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TROP_T", &TROP_T); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, TROP_T, _FillValue, NC_FLOAT, 1, &fillv); ERR
+    err = SKIP_HDF5_PUT_ATT_FLOAT(ncid, TROP_T, "missing_value", NC_FLOAT, 1, &missv); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TROP_T, "units", 1, "K"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TROP_T, "long_name", 22, "Tropopause Temperature"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TROP_T, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TROP_T;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TS", &TS); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TS, "units", 1, "K"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TS, "long_name", 31, "Surface temperature (radiative)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TS, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TSMN", &TSMN); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TSMN, "units", 1, "K"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TSMN, "long_name", 46, "Minimum surface temperature over output period"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TSMN, "cell_methods", 13, "time: minimum"); ERR
+    varids[i++] = TSMN;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TSMX", &TSMX); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TSMX, "units", 1, "K"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TSMX, "long_name", 46, "Maximum surface temperature over output period"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TSMX, "cell_methods", 13, "time: maximum"); ERR
+    varids[i++] = TSMX;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TUH", &TUH); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TUH, "units", 3, "W/m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TUH, "long_name", 44, "Total (vertically integrated) zonal MSE flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TUH, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TUH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TUQ", &TUQ); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TUQ, "units", 6, "kg/m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TUQ, "long_name", 46, "Total (vertically integrated) zonal water flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TUQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TUQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TVH", &TVH); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TVH, "units", 3, "W/m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TVH, "long_name", 49, "Total (vertically integrated) meridional MSE flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TVH, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TVH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TVQ", &TVQ); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TVQ, "units", 6, "kg/m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TVQ, "long_name", 51, "Total (vertically integrated) meridional water flux"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, TVQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = TVQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "U", &U); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, U, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, U, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, U, "long_name", 10, "Zonal wind"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, U, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = U;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "U10", &U10); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, U10, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, U10, "long_name", 14, "10m wind speed"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, U10, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = U10;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "UU", &UU); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, UU, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, UU, "units", 5, "m2/s2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, UU, "long_name", 22, "Zonal velocity squared"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, UU, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = UU;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "V", &V); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, V, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, V, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, V, "long_name", 15, "Meridional wind"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, V, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = V;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VQ", &VQ); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, VQ, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VQ, "units", 8, "m/skg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VQ, "long_name", 26, "Meridional water transport"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VQ, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = VQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VT", &VT); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, VT, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VT, "units", 5, "K m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VT, "long_name", 25, "Meridional heat transport"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VT, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = VT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VU", &VU); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, VU, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VU, "units", 5, "m2/s2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VU, "long_name", 33, "Meridional flux of zonal momentum"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VU, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = VU;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VV", &VV); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, VV, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VV, "units", 5, "m2/s2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VV, "long_name", 27, "Meridional velocity squared"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, VV, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = VV;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WD_H2O2", &WD_H2O2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_H2O2, "units", 4, "kg/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_H2O2, "long_name", 31, "H2O2             wet deposition"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_H2O2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = WD_H2O2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WD_H2SO4", &WD_H2SO4); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_H2SO4, "units", 4, "kg/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_H2SO4, "long_name", 31, "H2SO4            wet deposition"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_H2SO4, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = WD_H2SO4;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WD_SO2", &WD_SO2); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_SO2, "units", 4, "kg/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_SO2, "long_name", 31, "SO2              wet deposition"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WD_SO2, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = WD_SO2;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "WSUB", &WSUB); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, WSUB, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WSUB, "units", 3, "m/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WSUB, "long_name", 37, "Diagnostic sub-grid vertical velocity"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, WSUB, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = WSUB;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Z3", &Z3); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, Z3, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Z3, "units", 1, "m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Z3, "long_name", 37, "Geopotential Height (above sea level)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, Z3, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = Z3;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "aero_water", &aero_water); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, aero_water, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, aero_water, "units", 1, "m"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, aero_water, "long_name", 70, "sum of aerosol water of interstitial modes wat_a1+wat_a2+wat_a3+wat_a4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, aero_water, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = aero_water;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "airFV", &airFV); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, airFV, "units", 4, "frac"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, airFV, "long_name", 2, "FV"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, airFV, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = airFV;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1DDF", &bc_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1DDF, "long_name", 49, "bc_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1SFWET", &bc_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1_SRF", &bc_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1_SRF, "long_name", 21, "bc_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a1_sfgaex1", &bc_a1_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1_sfgaex1, "long_name", 50, "bc_a1 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a3DDF", &bc_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3DDF, "long_name", 49, "bc_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a3SFWET", &bc_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a3_SRF", &bc_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3_SRF, "long_name", 21, "bc_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4DDF", &bc_a4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4DDF, "long_name", 49, "bc_a4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4SFWET", &bc_a4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4_CLXF", &bc_a4_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_CLXF, "long_name", 49, "vertically intergrated external forcing for bc_a4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a4_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4_SRF", &bc_a4_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_SRF, "long_name", 21, "bc_a4 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_a4_sfgaex1", &bc_a4_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_sfgaex1, "long_name", 50, "bc_a4 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c1DDF", &bc_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c1DDF, "long_name", 49, "bc_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c1SFWET", &bc_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c1SFWET, "long_name", 36, "bc_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c3DDF", &bc_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c3DDF, "long_name", 49, "bc_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c3SFWET", &bc_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c3SFWET, "long_name", 36, "bc_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c4DDF", &bc_c4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c4DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c4DDF, "long_name", 49, "bc_c4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "bc_c4SFWET", &bc_c4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c4SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c4SFWET, "long_name", 36, "bc_c4 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, bc_c4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = bc_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "chla", &chla); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, chla, "units", 6, "mg L-1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, chla, "long_name", 22, "ocean input data: chla"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, chla, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = chla;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1DDF", &dst_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1DDF, "long_name", 50, "dst_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1SF", &dst_a1SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1SF, "long_name", 28, "dst_a1 dust surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1SFWET", &dst_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a1_SRF", &dst_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1_SRF, "long_name", 22, "dst_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3DDF", &dst_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3DDF, "long_name", 50, "dst_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3SF", &dst_a3SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3SF, "long_name", 28, "dst_a3 dust surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a3SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3SFWET", &dst_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_a3_SRF", &dst_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3_SRF, "long_name", 22, "dst_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c1DDF", &dst_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c1DDF, "long_name", 50, "dst_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c1SFWET", &dst_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c1SFWET, "long_name", 37, "dst_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c3DDF", &dst_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c3DDF, "long_name", 50, "dst_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "dst_c3SFWET", &dst_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c3SFWET, "long_name", 37, "dst_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, dst_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = dst_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "hstobie_linoz", &hstobie_linoz); ERR
+    err = SKIP_HDF5_PUT_ATT_INT(ncid, hstobie_linoz, "mdims", NC_INT, 1, &mdims); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, hstobie_linoz, "units", 22, "fraction of model time"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, hstobie_linoz, "long_name", 27, "Lowest possible Linoz level"); ERR
+    varids[i++] = hstobie_linoz;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mlip", &mlip); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mlip, "units", 4, "uM C"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mlip, "long_name", 22, "ocean input data: mlip"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mlip, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mlip;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1DDF", &mom_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1DDF, "long_name", 50, "mom_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1SF", &mom_a1SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1SF, "long_name", 31, "mom_a1 seasalt surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1SFWET", &mom_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1_SRF", &mom_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1_SRF, "long_name", 22, "mom_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a1_sfgaex1", &mom_a1_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1_sfgaex1, "long_name", 51, "mom_a1 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2DDF", &mom_a2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2DDF, "long_name", 50, "mom_a2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2SF", &mom_a2SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2SF, "long_name", 31, "mom_a2 seasalt surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a2SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2SFWET", &mom_a2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a2_SRF", &mom_a2_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2_SRF, "long_name", 22, "mom_a2 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a2_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a3DDF", &mom_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3DDF, "long_name", 50, "mom_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a3SFWET", &mom_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a3_SRF", &mom_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3_SRF, "long_name", 22, "mom_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4DDF", &mom_a4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4DDF, "long_name", 50, "mom_a4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4SF", &mom_a4SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4SF, "long_name", 31, "mom_a4 seasalt surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a4SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4SFWET", &mom_a4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4_SRF", &mom_a4_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4_SRF, "long_name", 22, "mom_a4 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_a4_sfgaex1", &mom_a4_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4_sfgaex1, "long_name", 51, "mom_a4 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c1DDF", &mom_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c1DDF, "long_name", 50, "mom_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c1SFWET", &mom_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c1SFWET, "long_name", 37, "mom_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c2DDF", &mom_c2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c2DDF, "long_name", 50, "mom_c2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c2SFWET", &mom_c2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c2SFWET, "long_name", 37, "mom_c2 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c3DDF", &mom_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c3DDF, "long_name", 50, "mom_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c3SFWET", &mom_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c3SFWET, "long_name", 37, "mom_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c4DDF", &mom_c4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c4DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c4DDF, "long_name", 50, "mom_c4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mom_c4SFWET", &mom_c4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c4SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c4SFWET, "long_name", 37, "mom_c4 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mom_c4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mom_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mpoly", &mpoly); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mpoly, "units", 4, "uM C"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mpoly, "long_name", 23, "ocean input data: mpoly"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mpoly, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mpoly;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "mprot", &mprot); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mprot, "units", 4, "uM C"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mprot, "long_name", 23, "ocean input data: mprot"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, mprot, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = mprot;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1DDF", &ncl_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1DDF, "long_name", 50, "ncl_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1SF", &ncl_a1SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1SF, "long_name", 31, "ncl_a1 seasalt surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1SFWET", &ncl_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a1_SRF", &ncl_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1_SRF, "long_name", 22, "ncl_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2DDF", &ncl_a2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2DDF, "long_name", 50, "ncl_a2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2SF", &ncl_a2SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2SF, "long_name", 31, "ncl_a2 seasalt surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a2SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2SFWET", &ncl_a2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a2_SRF", &ncl_a2_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2_SRF, "long_name", 22, "ncl_a2 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a2_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3DDF", &ncl_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3DDF, "long_name", 50, "ncl_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3SF", &ncl_a3SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3SF, "long_name", 31, "ncl_a3 seasalt surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a3SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3SFWET", &ncl_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_a3_SRF", &ncl_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3_SRF, "long_name", 22, "ncl_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c1DDF", &ncl_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c1DDF, "long_name", 50, "ncl_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c1SFWET", &ncl_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c1SFWET, "long_name", 37, "ncl_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c2DDF", &ncl_c2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c2DDF, "long_name", 50, "ncl_c2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c2SFWET", &ncl_c2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c2SFWET, "long_name", 37, "ncl_c2 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c3DDF", &ncl_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c3DDF, "long_name", 50, "ncl_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "ncl_c3SFWET", &ncl_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c3SFWET, "long_name", 37, "ncl_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, ncl_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = ncl_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1DDF", &num_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1DDF, "long_name", 50, "num_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1SF", &num_a1SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1SF, "long_name", 28, "num_a1 dust surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a1SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1SFWET", &num_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1_CLXF", &num_a1_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_CLXF, "long_name", 50, "vertically intergrated external forcing for num_a1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a1_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1_SRF", &num_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_SRF, "units", 5, " 1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_SRF, "long_name", 22, "num_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a1_sfgaex1", &num_a1_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_sfgaex1, "long_name", 51, "num_a1 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2DDF", &num_a2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2DDF, "long_name", 50, "num_a2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2SFWET", &num_a2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2_CLXF", &num_a2_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2_CLXF, "long_name", 50, "vertically intergrated external forcing for num_a2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a2_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a2_SRF", &num_a2_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2_SRF, "units", 5, " 1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2_SRF, "long_name", 22, "num_a2 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a2_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3DDF", &num_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3DDF, "long_name", 50, "num_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3SF", &num_a3SF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3SF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3SF, "long_name", 28, "num_a3 dust surface emission"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3SF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a3SF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3SFWET", &num_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a3_SRF", &num_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3_SRF, "units", 5, " 1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3_SRF, "long_name", 22, "num_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4DDF", &num_a4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4DDF, "long_name", 50, "num_a4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4SFWET", &num_a4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4_CLXF", &num_a4_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_CLXF, "long_name", 50, "vertically intergrated external forcing for num_a4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a4_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4_SRF", &num_a4_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_SRF, "units", 5, " 1/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_SRF, "long_name", 22, "num_a4 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_a4_sfgaex1", &num_a4_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_sfgaex1, "long_name", 51, "num_a4 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c1DDF", &num_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c1DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c1DDF, "long_name", 50, "num_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c1SFWET", &num_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c1SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c1SFWET, "long_name", 37, "num_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c2DDF", &num_c2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c2DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c2DDF, "long_name", 50, "num_c2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c2SFWET", &num_c2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c2SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c2SFWET, "long_name", 37, "num_c2 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c3DDF", &num_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c3DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c3DDF, "long_name", 50, "num_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c3SFWET", &num_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c3SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c3SFWET, "long_name", 37, "num_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c4DDF", &num_c4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c4DDF, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c4DDF, "long_name", 50, "num_c4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "num_c4SFWET", &num_c4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c4SFWET, "units", 7, " 1/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c4SFWET, "long_name", 37, "num_c4 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, num_c4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = num_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1DDF", &pom_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1DDF, "long_name", 50, "pom_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1SFWET", &pom_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1_SRF", &pom_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1_SRF, "long_name", 22, "pom_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a1_sfgaex1", &pom_a1_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1_sfgaex1, "long_name", 51, "pom_a1 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a3DDF", &pom_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3DDF, "long_name", 50, "pom_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a3SFWET", &pom_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a3_SRF", &pom_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3_SRF, "long_name", 22, "pom_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4DDF", &pom_a4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4DDF, "long_name", 50, "pom_a4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4SFWET", &pom_a4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4_CLXF", &pom_a4_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_CLXF, "long_name", 50, "vertically intergrated external forcing for pom_a4"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a4_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4_SRF", &pom_a4_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_SRF, "long_name", 22, "pom_a4 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a4_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_a4_sfgaex1", &pom_a4_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_sfgaex1, "long_name", 51, "pom_a4 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_a4_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_a4_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c1DDF", &pom_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c1DDF, "long_name", 50, "pom_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c1SFWET", &pom_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c1SFWET, "long_name", 37, "pom_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c3DDF", &pom_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c3DDF, "long_name", 50, "pom_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c3SFWET", &pom_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c3SFWET, "long_name", 37, "pom_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c4DDF", &pom_c4DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c4DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c4DDF, "long_name", 50, "pom_c4 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c4DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_c4DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "pom_c4SFWET", &pom_c4SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c4SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c4SFWET, "long_name", 37, "pom_c4 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, pom_c4SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = pom_c4SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1DDF", &so4_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1DDF, "long_name", 50, "so4_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1SFWET", &so4_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1_CLXF", &so4_a1_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_CLXF, "long_name", 50, "vertically intergrated external forcing for so4_a1"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a1_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1_SRF", &so4_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_SRF, "long_name", 22, "so4_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a1_sfgaex1", &so4_a1_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_sfgaex1, "long_name", 51, "so4_a1 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2DDF", &so4_a2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2DDF, "long_name", 50, "so4_a2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2SFWET", &so4_a2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2_CLXF", &so4_a2_CLXF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_CLXF, "units", 11, "molec/cm2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_CLXF, "long_name", 50, "vertically intergrated external forcing for so4_a2"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_CLXF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a2_CLXF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2_SRF", &so4_a2_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_SRF, "long_name", 22, "so4_a2 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a2_sfgaex1", &so4_a2_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_sfgaex1, "long_name", 51, "so4_a2 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a2_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a2_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3DDF", &so4_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3DDF, "long_name", 50, "so4_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3SFWET", &so4_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3_SRF", &so4_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3_SRF, "long_name", 22, "so4_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_a3_sfgaex1", &so4_a3_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3_sfgaex1, "long_name", 51, "so4_a3 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_a3_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_a3_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c1DDF", &so4_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c1DDF, "long_name", 50, "so4_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c1SFWET", &so4_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c1SFWET, "long_name", 37, "so4_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c2DDF", &so4_c2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c2DDF, "long_name", 50, "so4_c2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c2SFWET", &so4_c2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c2SFWET, "long_name", 37, "so4_c2 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c3DDF", &so4_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c3DDF, "long_name", 50, "so4_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "so4_c3SFWET", &so4_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c3SFWET, "long_name", 37, "so4_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, so4_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = so4_c3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1DDF", &soa_a1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1DDF, "long_name", 50, "soa_a1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1SFWET", &soa_a1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1_SRF", &soa_a1_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1_SRF, "long_name", 22, "soa_a1 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a1_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a1_sfgaex1", &soa_a1_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1_sfgaex1, "long_name", 51, "soa_a1 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a1_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a1_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2DDF", &soa_a2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2DDF, "long_name", 50, "soa_a2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2SFWET", &soa_a2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2_SRF", &soa_a2_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2_SRF, "long_name", 22, "soa_a2 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a2_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a2_sfgaex1", &soa_a2_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2_sfgaex1, "long_name", 51, "soa_a2 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a2_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a2_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3DDF", &soa_a3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3DDF, "long_name", 50, "soa_a3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3SFWET", &soa_a3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3SFWET, "long_name", 30, "Wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a3SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3_SRF", &soa_a3_SRF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3_SRF, "units", 5, "kg/kg"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3_SRF, "long_name", 22, "soa_a3 in bottom layer"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3_SRF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a3_SRF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_a3_sfgaex1", &soa_a3_sfgaex1); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3_sfgaex1, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3_sfgaex1, "long_name", 51, "soa_a3 gas-aerosol-exchange primary column tendency"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_a3_sfgaex1, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_a3_sfgaex1;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c1DDF", &soa_c1DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c1DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c1DDF, "long_name", 50, "soa_c1 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c1DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_c1DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c1SFWET", &soa_c1SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c1SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c1SFWET, "long_name", 37, "soa_c1 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c1SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_c1SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c2DDF", &soa_c2DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c2DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c2DDF, "long_name", 50, "soa_c2 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c2DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_c2DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c2SFWET", &soa_c2SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c2SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c2SFWET, "long_name", 37, "soa_c2 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c2SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_c2SFWET;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c3DDF", &soa_c3DDF); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c3DDF, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c3DDF, "long_name", 50, "soa_c3 dry deposition flux at bottom (grav + turb)"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c3DDF, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_c3DDF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "soa_c3SFWET", &soa_c3SFWET); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c3SFWET, "units", 7, "kg/m2/s"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c3SFWET, "long_name", 37, "soa_c3 wet deposition flux at surface"); ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT(ncid, soa_c3SFWET, "cell_methods", 10, "time: mean"); ERR
+    varids[i++] = soa_c3SFWET;
+
+    assert(i == nvars);
+
+fn_exit:
+    return nerrs;
+}
+
+
+/*----< def_F_case_h0() >----------------------------------------------------*/
+int def_F_case_h0_hdf5(hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids)  /* variable IDs */
 {
     /* Total 414 variables */
     int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date, datesec, time_bnds,
@@ -10863,10 +14375,267 @@ fn_exit:
 }
 
 /*----< def_F_case_h1() >----------------------------------------------------*/
-int def_F_case_h1_hdf5 (hid_t ncid,               /* file ID */
-                        const MPI_Offset dims[2], /* dimension sizes */
-                        int nvars,                /* number of variables */
-                        int *varids)              /* variable IDs */
+int def_F_case_h1_hdf5_mpi(hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids)  /* variable IDs */
+{
+    /* Total 51 variables */
+    int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date,
+        datesec, time_bnds, date_written, time_written, ndbase, nsbase, nbdate,
+        nbsec, mdt, ndcur, nscur, co2vmr, ch4vmr, n2ovmr, f11vmr, f12vmr,
+	sol_tsi, nsteph, CLDHGH, CLDLOW, CLDMED, FLNT, LWCF, OMEGA500,
+	OMEGA850, PRECT, PS, SWCF, T850, TMQ, TS, U, U250, U850, UBOT, V250,
+        V850, VBOT, Z500;
+
+    int i, err, nerrs=0, dimids[3], iattr, mdims=1;
+    int dim_ncol, dim_time, dim_nbnd, dim_chars, dim_lev, dim_ilev;
+
+    /* define dimensions */
+    err = hdf5_def_dim_mpi(dims[1],      &dim_ncol); ERR
+    err = hdf5_def_dim_mpi(NC_UNLIMITED, &dim_time); ERR
+    err = hdf5_def_dim_mpi(2,           &dim_nbnd); ERR
+    err = hdf5_def_dim_mpi(8,           &dim_chars); ERR
+    err = hdf5_def_dim_mpi(dims[0],     &dim_lev); ERR
+    err = hdf5_def_dim_mpi(dims[0]+1,   &dim_ilev); ERR
+
+    i = 0;
+
+    /* define variables */
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "lat", &lat); ERR
+    varids[i++] = lat;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "lon", &lon); ERR
+    varids[i++] = lon;
+
+    dimids[0] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "area", &area); ERR
+    varids[i++] = area;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "lev", &lev); ERR
+    varids[i++] = lev;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "hyam", &hyam); ERR
+    varids[i++] = hyam;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "hybm", &hybm); ERR
+    varids[i++] = hybm;
+
+    dimids[0] = dim_lev;
+    err = hdf5_def_var_mpi(ncid, "P0", &P0); ERR
+    varids[i++] = P0;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "ilev", &ilev); ERR
+    varids[i++] = ilev;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "hyai", &hyai); ERR
+    varids[i++] = hyai;
+
+    dimids[0] = dim_ilev;
+    err = hdf5_def_var_mpi(ncid, "hybi", &hybi); ERR
+    varids[i++] = hybi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "time", &time); ERR
+    varids[i++] = time;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "date", &date); ERR
+    varids[i++] = date;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "datesec", &datesec); ERR
+    varids[i++] = datesec;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_nbnd;
+    err = hdf5_def_var_mpi(ncid, "time_bnds", &time_bnds); ERR
+    varids[i++] = time_bnds;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var_mpi(ncid, "date_written", &date_written); ERR
+    varids[i++] = date_written;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_chars;
+    err = hdf5_def_var_mpi(ncid, "time_written", &time_written); ERR
+    varids[i++] = time_written;
+
+    err = hdf5_def_var_mpi(ncid, "ndbase", &ndbase); ERR
+    varids[i++] = ndbase;
+    err = hdf5_def_var_mpi(ncid, "nsbase", &nsbase); ERR
+    varids[i++] = nsbase;
+
+    err = hdf5_def_var_mpi(ncid, "nbdate", &nbdate); ERR
+    varids[i++] = nbdate;
+
+    err = hdf5_def_var_mpi(ncid, "nbsec", &nbsec); ERR
+    varids[i++] = nbsec;
+
+    err = hdf5_def_var_mpi(ncid, "mdt", &mdt); ERR
+    varids[i++] = mdt;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "ndcur", &ndcur); ERR
+    varids[i++] = ndcur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "nscur", &nscur); ERR
+    varids[i++] = nscur;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "co2vmr", &co2vmr); ERR
+    varids[i++] = co2vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "ch4vmr", &ch4vmr); ERR
+    varids[i++] = ch4vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "n2ovmr", &n2ovmr); ERR
+    varids[i++] = n2ovmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "f11vmr", &f11vmr); ERR
+    varids[i++] = f11vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "f12vmr", &f12vmr); ERR
+    varids[i++] = f12vmr;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "sol_tsi", &sol_tsi); ERR
+    varids[i++] = sol_tsi;
+
+    dimids[0] = dim_time;
+    err = hdf5_def_var_mpi(ncid, "nsteph", &nsteph); ERR
+    varids[i++] = nsteph;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDHGH", &CLDHGH); ERR
+    varids[i++] = CLDHGH;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDLOW", &CLDLOW); ERR
+    varids[i++] = CLDLOW;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "CLDMED", &CLDMED); ERR
+    varids[i++] = CLDMED;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "FLNT", &FLNT); ERR
+    varids[i++] = FLNT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "LWCF", &LWCF); ERR
+    varids[i++] = LWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGA500", &OMEGA500); ERR
+    varids[i++] = OMEGA500;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "OMEGA850", &OMEGA850); ERR
+    varids[i++] = OMEGA850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PRECT", &PRECT); ERR
+    varids[i++] = PRECT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "PS", &PS); ERR
+    varids[i++] = PS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "SWCF", &SWCF); ERR
+    varids[i++] = SWCF;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "T850", &T850); ERR
+    varids[i++] = T850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TMQ", &TMQ); ERR
+    varids[i++] = TMQ;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "TS", &TS); ERR
+    varids[i++] = TS;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_lev;
+    dimids[2] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "U", &U); ERR
+    varids[i++] = U;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "U250", &U250); ERR
+    varids[i++] = U250;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "U850", &U850); ERR
+    varids[i++] = U850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "UBOT", &UBOT); ERR
+    varids[i++] = UBOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "V250", &V250); ERR
+    varids[i++] = V250;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "V850", &V850); ERR
+    varids[i++] = V850;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "VBOT", &VBOT); ERR
+    varids[i++] = VBOT;
+
+    dimids[0] = dim_time;
+    dimids[1] = dim_ncol;
+    err = hdf5_def_var_mpi(ncid, "Z500", &Z500); ERR
+    varids[i++] = Z500;
+
+    assert(i == nvars);
+
+fn_exit:
+    return nerrs;
+}
+
+/*----< def_F_case_h1() >----------------------------------------------------*/
+int def_F_case_h1_hdf5(hid_t               ncid,    /* file ID */
+                  const MPI_Offset  dims[2], /* dimension sizes */
+                  int               nvars,   /* number of variables */
+                  int              *varids)  /* variable IDs */
 {
     /* Total 51 variables */
     int lat, lon, area, lev, hyam, hybm, P0, ilev, hyai, hybi, time, date, datesec, time_bnds,

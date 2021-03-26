@@ -23,8 +23,23 @@
 #endif
 #include <sys/stat.h>
 
+int hdf5_put_varn_mpi (int vid,
+                   MPI_Datatype mpitype,
+                   hid_t dxplid,
+                   int cnt,
+                   int max_cnt,
+                   MPI_Offset **mstarts,
+                   MPI_Offset **mcounts,
+                   void *buf);
+
+int flush_multidatasets();
+int dataspace_recycle_all();
+int memspace_recycle_all();
+
+
 /*----< write_small_vars_F_case_hdf5() >------------------------------------------*/
 static int write_small_vars_F_case_hdf5 (hid_t ncid,
+                                         int rank,
                                          int vid, /* starting variable ID */
                                          int *varids,
                                          hsize_t rec_no,
@@ -42,7 +57,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     /* scalar and small variables are written by rank 0 only */
     i = vid;
 
-    if (rec_no == 0) {
+    if (rec_no == 0 && rank == 0) {
         /* lev */
         err = HDF5_IPUT_VAR_DOUBLE (ncid, varids[i++], *dbl_buf, NULL);
         ERR
@@ -76,17 +91,17 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
 
     /* time */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* date */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* datesec */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* time_bnds */
@@ -94,7 +109,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     start[1] = 0;
     count[0] = 1;
     count[1] = nbnd;
-    err      = HDF5_IPUT_VARA_DOUBLE (ncid, varids[i++], start, count, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VARA_DOUBLE_MPI (ncid, varids[i++], start, count, *dbl_buf, rank);
     ERR
     *dbl_buf += nbnd + gap;
     /* date_written */
@@ -102,7 +117,7 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     start[1] = 0;
     count[0] = 1;
     count[1] = nchars;
-    err      = HDF5_IPUT_VARA_TEXT (ncid, varids[i++], start, count, *txt_buf, NULL);
+    err      = HDF5_IPUT_VARA_TEXT_MPI (ncid, varids[i++], start, count, *txt_buf, rank);
     ERR
     *txt_buf += nchars;
     /* time_written */
@@ -110,11 +125,11 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
     start[1] = 0;
     count[0] = 1;
     count[1] = nchars;
-    err      = HDF5_IPUT_VARA_TEXT (ncid, varids[i++], start, count, *txt_buf, NULL);
+    err      = HDF5_IPUT_VARA_TEXT_MPI (ncid, varids[i++], start, count, *txt_buf, rank);
     ERR
     *txt_buf += nchars;
 
-    if (rec_no == 0) {
+    if (rec_no == 0 && rank == 0) {
         /* ndbase */
         err = HDF5_IPUT_VAR_INT (ncid, varids[i++], *int_buf, NULL);
         ERR
@@ -140,47 +155,47 @@ static int write_small_vars_F_case_hdf5 (hid_t ncid,
 
     /* ndcur */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* nscur */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
     /* co2vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* ch4vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* n2ovmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* f11vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* f12vmr */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* sol_tsi */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_DOUBLE (ncid, varids[i++], start, *dbl_buf, NULL);
+    err      = HDF5_IPUT_VAR1_DOUBLE_MPI (ncid, varids[i++], start, *dbl_buf, rank);
     ERR
     *dbl_buf += 1 + gap;
     /* nsteph */
     start[0] = rec_no;
-    err      = HDF5_IPUT_VAR1_INT (ncid, varids[i++], start, *int_buf, NULL);
+    err      = HDF5_IPUT_VAR1_INT_MPI (ncid, varids[i++], start, *int_buf, rank);
     ERR
     *int_buf += 1;
 fn_exit:
@@ -202,7 +217,6 @@ static int read_small_vars_F_case_hdf5 (hid_t ncid,
                                         double **dbl_buf) {
     int i, err, nerrs = 0;
     hsize_t start[2], count[2];
-
     /* scalar and small variables are written by rank 0 only */
     i = vid;
 
@@ -462,11 +476,14 @@ fn_exit:
         }                                                                                          \
         nreqs = k + 1;                                                                             \
     }
-
-#define POST_VARN(k, num, vid)                                                                     \
-    for (j = 0; j < num; j++) {                                                                    \
+/*
         err = HDF5_IPUT_VARN (ncid, vid + j, xnreqs[k - 1], starts_D##k, counts_D##k, rec_buf_ptr, \
                               -1, REC_ITYPE, NULL);                                                \
+*/
+
+#define POST_VARN(k, num, vid)                                                            \
+    for (j = 0; j < num; j++) {                                                                    \
+        hdf5_put_varn_mpi (vid + j, REC_ITYPE, dxplid_coll, xnreqs[k - 1], max_cnt[k - 1], starts_D##k, counts_D##k, rec_buf_ptr);\
         ERR                                                                                        \
         rec_buf_ptr += nelems[k - 1] + gap;                                                        \
         my_nreqs += xnreqs[k - 1];                                                                 \
@@ -493,13 +510,13 @@ int run_varn_F_case_hdf5 (
 {
     char outfname[512], *txt_buf_ptr;
     herr_t herr;
-    hid_t ncid, faplid;
+    hid_t ncid, faplid, faplid_indp, fcplid_indp;
     int i, j, k, err, nerrs = 0, rank, cmode, *varids, nvars_D[3];
-    int rec_no, gap = 0, my_nreqs, *int_buf_ptr, xnreqs[3];
+    int rec_no, gap = 0, my_nreqs, *int_buf_ptr, xnreqs[3], max_cnt[3];
     size_t dbl_buflen, rec_buflen, nelems[3];
     itype *rec_buf  = NULL, *rec_buf_ptr;
     double *dbl_buf = NULL, *dbl_buf_ptr;
-    double pre_timing, open_timing, post_timing, wait_timing, close_timing;
+    double pre_timing, open_timing, metadata_timing, post_timing, small_coll_timing, wait_timing, close_timing, small_write_timing;
     double timing, total_timing, max_timing;
     MPI_Offset tmp, metadata_size, put_size, total_size, max_nreqs, total_nreqs;
     MPI_Offset **starts_D2 = NULL, **counts_D2 = NULL;
@@ -514,6 +531,7 @@ int run_varn_F_case_hdf5 (
     post_timing  = 0.0;
     wait_timing  = 0.0;
     close_timing = 0.0;
+    small_write_timing = .0;
 
     MPI_Comm_rank (io_comm, &rank);
 
@@ -557,6 +575,7 @@ int run_varn_F_case_hdf5 (
         for (i = 0; i < rec_buflen; i++) rec_buf[i] = rank;
         for (i = 0; i < 10; i++) int_buf[i] = rank;
         for (i = 0; i < 16; i++) txt_buf[i] = 'a' + rank;
+
     }
 
     pre_timing = MPI_Wtime () - pre_timing;
@@ -570,6 +589,65 @@ int run_varn_F_case_hdf5 (
     err = hdf5_wrap_init ();
     ERR;
 
+
+    // We are going to let rank 0 to handle datasets init and attributes alone.
+    if (!rank) {
+        faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
+        fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
+        ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, fcplid_indp, faplid_indp);
+        if (nvars == 414) {
+            /* for h0 file */
+            err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);
+            ERR
+        } else {
+            /* for h1 file */
+            err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
+            ERR
+        }
+        /* exit define mode and enter data mode */
+        err = HDF5_NOP1 (ncid);
+        ERR
+        herr = hdf5_close_vars (ncid);
+        H5Pclose(faplid_indp);
+        H5Pclose(fcplid_indp);
+        H5Fclose(ncid);
+    }
+    metadata_timing += MPI_Wtime() - timing;
+    MPI_Barrier(io_comm);
+
+    // Now collectively open the datasets just created
+
+    timing = MPI_Wtime ();
+    faplid = H5Pcreate (H5P_FILE_ACCESS);
+    H5Pset_fapl_mpio (faplid, io_comm, info);
+    H5Pset_all_coll_metadata_ops (faplid, 1);
+    ncid = H5Fopen (outfname, H5F_ACC_RDWR, faplid);
+
+    if (nvars == 414) {
+        //for h0 file
+        err = def_F_case_h0_hdf5_mpi (ncid, dims[2], nvars, varids);
+        ERR
+    } else {
+        //for h1 file
+        err = def_F_case_h1_hdf5_mpi (ncid, dims[2], nvars, varids);
+        ERR
+    }
+    err = HDF5_NOP1 (ncid);
+    ERR
+    CHECK_HID (ncid)
+/*
+    herr = hdf5_close_vars (ncid);
+    HERR;
+
+    herr = H5Fclose (ncid);
+    HERR;
+    herr = H5Pclose (faplid);
+    HERR;
+    hdf5_wrap_finalize ();
+    return 0;
+*/
+
+/*
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL
     H5Pset_fapl_mpio (faplid, io_comm, info);
@@ -580,38 +658,25 @@ int run_varn_F_case_hdf5 (
     // Create file
     ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, H5P_DEFAULT, faplid);
     CHECK_HID (ncid)
-
+*/
     /* define dimensions, variables, and attributes */
-    if (nvars == 414) {
-        /* for h0 file */
-        err = def_F_case_h0_hdf5 (ncid, dims[2], nvars, varids);
-        ERR
-    } else {
-        /* for h1 file */
-        err = def_F_case_h1_hdf5 (ncid, dims[2], nvars, varids);
-        ERR
-    }
-
-    /* exit define mode and enter data mode */
-    err = HDF5_NOP1 (ncid);
-    ERR
-
     /* I/O amount so far */
     // err = HDF5_INQ_PUT_SIZE (ncid, &metadata_size); ERR
+    open_timing += MPI_Wtime () - timing;
 
     stat (outfname, &file_stat);
     metadata_size = file_stat.st_size;
 
     err = HDF5_INQ_FILE_INFO (ncid, &info_used);
     ERR
-    open_timing += MPI_Wtime () - timing;
+
 
     MPI_Barrier (io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime ();
 
     i           = 0;
     dbl_buf_ptr = dbl_buf;
-
+    MPI_Allreduce(xnreqs, max_cnt, 3, MPI_INT, MPI_MAX, io_comm);
     if (xnreqs[1] > 0) {
         /* lat */
         MPI_Offset **fix_starts_D2, **fix_counts_D2;
@@ -621,17 +686,36 @@ int run_varn_F_case_hdf5 (
         FIX_1D_VAR_STARTS_COUNTS (fix_starts_D2, fix_counts_D2, num, disps[1], blocklens[1])
 
         REC_2D_VAR_STARTS_COUNTS (0, starts_D2, counts_D2, xnreqs[1], disps[1], blocklens[1])
-
+/*
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
                               dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL);
+*/
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   xnreqs[1],
+                   max_cnt[1],
+                   fix_starts_D2,
+                   fix_counts_D2,
+                   dbl_buf_ptr);
         ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
         nvars_D[1]++;
 
         /* lon */
+/*
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[1], fix_starts_D2, fix_counts_D2,
                               dbl_buf_ptr, nelems[1], MPI_DOUBLE, NULL);
+*/
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   xnreqs[1],
+                   max_cnt[1],
+                   fix_starts_D2,
+                   fix_counts_D2,
+                   dbl_buf_ptr);
         ERR
         dbl_buf_ptr += nelems[1] + gap;
         my_nreqs += xnreqs[1];
@@ -639,9 +723,10 @@ int run_varn_F_case_hdf5 (
 
         free (fix_starts_D2[0]);
         free (fix_starts_D2);
-    } else
+    } else {
         i += 2;
-
+    }
+    flush_multidatasets();
     /* area */
     if (xnreqs[0] > 0) {
         MPI_Offset **fix_starts_D1, **fix_counts_D1;
@@ -649,9 +734,18 @@ int run_varn_F_case_hdf5 (
         /* construct varn API arguments starts[][] and counts[][] */
         FIX_1D_VAR_STARTS_COUNTS (fix_starts_D1, fix_counts_D1, xnreqs[0], disps[0], blocklens[0])
         nvars_D[0]++;
-
+/*
         err = HDF5_IPUT_VARN (ncid, varids[i++], xnreqs[0], fix_starts_D1, fix_counts_D1,
                               dbl_buf_ptr, nelems[0], MPI_DOUBLE, NULL);
+*/
+        hdf5_put_varn_mpi (varids[i++],
+                   MPI_DOUBLE,
+                   dxplid_coll,
+                   xnreqs[0],
+                   max_cnt[0],
+                   fix_starts_D1,
+                   fix_counts_D1,
+                   dbl_buf_ptr);
         ERR
         dbl_buf_ptr += nelems[0] + gap;
         my_nreqs += xnreqs[0];
@@ -659,15 +753,16 @@ int run_varn_F_case_hdf5 (
 
         free (fix_starts_D1[0]);
         free (fix_starts_D1);
-    } else
+    } else {
         i++;
-
+    }
+    flush_multidatasets();
     /* construct varn API arguments starts[][] and counts[][] */
     if (xnreqs[2] > 0)
         REC_3D_VAR_STARTS_COUNTS (0, starts_D3, counts_D3, xnreqs[2], disps[2], blocklens[2],
                                   dims[2][1])
 
-    post_timing += MPI_Wtime () - timing;
+    small_coll_timing += MPI_Wtime () - timing;
 
     for (rec_no = 0; rec_no < num_recs; rec_no++) {
         MPI_Barrier (io_comm); /*-----------------------------------------*/
@@ -677,37 +772,38 @@ int run_varn_F_case_hdf5 (
         dbl_buf_ptr = dbl_buf + nelems[1] * 2 + nelems[0] + gap * 3;
         int_buf_ptr = int_buf;
         txt_buf_ptr = txt_buf;
-
         /* next 27 small variables are written by rank 0 only */
-        if (rank == 0) {
+        //if (rank == 0) {
             my_nreqs += 27;
             /* post nonblocking requests using HDF5_IPUT_VARN() */
-            err = write_small_vars_F_case_hdf5 (ncid, i, varids, rec_no, gap, dims[2][0],
+
+            err = write_small_vars_F_case_hdf5 (ncid, rank, i, varids, rec_no, gap, dims[2][0],
                                                 dims[2][0] + 1, 2, 8, &int_buf_ptr, &txt_buf_ptr,
                                                 &dbl_buf_ptr);
+
             ERR
-        }
+        //}
+
+        flush_multidatasets();
+        small_write_timing += MPI_Wtime () - timing;
         i += 27;
 
-        post_timing += MPI_Wtime () - timing;
-
         MPI_Barrier (io_comm); /*-----------------------------------------*/
-        timing = MPI_Wtime ();
 
         /* flush fixed-size and small variables */
+        timing = MPI_Wtime ();
         err = HDF5_WAIT_ALL (ncid, NC_REQ_ALL, NULL, NULL);
         ERR
 
         wait_timing += MPI_Wtime () - timing;
 
-        MPI_Barrier (io_comm); /*-----------------------------------------*/
+        //MPI_Barrier (io_comm); /*-----------------------------------------*/
         timing = MPI_Wtime ();
 
         rec_buf_ptr = rec_buf;
 
         for (j = 0; j < xnreqs[1]; j++) starts_D2[j][0] = rec_no;
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
-
         if (nvars == 414) {
             if (two_buf) {
                 /* write 2D variables */
@@ -826,11 +922,15 @@ int run_varn_F_case_hdf5 (
                 POST_VARN (2, 7, 44)  /* U250 ... Z500 */
             }
         }
-
         post_timing += MPI_Wtime () - timing;
 
         MPI_Barrier (io_comm); /*-----------------------------------------*/
+
         timing = MPI_Wtime ();
+
+        flush_multidatasets();
+        dataspace_recycle_all();
+        memspace_recycle_all();
 
         err = HDF5_WAIT_ALL (ncid, NC_REQ_ALL, NULL, NULL);
         ERR
@@ -854,7 +954,7 @@ int run_varn_F_case_hdf5 (
     // put_size = total_size - metadata_size;
     stat (outfname, &file_stat);
     total_size = file_stat.st_size;
-    put_size   = total_size - metadata_size;
+    put_size   = total_size;
 
     if (starts_D3 != NULL) {
         free (starts_D3[0]);
@@ -879,10 +979,16 @@ int run_varn_F_case_hdf5 (
     // total_size = tmp;
     MPI_Reduce (&open_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     open_timing = max_timing;
+    MPI_Reduce (&metadata_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
+    metadata_timing = max_timing;
     MPI_Reduce (&pre_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     pre_timing = max_timing;
     MPI_Reduce (&post_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     post_timing = max_timing;
+    MPI_Reduce (&small_write_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
+    small_write_timing = max_timing;
+    MPI_Reduce (&small_coll_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
+    small_coll_timing = max_timing;
     MPI_Reduce (&wait_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     wait_timing = max_timing;
     MPI_Reduce (&close_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
@@ -910,10 +1016,13 @@ int run_varn_F_case_hdf5 (
         printf ("#%%$: total_write_amount: %lf\n", (double)total_size / 1048576);
         printf ("Total number of requests           = %lld\n", total_nreqs);
         printf ("Max number of requests             = %lld\n", max_nreqs);
-        printf ("Max Time of open + metadata define = %.4f sec\n", open_timing);
+        printf ("Max Time of metadata define        = %.4f sec\n", metadata_timing);
+        printf ("Max Time of open                   = %.4f sec\n", open_timing);
         printf ("Max Time of I/O preparing          = %.4f sec\n", pre_timing);
-        printf ("Max Time of HDF5_IPUT_VARN        = %.4f sec\n", post_timing);
-        printf ("Max Time of HDF5_WAIT_ALL         = %.4f sec\n", wait_timing);
+        printf ("Max Time of HDF5_IPUT_VARN         = %.4f sec\n", post_timing);
+        printf ("Max Time of HDF5 small writes      = %.4f sec\n", small_write_timing);
+        printf ("Max Time of HDF5 coll writes       = %.4f sec\n", small_coll_timing);
+        printf ("Max Time of HDF5_WAIT_ALL          = %.4f sec\n", wait_timing);
         printf ("Max Time of close                  = %.4f sec\n", close_timing);
         printf ("Max Time of TOTAL                  = %.4f sec\n", total_timing);
         printf ("#%%$: open_and_def_time_max: %lf\n", open_timing);

@@ -750,10 +750,10 @@ int run_varn_G_case_hdf5 (
     MPI_Reduce (&total_nreqs, &max_nreqs, 1, MPI_OFFSET, MPI_MAX, 0, io_comm);
     MPI_Reduce (&total_nreqs, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
     total_nreqs = tmp;
-    //MPI_Reduce (&put_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
-    //put_size = tmp;
-    //MPI_Reduce (&total_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
-    //total_size = tmp;
+    // MPI_Reduce (&put_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
+    // put_size = tmp;
+    // MPI_Reduce (&total_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, io_comm);
+    // total_size = tmp;
     MPI_Reduce (&open_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
     open_timing = max_timing;
     MPI_Reduce (&pre_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, io_comm);
@@ -981,7 +981,8 @@ int run_varn_G_case_rd_hdf5 (
     }
 
     // printf("Rank: %d, nelems = [%lld, %lld, %lld, %lld, %lld, %lld], rec_buflen = %lld\n", rank,
-    // nelems[0], nelems[1], nelems[2], nelems[3], nelems[4], nelems[5], rec_buflen); fflush(stdout);
+    // nelems[0], nelems[1], nelems[2], nelems[3], nelems[4], nelems[5], rec_buflen);
+    // fflush(stdout);
 
     /* allocate and initialize write buffer for 7 fixed-size variables */
     /* int (nCells): maxLevelCell */
@@ -1388,10 +1389,10 @@ int run_varn_G_case_rd_hdf5 (
     MPI_Reduce (&total_nreqs, &max_nreqs, 1, MPI_OFFSET, MPI_MAX, 0, comm);
     MPI_Reduce (&total_nreqs, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, comm);
     total_nreqs = tmp;
-    //MPI_Reduce (&get_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, comm);
-    //get_size = tmp;
-    //MPI_Reduce (&total_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, comm);
-    //total_size = tmp;
+    // MPI_Reduce (&get_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, comm);
+    // get_size = tmp;
+    // MPI_Reduce (&total_size, &tmp, 1, MPI_OFFSET, MPI_SUM, 0, comm);
+    // total_size = tmp;
     MPI_Reduce (&open_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, comm);
     open_timing = max_timing;
     MPI_Reduce (&pre_timing, &max_timing, 1, MPI_DOUBLE, MPI_MAX, 0, comm);

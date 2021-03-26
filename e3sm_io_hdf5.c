@@ -325,7 +325,7 @@ int hdf5_put_varn (int vid,
     // Convert starts and counts;
     starts    = (hsize_t **)malloc (sizeof (hsize_t *) * cnt * 2);
     counts    = starts + cnt;
-    starts[0] = (hsize_t *)malloc (sizeof (hsize_t ) * cnt * ndim * 2);
+    starts[0] = (hsize_t *)malloc (sizeof (hsize_t) * cnt * ndim * 2);
     counts[0] = starts[0] + cnt * ndim;
     for (i = 1; i < cnt; i++) {
         starts[i] = starts[i - 1] + ndim;

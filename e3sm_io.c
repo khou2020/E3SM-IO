@@ -217,7 +217,7 @@ int main (int argc, char **argv) {
         run_g_case = 1;
 
     /* use total write amount to estimate nc_ibuf_size */
-    estimated_nc_ibuf_size = dims[2][0] * dims[2][1] * sizeof(double) / num_iotasks;
+    estimated_nc_ibuf_size = dims[2][0] * dims[2][1] * sizeof (double) / num_iotasks;
     estimated_nc_ibuf_size *= (run_f_case) ? 414 : 52;
     if (estimated_nc_ibuf_size > 16777216) {
         char nc_ibuf_size_str[32];
@@ -265,22 +265,22 @@ int main (int argc, char **argv) {
                 fflush (stdout);
 
                 if (hx == -1 || hx == 0) {
-                MPI_Barrier(io_comm);
+                    MPI_Barrier (io_comm);
 
-                nvars = 414;
-                outfname = "f_case_h0_vard.nc";
-                nerrs += run_vard_F_case(io_comm, out_dir, outfname, nvars, num_recs,
-                                        noncontig_buf, info, dims,
-                                        contig_nreqs, disps, blocklens);
+                    nvars    = 414;
+                    outfname = "f_case_h0_vard.nc";
+                    nerrs +=
+                        run_vard_F_case (io_comm, out_dir, outfname, nvars, num_recs, noncontig_buf,
+                                         info, dims, contig_nreqs, disps, blocklens);
                 }
                 if (hx == -1 || hx == 1) {
-                MPI_Barrier(io_comm);
+                    MPI_Barrier (io_comm);
 
-                nvars = 51;
-                outfname = "f_case_h1_vard.nc";
-                nerrs += run_vard_F_case(io_comm, out_dir, outfname, nvars, num_recs,
-                                        noncontig_buf, info, dims,
-                                        contig_nreqs, disps, blocklens);
+                    nvars    = 51;
+                    outfname = "f_case_h1_vard.nc";
+                    nerrs +=
+                        run_vard_F_case (io_comm, out_dir, outfname, nvars, num_recs, noncontig_buf,
+                                         info, dims, contig_nreqs, disps, blocklens);
                 }
             }
 #endif
@@ -473,21 +473,21 @@ int main (int argc, char **argv) {
                 outfname = "g_case_hist_varn.nc";
 #ifdef ENABLE_HDF5
                 if (api == UNDER_API_HDF5) {
-                                 nerrs += run_varn_G_case_rd_hdf5 (
-                    io_comm, in_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
-                    blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf, &D4_fix_int_buf,
-                    &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf, &D4_rec_dbl_buf,
-                    &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
+                    nerrs += run_varn_G_case_rd_hdf5 (
+                        io_comm, in_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
+                        blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
+                        &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
+                        &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
                 } else
 #endif
-{
+                {
 
-                nerrs += run_varn_G_case_rd (
-                    io_comm, in_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
-                    blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf, &D4_fix_int_buf,
-                    &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf, &D4_rec_dbl_buf,
-                    &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
-}
+                    nerrs += run_varn_G_case_rd (
+                        io_comm, in_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
+                        blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
+                        &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
+                        &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
+                }
             }
 
             if (tst_wr) {
@@ -505,18 +505,18 @@ int main (int argc, char **argv) {
 #ifdef ENABLE_HDF5
                 if (api == UNDER_API_HDF5) {
                     nerrs += run_varn_G_case_hdf5 (
-                    io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
-                    blocklens, D1_fix_int_buf, D2_fix_int_buf, D3_fix_int_buf, D4_fix_int_buf,
-                    D5_fix_int_buf, D1_rec_dbl_buf, D3_rec_dbl_buf, D4_rec_dbl_buf, D5_rec_dbl_buf,
-                    D6_rec_dbl_buf, D1_fix_dbl_buf);
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs,
+                        disps, blocklens, D1_fix_int_buf, D2_fix_int_buf, D3_fix_int_buf,
+                        D4_fix_int_buf, D5_fix_int_buf, D1_rec_dbl_buf, D3_rec_dbl_buf,
+                        D4_rec_dbl_buf, D5_rec_dbl_buf, D6_rec_dbl_buf, D1_fix_dbl_buf);
                 } else
 #endif
                 {
                     nerrs += run_varn_G_case (
-                    io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
-                    blocklens, D1_fix_int_buf, D2_fix_int_buf, D3_fix_int_buf, D4_fix_int_buf,
-                    D5_fix_int_buf, D1_rec_dbl_buf, D3_rec_dbl_buf, D4_rec_dbl_buf, D5_rec_dbl_buf,
-                    D6_rec_dbl_buf, D1_fix_dbl_buf);
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs,
+                        disps, blocklens, D1_fix_int_buf, D2_fix_int_buf, D3_fix_int_buf,
+                        D4_fix_int_buf, D5_fix_int_buf, D1_rec_dbl_buf, D3_rec_dbl_buf,
+                        D4_rec_dbl_buf, D5_rec_dbl_buf, D6_rec_dbl_buf, D1_fix_dbl_buf);
                 }
             }
 

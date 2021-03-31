@@ -15,24 +15,29 @@ CONFIG_F30=datasets/f_case_48602x72_512p.nc
 CONFIG_F120=/global/cscratch1/sd/khl7265/FS_64_1M/E3SM/decom/FC5AV1C-H01B_ne120_oRRS18v3_21600p.nc
 CONFIG_G=/global/cscratch1/sd/khl7265/FS_64_1M/E3SM/decom/GMPAS-NYF_T62_oRRS18to6v3_9600p.nc
 
+IN_FDBG=/global/cscratch1/sd/khl7265/FS_64_1M/E3SM/realdata/F_DBG
+IN_F30=/global/cscratch1/sd/khl7265/FS_64_1M/E3SM/realdata/F_30
+IN_F120=/global/cscratch1/sd/khl7265/FS_64_1M/E3SM/realdata/F_120
+IN_G=/global/cscratch1/sd/khl7265/FS_64_1M/E3SM/realdata/G
+
 E3SM_IO_DATE="EXP_E3SM_IO_DATE"
 HDF5_LIB_PATH=EXP_HDF5_LIB_PATH
 HDF5_LIB_DATE="EXP_HDF5_LIB_DATE"
 PNC_LIB_PATH=EXP_PNC_LIB_PATH
-LOGVOL_LIB_PATH=EXP_LOGVOL_LIB_PATH
-LOGVOL_LIB_DATE="EXP_LOGVOL_LIB_DATE"
 NREC=EXP_RECS
 PPN=EXP_PPN
 RTL=EXP_RTL
 CONFIG_POST=EXP_CONFIG
 OUTDIR_ROOT=EXP_OUTDIR_ROOT
-INFILE=EXP_INFILE
 
-APP=e3sm_io
+APPS=(e3sm_io)
 HXS=(EXP_HX)
 CONFIG="CONFIG_${CONFIG_POST}"
 CONFIG=${!CONFIG}
-APIS=(pnc hdf5)
+INDIR="IN_${CONFIG_POST}"
+INDIR=${!INDIR}
+APIS=(pnc)
+LAYOUTS=(contig chunk zlib)
 OPS=(EXP_OP)
 
 NN=${SLURM_NNODES}
@@ -44,8 +49,6 @@ echo "#%$: pnc_hash: EXP_PNC_HASH"
 echo "#%$: pnc_path: ${PNC_LIB_PATH}"
 echo "#%$: hdf5_hash: EXP_HDF5_HASH"
 echo "#%$: hdf5_path: ${HDF5_LIB_PATH}"
-echo "#%$: logvol_hash: EXP_LOGVOL_HASH"
-echo "#%$: logvol_path: ${LOGVOL_LIB_PATH}"
 echo "#%$: submit_date: EXP_SUBMIT_DATE"
 echo "#%$: exe_date: $(date)"
 echo "#%$: exp: e3sm_io"
@@ -59,15 +62,17 @@ echo '-----+-----++----***--------+++++**++++--+---'
 
 for API in ${APIS[@]}
 do
-    echo "mkdir -p ${OUTDIR_ROOT}/${API}"
-    mkdir -p ${OUTDIR_ROOT}/${API}
+    for LAYOUT in ${LAYOUTS[@]}
+    do
+        echo "mkdir -p ${OUTDIR_ROOT}/${API}/${LAYOUT}"
+        mkdir -p ${OUTDIR_ROOT}/${API}/${LAYOUT}
+    done
 done
 
-export LD_LIBRARY_PATH=${HDF5_LIB_PATH}/lib:${PNC_LIB_PATH}/lib:${LOGVOL_LIB_PATH}/lib:${LD_LIBRARY_PATH}
-#export HDF5_PLUGIN_PATH=${HOME}/.local/lib
-export H5VL_LOG_METADATA_MERGE=1
-export H5VL_LOG_METADATA_ZIP=1
-export H5VL_LOG_SEL_ENCODING=1
+export LD_LIBRARY_PATH=${HDF5_LIB_PATH}/lib:${PNC_LIB_PATH}/lib:${LD_LIBRARY_PATH}
+export PNETCDF_SHOW_PERFORMANCE_INFO=1
+#export PNETCDF_DEFAULT_CHUNK_DIM="ncol : 14563 ; nbnd : 2 ; Time : 1 ; ilev : 73 ; lev : 72 ; chars : 64 ;nCells : 16384 ; nEdges : 16384 ; nVertices : 16384 ; nVertLevelsP1 : 81 ; nVertLevels : 80 ; StrLen : 64 ;"
+export PNETCDF_HINTS="nc_zip_delay_init=1;nc_zip_nrec=1;nc_zip_buffer_size=0"
 
 ulimit -c unlimited
 
@@ -75,71 +80,78 @@ TSTARTTIME=`date +%s.%N`
 
 for i in $(seq EXP_RUNS);
 do
-    for API in ${APIS[@]}
+    for APP in ${APPS[@]}
     do
-        OUTDIR=${OUTDIR_ROOT}/${API}/
-        echo "rm -f ${OUTDIR}/*"
-        rm -f ${OUTDIR}/*
-
         for HX in ${HXS[@]}
         do
-            for (( j=0; j<${#OPS}; j++ ));
+            for API in ${APIS[@]}
             do
-                OP=${OPS:$j:1}
+                for LAYOUT in ${LAYOUTS[@]}
+                do
+                    OUTDIR="${OUTDIR_ROOT}/${API}/${LAYOUT}"
+                    echo "rm -f ${OUTDIR}/*"
+                    rm -f ${OUTDIR}/*
 
-                OUTDIR="${OUTDIR_ROOT}/${API}/${LAYOUTS}"
-                OUTFILE="${OUTDIR_ROOT}/${API}/${LAYOUTS}/output.bin"
+                    if [ "$LAYOUT" = "zlib" ] ; then
+                        INDIRARG="-i ${INDIR}"
+                    else
+                        INDIRARG=
+                    fi
 
-                echo "========================== E3SM-IO ${API} ${OP} =========================="
-                >&2 echo "========================== E3SM-IO ${API} ${OP}=========================="
-                
-                CUR_E3SM_IO_DATE=$(stat -c %Y ./e3sm_io)
-                if [[ "${CUR_E3SM_IO_DATE}" != "${E3SM_IO_DATE}" ]]; then
-                    echo "Warning: e3sm_io changed after submission"
-                fi
-                CUR_HDF5_DATE=$(stat -c %Y ${HDF5_LIB_PATH}/lib/libhdf5.so.200.0.0)
-                if [[ "${CUR_HDF5_DATE}" != "${HDF5_LIB_DATE}" ]]; then
-                    echo "Warning: libhdf5.so changed after submission"
-                fi
-                CUR_LOGVOL_DATE=$(stat -c %Y ${LOGVOL_LIB_PATH}/lib/libH5VL_log.so.0.0.0)
-                if [[ "${CUR_LOGVOL_DATE}" != "${LOGVOL_LIB_DATE}" ]]; then
-                    echo "Warning: libH5VL_log.so.0.0.0 changed after submission"
-                fi
+                    for (( j=0; j<${#OPS}; j++ ));
+                    do
+                        OP=${OPS:$j:1}
 
-                echo "#%$: exp: e3sm_io"
-                echo "#%$: app: ${APP}"
-                echo "#%$: config: ${CONFIG}"
-                echo "#%$: h_num: ${HX}"
-                echo "#%$: nrecords: ${NREC}"
-                echo "#%$: api: ${API}"
-                echo "#%$: operation: ${OP}"
-                echo "#%$: number_of_nodes: ${NN}"
-                echo "#%$: number_of_proc: ${NP}"
-                echo "#%$: logvol_metadata_merge: ${H5VL_LOG_METADATA_MERGE}"
-                echo "#%$: logvol_metadata_zip: ${H5VL_LOG_METADATA_ZIP}"
-                echo "#%$: logvol_metadata_encoding: ${H5VL_LOG_SEL_ENCODING}"
-                                        
-                STARTTIME=`date +%s.%N`
+                        echo "========================== E3SM-IO ${API} ${OP} =========================="
+                        >&2 echo "========================== E3SM-IO ${API} ${OP}=========================="
+                        
+                        CUR_E3SM_IO_DATE=$(stat -c %Y ./e3sm_io)
+                        if [[ "${CUR_E3SM_IO_DATE}" != "${E3SM_IO_DATE}" ]]; then
+                            echo "Warning: e3sm_io changed after submission"
+                        fi
+                        CUR_HDF5_DATE=$(stat -c %Y ${HDF5_LIB_PATH}/lib/libhdf5.so.200.0.0)
+                        if [[ "${CUR_HDF5_DATE}" != "${HDF5_LIB_DATE}" ]]; then
+                            echo "Warning: libhdf5.so changed after submission"
+                        fi
 
-                if [ "$OP" = "w" ] ; then
-                    echo "srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} ${CONFIG}"
-                    srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} ${CONFIG}
-                else
-                    echo "srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} -R ${CONFIG}"
-                    srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} -R ${CONFIG}
-                fi
+                        echo "#%$: exp: e3sm_io"
+                        echo "#%$: app: ${APP}"
+                        echo "#%$: config: ${CONFIG}"
+                        echo "#%$: h_num: ${HX}"
+                        echo "#%$: nrec: ${NREC}"
+                        echo "#%$: api: ${API}"
+                        echo "#%$: zip_driver: ${LAYOUT}"
+                        echo "#%$: operation: ${OP}"
+                        echo "#%$: delay_init: 1"
+                        echo "#%$: number_of_nodes: ${NN}"
+                        echo "#%$: number_of_proc: ${NP}"
 
-                ENDTIME=`date +%s.%N`
-                TIMEDIFF=`echo "$ENDTIME - $STARTTIME" | bc | awk -F"." '{print $1"."$2}'`
+                        STARTTIME=`date +%s.%N`
 
-                echo "#%$: exe_time: $TIMEDIFF"
+                        if [ "$OP" = "w" ] ; then
+                            echo "srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} -l ${LAYOUT} ${INDIRARG} ${CONFIG}"
+                            srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} -l ${LAYOUT} ${INDIRARG} ${CONFIG}
+                        else
+                            echo "srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} -l ${LAYOUT} ${INDIRARG} -R ${CONFIG}"
+                            srun -n ${NP} -t ${RTL} ./${APP} -k -o ${OUTDIR} -n -a ${API} -f ${HX} -r ${NREC} -l ${LAYOUT} ${INDIRARG} -R ${CONFIG}
+                        fi
 
-                echo "ls -lah ${OUTDIR}"
-                ls -lah ${OUTDIR}
-                echo "lfs getstripe ${OUTDIR}"
-                lfs getstripe ${OUTDIR}
+                        ENDTIME=`date +%s.%N`
+                        TIMEDIFF=`echo "$ENDTIME - $STARTTIME" | bc | awk -F"." '{print $1"."$2}'`
 
-                echo '-----+-----++------------+++++++++--+---'
+                        echo "#%$: exe_time: $TIMEDIFF"
+
+                        echo "ls -lah ${OUTDIR}"
+                        ls -lah ${OUTDIR}
+                        echo "lfs getstripe ${OUTDIR}"
+                        lfs getstripe ${OUTDIR}
+
+                        echo '-----+-----++------------+++++++++--+---'
+                    done
+
+                    echo "rm -f ${OUTDIR}/*"
+                    rm -f ${OUTDIR}/*
+                done
             done
         done
     done

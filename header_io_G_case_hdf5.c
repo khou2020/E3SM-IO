@@ -2820,6 +2820,713 @@ fn_exit:
     return nerrs;
 }
 
+#define HDF5_DEF_VAR_MPI(A,B,C,D,E,F) hdf5_def_var_mpi (A, B, F)
+/*----< def_G_case_h0() >----------------------------------------------------*/
+int def_G_case_h0_hdf5_mpi (hid_t ncid,                  /* file ID */
+                            const MPI_Offset dims_D1[1], /* dimension sizes of decomposition 1 */
+                            const MPI_Offset dims_D2[1], /* dimension sizes of decomposition 2 */
+                            const MPI_Offset dims_D3[2], /* dimension sizes of decomposition 3 */
+                            const MPI_Offset dims_D4[2], /* dimension sizes of decomposition 4 */
+                            const MPI_Offset dims_D5[2], /* dimension sizes of decomposition 5 */
+                            const MPI_Offset dims_D6[2], /* dimension sizes of decomposition 6 */
+                            int nvars,                   /* number of variables */
+                            int *varids)                 /* variable IDs */
+{
+    /* Total 52 variables */
+    int salinitySurfaceRestoringTendency, vertTransportVelocityTop, vertGMBolusVelocityTop,
+        vertAleTransportTop, tendSSH, layerThickness, normalVelocity, ssh, maxLevelEdgeTop,
+        vertCoordMovementWeights, edgeMask, cellMask, vertexMask, refZMid, refLayerThickness, xtime,
+        kineticEnergyCell, relativeVorticityCell, relativeVorticity, divergence, areaCellGlobal,
+        areaEdgeGlobal, areaTriangleGlobal, volumeCellGlobal, volumeEdgeGlobal, CFLNumberGlobal,
+        BruntVaisalaFreqTop, vertVelocityTop, velocityZonal, velocityMeridional, displacedDensity,
+        potentialDensity, pressure, refBottomDepth, zMid, bottomDepth, maxLevelCell,
+        maxLevelEdgeBot, columnIntegratedSpeed, temperatureHorizontalAdvectionTendency,
+        salinityHorizontalAdvectionTendency, temperatureVerticalAdvectionTendency,
+        salinityVerticalAdvectionTendency, temperatureVertMixTendency, salinityVertMixTendency,
+        temperatureSurfaceFluxTendency, salinitySurfaceFluxTendency, temperatureShortWaveTendency,
+        temperatureNonLocalTendency, salinityNonLocalTendency, temperature, salinity;
+
+    int i, err, nerrs = 0, dimids[3];
+    int dim_nVertLevelsP1, dim_nCells, dim_Time, dim_nVertLevels, dim_nEdges, dim_nVertices,
+        dim_StrLen;
+
+    err = define_global_attributes_hdf5 (ncid);
+    ERR
+
+    /* define dimensions */
+    err = hdf5_def_dim_mpi (ncid, &dim_nCells);
+    ERR
+    err = hdf5_def_dim_mpi (ncid, &dim_Time);
+    ERR
+    err = hdf5_def_dim_mpi (ncid, &dim_nVertLevelsP1);
+    ERR
+    err = hdf5_def_dim_mpi (ncid, &dim_nVertLevels);
+    ERR
+    err = hdf5_def_dim_mpi (ncid, &dim_nEdges);
+    ERR
+    err = hdf5_def_dim_mpi (ncid, &dim_nVertices);
+    ERR
+    err = hdf5_def_dim_mpi (ncid, &dim_StrLen);
+    ERR
+
+    i = 0;
+
+    /* define variables */
+    /* 1 double (Time, nCells) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "salinitySurfaceRestoringTendency", NC_DOUBLE, 2, dimids,
+                            &salinitySurfaceRestoringTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinitySurfaceRestoringTendency, "units", 7, "m PSU/s");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinitySurfaceRestoringTendency, "long_name", 42,
+                                  "salinity tendency due to surface restoring");
+    ERR
+    varids[i++] = salinitySurfaceRestoringTendency;
+
+    /* 3 double (Time, nCells, nVertLevelsP1) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevelsP1;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "vertTransportVelocityTop", NC_DOUBLE, 3, dimids,
+                            &vertTransportVelocityTop);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertTransportVelocityTop, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (
+        ncid, vertTransportVelocityTop, "long_name", 280,
+        "vertical tracer-transport velocity defined at center (horizontally) "
+        "and top (vertically) of cell.  This is not the vertical ALE transport, "
+        "but is Eulerian (fixed-frame) in the vertical, and computed from the "
+        "continuity equation from the horizontal total tracer-transport velocity.");
+    ERR
+    varids[i++] = vertTransportVelocityTop;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "vertGMBolusVelocityTop", NC_DOUBLE, 3, dimids,
+                            &vertGMBolusVelocityTop);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertGMBolusVelocityTop, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (
+        ncid, vertGMBolusVelocityTop, "long_name", 266,
+        "vertical tracer-transport velocity defined at center (horizontally) "
+        "and top (vertically) of cell.  This is not the vertical ALE transport, "
+        "but is Eulerian (fixed-frame) in the vertical, and computed from the "
+        "continuity equation from the horizontal GM Bolus velocity.");
+    ERR
+    varids[i++] = vertGMBolusVelocityTop;
+
+    err =
+        HDF5_DEF_VAR_MPI (ncid, "vertAleTransportTop", NC_DOUBLE, 3, dimids, &vertAleTransportTop);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertAleTransportTop, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertAleTransportTop, "long_name", 69,
+                                  "vertical transport through "
+                                  "the layer interface at the top of the cell");
+    ERR
+    varids[i++] = vertAleTransportTop;
+
+    /* 1 double (Time, nCells) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "tendSSH", NC_DOUBLE, 2, dimids, &tendSSH);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, tendSSH, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, tendSSH, "long_name", 35,
+                                  "time tendency of sea-surface height");
+    ERR
+    varids[i++] = tendSSH;
+
+    /* 1 double (Time, nCells, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "layerThickness", NC_DOUBLE, 3, dimids, &layerThickness);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, layerThickness, "units", 1, "m");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, layerThickness, "long_name", 15, "layer thickness");
+    ERR
+    varids[i++] = layerThickness;
+
+    /* 1 double (Time, nEdges, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nEdges;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "normalVelocity", NC_DOUBLE, 3, dimids, &normalVelocity);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, normalVelocity, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, normalVelocity, "long_name", 47,
+                                  "horizonal velocity, "
+                                  "normal component to an edge");
+    ERR
+    varids[i++] = normalVelocity;
+
+    /* 1 double (Time, nCells) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "ssh", NC_DOUBLE, 2, dimids, &ssh);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, ssh, "units", 1, "m");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, ssh, "long_name", 18, "sea surface height");
+    ERR
+    varids[i++] = ssh;
+
+    /* 1 int (nEdges) */
+    dimids[0] = dim_nEdges;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "maxLevelEdgeTop", NC_INT, 1, dimids, &maxLevelEdgeTop);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, maxLevelEdgeTop, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, maxLevelEdgeTop, "long_name", 79,
+                                  "Index to the last edge "
+                                  "in a column with active ocean cells on both sides of it.");
+    ERR
+    varids[i++] = maxLevelEdgeTop;
+
+    /* 1 double (nVertLevels) */
+    dimids[0] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "vertCoordMovementWeights", NC_DOUBLE, 1, dimids,
+                            &vertCoordMovementWeights);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertCoordMovementWeights, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertCoordMovementWeights, "long_name", 98,
+                                  "Weights used "
+                                  "for distribution of sea surface heigh purturbations through "
+                                  "multiple vertical levels.");
+    ERR
+    varids[i++] = vertCoordMovementWeights;
+
+    /* 1 int (nEdges, nVertLevels) */
+    dimids[0] = dim_nEdges;
+    dimids[1] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "edgeMask", NC_INT, 2, dimids, &edgeMask);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, edgeMask, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, edgeMask, "long_name", 69,
+                                  "Mask on edges that determines "
+                                  "if computations should be done on edge.");
+    ERR
+    varids[i++] = edgeMask;
+
+    /* 1 int (nCells, nVertLevels) */
+    dimids[0] = dim_nCells;
+    dimids[1] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "cellMask", NC_INT, 2, dimids, &cellMask);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, cellMask, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, cellMask, "long_name", 69,
+                                  "Mask on cells that determines "
+                                  "if computations should be done on cell.");
+    ERR
+    varids[i++] = cellMask;
+
+    /* 1 int (nVertices, nVertLevels) */
+    dimids[0] = dim_nVertices;
+    dimids[1] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "vertexMask", NC_INT, 2, dimids, &vertexMask);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertexMask, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertexMask, "long_name", 75,
+                                  "Mask on vertices that determines "
+                                  "if computations should be done on vertice.");
+    ERR
+    varids[i++] = vertexMask;
+
+    /* 2 double (nVertLevels) */
+    dimids[0] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "refZMid", NC_DOUBLE, 1, dimids, &refZMid);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, refZMid, "units", 1, "m");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, refZMid, "long_name", 87,
+                                  "Reference mid z-coordinate of ocean "
+                                  "for each vertical level. This has a negative value.");
+    ERR
+    varids[i++] = refZMid;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "refLayerThickness", NC_DOUBLE, 1, dimids, &refLayerThickness);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, refLayerThickness, "units", 1, "m");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, refLayerThickness, "long_name", 58,
+                                  "Reference layerThickness "
+                                  "of ocean for each vertical level.");
+    ERR
+    varids[i++] = refLayerThickness;
+
+    /* 1 char (Time, StrLen) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_StrLen;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "xtime", NC_CHAR, 2, dimids, &xtime);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, xtime, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, xtime, "long_name", 45,
+                                  "model time, with format \'YYYY-MM-DD_HH:MM:SS\'");
+    ERR
+    varids[i++] = xtime;
+
+    /* 2 double (Time, nCells, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "kineticEnergyCell", NC_DOUBLE, 3, dimids, &kineticEnergyCell);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, kineticEnergyCell, "units", 10, "m^2 s^{-2}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, kineticEnergyCell, "long_name", 45,
+                                  "kinetic energy of horizonal "
+                                  "velocity on cells");
+    ERR
+    varids[i++] = kineticEnergyCell;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "relativeVorticityCell", NC_DOUBLE, 3, dimids,
+                            &relativeVorticityCell);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, relativeVorticityCell, "units", 6, "s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, relativeVorticityCell, "long_name", 67,
+                                  "curl of horizontal velocity, "
+                                  "averaged from vertices to cell centers");
+    ERR
+    varids[i++] = relativeVorticityCell;
+
+    /* 1 double (Time, nVertices, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nVertices;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "relativeVorticity", NC_DOUBLE, 3, dimids, &relativeVorticity);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, relativeVorticity, "units", 6, "s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, relativeVorticity, "long_name", 48,
+                                  "curl of horizontal velocity, "
+                                  "defined at vertices");
+    ERR
+    varids[i++] = relativeVorticity;
+
+    /* 1 double (Time, nCells, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "divergence", NC_DOUBLE, 3, dimids, &divergence);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, divergence, "units", 6, "s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, divergence, "long_name", 32,
+                                  "divergence of horizonal velocity");
+    ERR
+    varids[i++] = divergence;
+
+    /* 6 double (Time) */
+    dimids[0] = dim_Time;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "areaCellGlobal", NC_DOUBLE, 1, dimids, &areaCellGlobal);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, areaCellGlobal, "units", 3, "m^2");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, areaCellGlobal, "long_name", 86,
+                                  "sum of the areaCell variable over "
+                                  "the full domain, used to normalize global statistics");
+    ERR
+    varids[i++] = areaCellGlobal;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "areaEdgeGlobal", NC_DOUBLE, 1, dimids, &areaEdgeGlobal);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, areaEdgeGlobal, "units", 3, "m^2");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, areaEdgeGlobal, "long_name", 86,
+                                  "sum of the areaEdge variable over "
+                                  "the full domain, used to normalize global statistics");
+    ERR
+    varids[i++] = areaEdgeGlobal;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "areaTriangleGlobal", NC_DOUBLE, 1, dimids, &areaTriangleGlobal);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, areaTriangleGlobal, "units", 3, "m^2");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, areaTriangleGlobal, "long_name", 90,
+                                  "sum of the areaTriangle variable "
+                                  "over the full domain, used to normalize global statistics");
+    ERR
+    varids[i++] = areaTriangleGlobal;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "volumeCellGlobal", NC_DOUBLE, 1, dimids, &volumeCellGlobal);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, volumeCellGlobal, "units", 3, "m^3");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, volumeCellGlobal, "long_name", 88,
+                                  "sum of the volumeCell variable over "
+                                  "the full domain, used to normalize global statistics");
+    ERR
+    varids[i++] = volumeCellGlobal;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "volumeEdgeGlobal", NC_DOUBLE, 1, dimids, &volumeEdgeGlobal);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, volumeEdgeGlobal, "units", 3, "m^3");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, volumeEdgeGlobal, "long_name", 88,
+                                  "sum of the volumeEdge variable over "
+                                  "the full domain, used to normalize global statistics");
+    ERR
+    varids[i++] = volumeEdgeGlobal;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "CFLNumberGlobal", NC_DOUBLE, 1, dimids, &CFLNumberGlobal);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, CFLNumberGlobal, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, CFLNumberGlobal, "long_name", 39,
+                                  "maximum CFL number over the full domain");
+    ERR
+    varids[i++] = CFLNumberGlobal;
+
+    /* 1 double (Time, nCells, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevels;
+
+    err =
+        HDF5_DEF_VAR_MPI (ncid, "BruntVaisalaFreqTop", NC_DOUBLE, 3, dimids, &BruntVaisalaFreqTop);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, BruntVaisalaFreqTop, "units", 6, "s^{-2}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, BruntVaisalaFreqTop, "long_name", 89,
+                                  "Brunt Vaisala frequency defined at "
+                                  "the center (horizontally) and top (vertically) of cell");
+    ERR
+    varids[i++] = BruntVaisalaFreqTop;
+
+    /* 1 double (Time, nCells, nVertLevelsP1) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevelsP1;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "vertVelocityTop", NC_DOUBLE, 3, dimids, &vertVelocityTop);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertVelocityTop, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, vertVelocityTop, "long_name", 79,
+                                  "vertical velocity defined at center "
+                                  "(horizontally) and top (vertically) of cell");
+    ERR
+    varids[i++] = vertVelocityTop;
+
+    /* 5 double (Time, nCells, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "velocityZonal", NC_DOUBLE, 3, dimids, &velocityZonal);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, velocityZonal, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, velocityZonal, "long_name", 58,
+                                  "component of horizontal velocity in "
+                                  "the eastward direction");
+    ERR
+    varids[i++] = velocityZonal;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "velocityMeridional", NC_DOUBLE, 3, dimids, &velocityMeridional);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, velocityMeridional, "units", 8, "m s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, velocityMeridional, "long_name", 59,
+                                  "component of horizontal velocity in "
+                                  "the northward direction");
+    ERR
+    varids[i++] = velocityMeridional;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "displacedDensity", NC_DOUBLE, 3, dimids, &displacedDensity);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, displacedDensity, "units", 9, "kg m^{-3}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (
+        ncid, displacedDensity, "long_name", 130,
+        "Density displaced adiabatically to "
+        "the mid-depth one layer deeper.  That is, layer k has been displaced to the "
+        "depth of layer k+1.");
+    ERR
+    varids[i++] = displacedDensity;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "potentialDensity", NC_DOUBLE, 3, dimids, &potentialDensity);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, potentialDensity, "units", 9, "kg m^{-3}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, potentialDensity, "long_name", 80,
+                                  "potential density: density displaced "
+                                  "adiabatically to the mid-depth of top layer");
+    ERR
+    varids[i++] = potentialDensity;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "pressure", NC_DOUBLE, 3, dimids, &pressure);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, pressure, "units", 8, "N m^{-2}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, pressure, "long_name", 38,
+                                  "pressure used in the momentum equation");
+    ERR
+    varids[i++] = pressure;
+
+    /* 1 double (nVertLevels) */
+    dimids[0] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "refBottomDepth", NC_DOUBLE, 1, dimids, &refBottomDepth);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, refBottomDepth, "units", 1, "m");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, refBottomDepth, "long_name", 78,
+                                  "Reference depth of ocean for each "
+                                  "vertical level. Used in \'z-level\' type runs.");
+    ERR
+    varids[i++] = refBottomDepth;
+
+    /* 1 double (Time, nCells, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "zMid", NC_DOUBLE, 3, dimids, &zMid);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, zMid, "units", 1, "m");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, zMid, "long_name", 42,
+                                  "z-coordinate of the mid-depth of the layer");
+    ERR
+    varids[i++] = zMid;
+
+    /* 1 double (nCells) */
+    dimids[0] = dim_nCells;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "bottomDepth", NC_DOUBLE, 1, dimids, &bottomDepth);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, bottomDepth, "units", 1, "m");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, bottomDepth, "long_name", 78,
+                                  "Depth of the bottom of the ocean. Given "
+                                  "as a positive distance from sea level.");
+    ERR
+    varids[i++] = bottomDepth;
+
+    /* 1 int (nCells) */
+    dimids[0] = dim_nCells;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "maxLevelCell", NC_INT, 1, dimids, &maxLevelCell);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, maxLevelCell, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, maxLevelCell, "long_name", 51,
+                                  "Index to the last active ocean cell in each column.");
+    ERR
+    varids[i++] = maxLevelCell;
+
+    /* 1 int (nEdges) */
+    dimids[0] = dim_nEdges;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "maxLevelEdgeBot", NC_INT, 1, dimids, &maxLevelEdgeBot);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, maxLevelEdgeBot, "units", 8, "unitless");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, maxLevelEdgeBot, "long_name", 92,
+                                  "Index to the last edge in a column with at "
+                                  "least one active ocean cell on either side of it.");
+    ERR
+    varids[i++] = maxLevelEdgeBot;
+
+    /* 1 double (Time, nCells) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "columnIntegratedSpeed", NC_DOUBLE, 2, dimids,
+                            &columnIntegratedSpeed);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, columnIntegratedSpeed, "units", 10, "m^2 s^{-1}");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (
+        ncid, columnIntegratedSpeed, "long_name", 109,
+        "speed = sum(h*sqrt(2*ke)), where ke "
+        "is kineticEnergyCell and the sum is over the full column at cell centers.");
+    ERR
+    varids[i++] = columnIntegratedSpeed;
+
+    /* 13 double (Time, nCells, nVertLevels) */
+    dimids[0] = dim_Time;
+    dimids[1] = dim_nCells;
+    dimids[2] = dim_nVertLevels;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "temperatureHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids,
+                            &temperatureHorizontalAdvectionTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureHorizontalAdvectionTendency, "long_name", 58,
+                                  "potential temperature "
+                                  "tendency due to horizontal advection");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureHorizontalAdvectionTendency, "units", 26,
+                                  "degrees Celsius per second");
+    ERR
+    varids[i++] = temperatureHorizontalAdvectionTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "salinityHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids,
+                            &salinityHorizontalAdvectionTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityHorizontalAdvectionTendency, "long_name", 45,
+                                  "salinity tendency due "
+                                  "to horizontal advection");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityHorizontalAdvectionTendency, "units", 14,
+                                  "PSU per second");
+    ERR
+    varids[i++] = salinityHorizontalAdvectionTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "temperatureVerticalAdvectionTendency", NC_DOUBLE, 3, dimids,
+                            &temperatureVerticalAdvectionTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureVerticalAdvectionTendency, "long_name", 56,
+                                  "potential temperature "
+                                  "tendency due to vertical advection");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureVerticalAdvectionTendency, "units", 26,
+                                  "degrees Celsius per second");
+    ERR
+    varids[i++] = temperatureVerticalAdvectionTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "salinityVerticalAdvectionTendency", NC_DOUBLE, 3, dimids,
+                            &salinityVerticalAdvectionTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityVerticalAdvectionTendency, "long_name", 43,
+                                  "salinity tendency due "
+                                  "to vertical advection");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityVerticalAdvectionTendency, "units", 14,
+                                  "PSU per second");
+    ERR
+    varids[i++] = salinityVerticalAdvectionTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "temperatureVertMixTendency", NC_DOUBLE, 3, dimids,
+                            &temperatureVertMixTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureVertMixTendency, "long_name", 53,
+                                  "potential temperature tendency "
+                                  "due to vertical mixing");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureVertMixTendency, "units", 26,
+                                  "degrees Celsius per second");
+    ERR
+    varids[i++] = temperatureVertMixTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "salinityVertMixTendency", NC_DOUBLE, 3, dimids,
+                            &salinityVertMixTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityVertMixTendency, "long_name", 40,
+                                  "salinity tendency due to vertical mixing");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityVertMixTendency, "units", 14, "PSU per second");
+    ERR
+    varids[i++] = salinityVertMixTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "temperatureSurfaceFluxTendency", NC_DOUBLE, 3, dimids,
+                            &temperatureSurfaceFluxTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureSurfaceFluxTendency, "long_name", 52,
+                                  "potential temperature tendency "
+                                  "due to surface fluxes");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureSurfaceFluxTendency, "units", 26,
+                                  "degrees Celsius per second");
+    ERR
+    varids[i++] = temperatureSurfaceFluxTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "salinitySurfaceFluxTendency", NC_DOUBLE, 3, dimids,
+                            &salinitySurfaceFluxTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinitySurfaceFluxTendency, "long_name", 39,
+                                  "salinity tendency due to surface fluxes");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinitySurfaceFluxTendency, "units", 14, "PSU per second");
+    ERR
+    varids[i++] = salinitySurfaceFluxTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "temperatureShortWaveTendency", NC_DOUBLE, 3, dimids,
+                            &temperatureShortWaveTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureShortWaveTendency, "units", 26,
+                                  "degrees Celsius per second");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureShortWaveTendency, "long_name", 59,
+                                  "potential temperature tendency due "
+                                  "to penetrating shortwave");
+    ERR
+    varids[i++] = temperatureShortWaveTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "temperatureNonLocalTendency", NC_DOUBLE, 3, dimids,
+                            &temperatureNonLocalTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureNonLocalTendency, "long_name", 56,
+                                  "potential temperature tendency due "
+                                  "to kpp non-local flux");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperatureNonLocalTendency, "units", 26,
+                                  "degrees Celsius per second");
+    ERR
+    varids[i++] = temperatureNonLocalTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "salinityNonLocalTendency", NC_DOUBLE, 3, dimids,
+                            &salinityNonLocalTendency);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityNonLocalTendency, "long_name", 43,
+                                  "salinity tendency due to kpp non-local flux");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinityNonLocalTendency, "units", 14, "PSU per second");
+    ERR
+    varids[i++] = salinityNonLocalTendency;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "temperature", NC_DOUBLE, 3, dimids, &temperature);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperature, "long_name", 21, "potential temperature");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, temperature, "units", 15, "degrees Celsius");
+    ERR
+    varids[i++] = temperature;
+
+    err = HDF5_DEF_VAR_MPI (ncid, "salinity", NC_DOUBLE, 3, dimids, &salinity);
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinity, "long_name", 8, "salinity");
+    ERR
+    err = SKIP_HDF5_PUT_ATT_TEXT (ncid, salinity, "units", 32, "grams salt per kilogram seawater");
+    ERR
+    varids[i++] = salinity;
+
+    assert (i == nvars);
+
+fn_exit:
+    return nerrs;
+}
+
 /*----< def_G_case_h0() >----------------------------------------------------*/
 int def_G_case_h0_hdf5 (hid_t ncid,                  /* file ID */
                         const MPI_Offset dims_D1[1], /* dimension sizes of decomposition 1 */

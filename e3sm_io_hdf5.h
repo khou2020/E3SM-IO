@@ -36,6 +36,7 @@ extern hid_t log_vlid;
         if (herr != 0) {                                              \
             printf ("Error at line %d in %s:\n", __LINE__, __FILE__); \
             H5Eprint1 (stdout);                                       \
+            abort ();                                                 \
             goto fn_exit;                                             \
         }                                                             \
     }
@@ -60,23 +61,15 @@ extern hid_t log_vlid;
 
 // VAR
 
-#define HDF5_PUT_VAR_DOUBLE(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_indep, C);
-#define HDF5_PUT_VAR_FLOAT(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_indep, C);
-#define HDF5_PUT_VAR_INT(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_indep, C);
-#define HDF5_PUT_VAR_TEXT(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_indep, C);
+#define HDF5_PUT_VAR_DOUBLE(A, B, C) hdf5_put_var (B, H5T_NATIVE_DOUBLE, dxplid_indep, C);
+#define HDF5_PUT_VAR_FLOAT(A, B, C)  hdf5_put_var (B, H5T_NATIVE_FLOAT, dxplid_indep, C);
+#define HDF5_PUT_VAR_INT(A, B, C)    hdf5_put_var (B, H5T_NATIVE_INT, dxplid_indep, C);
+#define HDF5_PUT_VAR_TEXT(A, B, C)   hdf5_put_var (B, H5T_NATIVE_CHAR, dxplid_indep, C);
 
-#define HDF5_PUT_VAR_DOUBLE_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_coll, C);
-#define HDF5_PUT_VAR_FLOAT_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_coll, C);
-#define HDF5_PUT_VAR_INT_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_coll, C);
-#define HDF5_PUT_VAR_TEXT_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_coll, C);
+#define HDF5_PUT_VAR_DOUBLE_ALL(A, B, C) hdf5_put_var (B, H5T_NATIVE_DOUBLE, dxplid_coll, C);
+#define HDF5_PUT_VAR_FLOAT_ALL(A, B, C)  hdf5_put_var (B, H5T_NATIVE_FLOAT, dxplid_coll, C);
+#define HDF5_PUT_VAR_INT_ALL(A, B, C)    hdf5_put_var (B, H5T_NATIVE_INT, dxplid_coll, C);
+#define HDF5_PUT_VAR_TEXT_ALL(A, B, C)   hdf5_put_var (B, H5T_NATIVE_CHAR, dxplid_coll, C);
 
 #define HDF5_IPUT_VAR_DOUBLE(A, B, C, D) \
     H5Dwrite (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
@@ -91,6 +84,12 @@ extern hid_t log_vlid;
 #define HDF5_BPUT_VAR_FLOAT(A, B, C, D)  HDF5_PUT_VAR_FLOAT (A, B, C)
 #define HDF5_BPUT_VAR_INT(A, B, C, D)    HDF5_PUT_VAR_INT (A, B, C)
 #define HDF5_BPUT_VAR_TEXT(A, B, C, D)   HDF5_PUT_VAR_TEXT (A, B, C)
+
+// VAR0, follow collective I/O
+#define HDF5_PUT_VAR0_DOUBLE_ALL(A, B, E) hdf5_put_var0 (B, H5T_NATIVE_DOUBLE, dxplid_coll, E);
+#define HDF5_PUT_VAR0_FLOAT_ALL(A, B, E)  hdf5_put_var0 (B, H5T_NATIVE_FLOAT, dxplid_coll, E);
+#define HDF5_PUT_VAR0_INT_ALL(A, B, E)    hdf5_put_var0 (B, H5T_NATIVE_INT, dxplid_coll);
+#define HDF5_PUT_VAR0_TEXT_ALL(A, B, E)   hdf5_put_var0 (B, H5T_NATIVE_CHAR, dxplid_coll);
 
 // VARA
 
@@ -119,10 +118,23 @@ extern hid_t log_vlid;
 #define HDF5_IPUT_VARA_TEXT(A, B, C, D, E, F) \
     hdf5_put_vara (B, H5T_NATIVE_CHAR, dxplid_indep_nb, C, D, E);
 
-#define HDF5_IPUT_VARA_DOUBLE_MPI(A, B, C, D, E, F) hdf5_put_vara_mpi (B, H5T_NATIVE_DOUBLE, dxplid_indep_nb, C, D, E, F);
-#define HDF5_IPUT_VARA_FLOAT_MPI(A, B, C, D, E, F)  hdf5_put_vara_mpi (B, H5T_NATIVE_FLOAT, dxplid_indep_nb, C, D, E, F);
-#define HDF5_IPUT_VARA_INT_MPI(A, B, C, D, E, F)    hdf5_put_vara_mpi (B, H5T_NATIVE_INT, dxplid_indep_nb, C, D, E, F);
-#define HDF5_IPUT_VARA_TEXT_MPI(A, B, C, D, E, F)   hdf5_put_vara_mpi (B, H5T_NATIVE_CHAR, dxplid_indep_nb, C, D, E, F);
+#define HDF5_IPUT_VARA_DOUBLE_MPI(A, B, C, D, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_DOUBLE, dxplid_indep_nb, C, D, E, F);
+#define HDF5_IPUT_VARA_FLOAT_MPI(A, B, C, D, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_FLOAT, dxplid_indep_nb, C, D, E, F);
+#define HDF5_IPUT_VARA_INT_MPI(A, B, C, D, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_INT, dxplid_indep_nb, C, D, E, F);
+#define HDF5_IPUT_VARA_TEXT_MPI(A, B, C, D, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_CHAR, dxplid_indep_nb, C, D, E, F);
+
+#define HDF5_IPUT_VAR_DOUBLE_MPI(A, B, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_DOUBLE, dxplid_indep_nb, NULL, NULL, E, F);
+#define HDF5_IPUT_VAR_FLOAT_MPI(A, B, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_FLOAT, dxplid_indep_nb, NULL, NULL, E, F);
+#define HDF5_IPUT_VAR_INT_MPI(A, B, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_INT, dxplid_indep_nb, NULL, NULL, E, F);
+#define HDF5_IPUT_VAR_TEXT_MPI(A, B, E, F) \
+    hdf5_put_vara_mpi (B, H5T_NATIVE_CHAR, dxplid_indep_nb, NULL, NULL, E, F);
 
 #define HDF5_BPUT_VARA_DOUBLE(A, B, C, D, E, F) HDF5_PUT_VARA_DOUBLE (A, B, C, D, E)
 #define HDF5_BPUT_VARA_FLOAT(A, B, C, D, E, F)  HDF5_PUT_VARA_FLOAT (A, B, C, D, E)
@@ -184,10 +196,14 @@ extern hid_t log_vlid;
 #define HDF5_IPUT_VAR1_TEXT(A, B, C, D, E) \
     hdf5_put_var1 (B, H5T_NATIVE_CHAR, dxplid_indep_nb, C, D);
 
-#define HDF5_IPUT_VAR1_DOUBLE_MPI(A, B, C, D, E) hdf5_put_var1_mpi (B, H5T_NATIVE_DOUBLE, dxplid_indep_nb, C, D, E);
-#define HDF5_IPUT_VAR1_FLOAT_MPI(A, B, C, D, E)  hdf5_put_var1_mpi (B, H5T_NATIVE_FLOAT, dxplid_indep_nb, C, D, E);
-#define HDF5_IPUT_VAR1_INT_MPI(A, B, C, D, E)    hdf5_put_var1_mpi (B, H5T_NATIVE_INT, dxplid_indep_nb, C, D, E);
-#define HDF5_IPUT_VAR1_TEXT_MPI(A, B, C, D, E)   hdf5_put_var1_mpi (B, H5T_NATIVE_CHAR, dxplid_indep_nb, C, D, E);
+#define HDF5_IPUT_VAR1_DOUBLE_MPI(A, B, C, D, E) \
+    hdf5_put_var1_mpi (B, H5T_NATIVE_DOUBLE, dxplid_indep_nb, C, D, E);
+#define HDF5_IPUT_VAR1_FLOAT_MPI(A, B, C, D, E) \
+    hdf5_put_var1_mpi (B, H5T_NATIVE_FLOAT, dxplid_indep_nb, C, D, E);
+#define HDF5_IPUT_VAR1_INT_MPI(A, B, C, D, E) \
+    hdf5_put_var1_mpi (B, H5T_NATIVE_INT, dxplid_indep_nb, C, D, E);
+#define HDF5_IPUT_VAR1_TEXT_MPI(A, B, C, D, E) \
+    hdf5_put_var1_mpi (B, H5T_NATIVE_CHAR, dxplid_indep_nb, C, D, E);
 
 #define HDF5_BPUT_VAR1_DOUBLE(A, B, C, D, E) HDF5_PUT_VAR1_DOUBLE (A, B, C, D)
 #define HDF5_BPUT_VAR1_FLOAT(A, B, C, D, E)  HDF5_PUT_VAR1_FLOAT (A, B, C, D)
@@ -197,6 +213,8 @@ extern hid_t log_vlid;
 // VARN
 #define HDF5_PUT_VARN(A, B, C, D, E, F, G, H)     hdf5_put_varn (B, H, dxplid_indep, C, D, E, F);
 #define HDF5_IPUT_VARN(A, B, C, D, E, F, G, H, I) hdf5_put_varn (B, H, dxplid_indep_nb, C, D, E, F);
+#define HDF5_IPUT_VARN_MPI(A, B, C, D, E, F, G, H) \
+    hdf5_put_varn_mpi (B, H, dxplid_indep_nb, C, 0, D, E, F);
 #define HDF5_BPUT_VARN(A, B, C, D, E, F, G, H, I) HDF5_PUT_VARN (A, B, C, D, E, F, G, H)
 
 // GET
@@ -204,31 +222,31 @@ extern hid_t log_vlid;
 // VAR
 
 #define HDF5_GET_VAR_DOUBLE(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_indep, C);
+    H5Dread (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_indep, C);
 #define HDF5_GET_VAR_FLOAT(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_indep, C);
+    H5Dread (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_indep, C);
 #define HDF5_GET_VAR_INT(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_indep, C);
+    H5Dread (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_indep, C);
 #define HDF5_GET_VAR_TEXT(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_indep, C);
+    H5Dread (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_indep, C);
 
 #define HDF5_GET_VAR_DOUBLE_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_coll, C);
+    H5Dread (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_coll, C);
 #define HDF5_GET_VAR_FLOAT_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_coll, C);
+    H5Dread (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_coll, C);
 #define HDF5_GET_VAR_INT_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_coll, C);
+    H5Dread (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_coll, C);
 #define HDF5_GET_VAR_TEXT_ALL(A, B, C) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_coll, C);
+    H5Dread (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_coll, C);
 
 #define HDF5_IGET_VAR_DOUBLE(A, B, C, D) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
+    H5Dread (f_dids[B], H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
 #define HDF5_IGET_VAR_FLOAT(A, B, C, D) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
+    H5Dread (f_dids[B], H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
 #define HDF5_IGET_VAR_INT(A, B, C, D) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
+    H5Dread (f_dids[B], H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
 #define HDF5_IGET_VAR_TEXT(A, B, C, D) \
-    H5Dwrite (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
+    H5Dread (f_dids[B], H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, dxplid_indep_nb, C);
 
 #define HDF5_BGET_VAR_DOUBLE(A, B, C, D) HDF5_GET_VAR_DOUBLE (A, B, C)
 #define HDF5_BGET_VAR_FLOAT(A, B, C, D)  HDF5_GET_VAR_FLOAT (A, B, C)
@@ -342,7 +360,7 @@ extern hid_t log_vlid;
 #define SKIP_HDF5_PUT_ATT_INT(A, B, C, D, E, F)   0;
 #define SKIP_HDF5_PUT_ATT_FLOAT(A, B, C, D, E, F) 0;
 
-#define HDF5_GET_ATT(A, B, C, D, E, F) hdf5_get_att(A, B, C, nc_type_to_hdf5_type(D), F)
+#define HDF5_GET_ATT(A, B, C, D, E, F) hdf5_get_att (A, B, C, nc_type_to_hdf5_type (D), F)
 #define HDF5_GET_ATT_TEXT(A, B, C, D)  hdf5_get_att (A, B, C, H5T_NATIVE_CHAR, D);
 #define HDF5_GET_ATT_INT(A, B, C, D)   hdf5_get_att (A, B, C, H5T_NATIVE_INT, D);
 #define HDF5_GET_ATT_FLOAT(A, B, C, D) hdf5_get_att (A, B, C, H5T_NATIVE_FLOAT, D);
@@ -361,12 +379,23 @@ hid_t mpi_type_to_hdf5_type (MPI_Datatype mpitype);
 
 int hdf5_wrap_init ();
 void hdf5_wrap_finalize ();
+int hdf5_put_var (int vid, hid_t mtype, hid_t dxplid, void *buf);
 int hdf5_put_vara (
     int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, MPI_Offset *mcount, void *buf);
-int hdf5_put_vara_mpi (
-    int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, MPI_Offset *mcount, void *buf, int rank);
-int hdf5_put_vars (
-    int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, MPI_Offset *mcount, MPI_Offset *mstride, void *buf);
+int hdf5_put_vara_mpi (int vid,
+                       hid_t mtype,
+                       hid_t dxplid,
+                       MPI_Offset *mstart,
+                       MPI_Offset *mcount,
+                       void *buf,
+                       int rank);
+int hdf5_put_vars (int vid,
+                   hid_t mtype,
+                   hid_t dxplid,
+                   MPI_Offset *mstart,
+                   MPI_Offset *mcount,
+                   MPI_Offset *mstride,
+                   void *buf);
 int hdf5_put_var1 (int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, void *buf);
 int hdf5_put_var1_mpi (int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, void *buf, int rank);
 int hdf5_put_varn (int vid,
@@ -376,7 +405,16 @@ int hdf5_put_varn (int vid,
                    MPI_Offset **mstarts,
                    MPI_Offset **mcounts,
                    void *buf);
+int hdf5_put_varn_mpi (int vid,
+                       MPI_Datatype mpitype,
+                       hid_t dxplid,
+                       int cnt,
+                       int max_cnt,
+                       MPI_Offset **mstarts,
+                       MPI_Offset **mcounts,
+                       void *buf);
 
+int hdf5_get_var (int vid, hid_t mtype, hid_t dxplid, void *buf);
 int hdf5_get_vara (
     int vid, hid_t mtype, hid_t dxplid, MPI_Offset *mstart, MPI_Offset *mcount, void *buf);
 int hdf5_get_vars (int vid,
@@ -413,14 +451,15 @@ int hdf5_inq_get_size (hid_t fid, size_t *size);
 
 int hdf5_def_dim_mpi (MPI_Offset msize, int *did);
 int hdf5_def_var_mpi (hid_t fid, const char *name, int *vid);
-int def_F_case_h0_hdf5_mpi (hid_t               ncid,    /* file ID */
-                  const MPI_Offset  dims[2], /* dimension sizes */
-                  int               nvars,   /* number of variables */
-                  int              *varids);
+int def_F_case_h0_hdf5_mpi (hid_t ncid,               /* file ID */
+                            const MPI_Offset dims[2], /* dimension sizes */
+                            int nvars,                /* number of variables */
+                            int *varids);
 
-int def_F_case_h1_hdf5_mpi(hid_t               ncid,    /* file ID */
-                  const MPI_Offset  dims[2], /* dimension sizes */
-                  int               nvars,   /* number of variables */
-                  int              *varids);  /* variable IDs */
+int def_F_case_h1_hdf5_mpi (hid_t ncid,               /* file ID */
+                            const MPI_Offset dims[2], /* dimension sizes */
+                            int nvars,                /* number of variables */
+                            int *varids);             /* variable IDs */
 
 int hdf5_close_vars (hid_t fid);
+int flush_multidatasets ();

@@ -480,6 +480,19 @@ int run_vard_F_case (
     sprintf (outfname, "%s/%s", out_dir, outfile);
 
     /* create a new CDF-5 file for writing */
+    if (layout != LAYOUT_CONTIG) {
+        MPI_Info_set (info, "nc_compression", "enable");
+        switch (layout) {
+            case LAYOUT_CHUNK:
+                MPI_Info_set (info, "nc_zip_driver", "none");
+                break;
+            case LAYOUT_ZLIB:
+                MPI_Info_set (info, "nc_zip_driver", "zlib");
+                break;
+            default:
+                abort ();
+        }
+    }
     cmode = NC_CLOBBER | NC_64BIT_DATA;
     err   = ncmpi_create (io_comm, outfname, cmode, info, &ncid);
     ERR
@@ -1003,6 +1016,19 @@ int run_varn_F_case (
     sprintf (outfname, "%s/%s", out_dir, outfile);
 
     /* create a new CDF-5 file for writing */
+    if (layout != LAYOUT_CONTIG) {
+        MPI_Info_set (info, "nc_compression", "enable");
+        switch (layout) {
+            case LAYOUT_CHUNK:
+                MPI_Info_set (info, "nc_zip_driver", "none");
+                break;
+            case LAYOUT_ZLIB:
+                MPI_Info_set (info, "nc_zip_driver", "zlib");
+                break;
+            default:
+                abort ();
+        }
+    }
     cmode = NC_CLOBBER | NC_64BIT_DATA;
     err   = ncmpi_create (io_comm, outfname, cmode, info, &ncid);
     ERR
@@ -1278,8 +1304,8 @@ int run_varn_F_case (
         free (starts_D2[0]);
         free (starts_D2);
     }
-    if (rec_buf != NULL) free (rec_buf);
-    if (dbl_buf != NULL) free (dbl_buf);
+    if (rec_bufp==NULL) free (rec_buf);
+    if (dbl_bufp == NULL) free (dbl_buf);
     free (varids);
 
     total_timing = MPI_Wtime () - total_timing;
@@ -1460,6 +1486,19 @@ int run_varn_F_case_rd (
     sprintf (outfname, "%s/%s", out_dir, outfile);
 
     /* create a new CDF-5 file for writing */
+    if (layout != LAYOUT_CONTIG) {
+        MPI_Info_set (info, "nc_compression", "enable");
+        switch (layout) {
+            case LAYOUT_CHUNK:
+                MPI_Info_set (info, "nc_zip_driver", "none");
+                break;
+            case LAYOUT_ZLIB:
+                MPI_Info_set (info, "nc_zip_driver", "zlib");
+                break;
+            default:
+                abort ();
+        }
+    }
     cmode = NC_64BIT_DATA;
     err   = ncmpi_open (comm, outfname, cmode, info, &ncid);
     ERR
@@ -1770,7 +1809,7 @@ int run_varn_F_case_rd (
     MPI_Offset m_alloc = 0, max_alloc;
     ncmpi_inq_malloc_max_size (&m_alloc);
     MPI_Reduce (&m_alloc, &max_alloc, 1, MPI_OFFSET, MPI_MAX, 0, comm);
-    if (rank == 0) {
+    if ((rank == 0) && show_result) {
         printf ("History output file                = %s\n", outfile);
         printf ("MAX heap memory allocated by PnetCDF internally is %.2f MiB\n",
                 (float)max_alloc / 1048576);

@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <e3sm_io.h>
+#include <e3sm_io_pnc.h>
 
 #define INQ_VID(A, B, D, E, F, C) ncmpi_inq_varid (A, B, C)
 #define NOP(A, B, D, E, C)        NC_NOERR
@@ -2926,7 +2927,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_nCells;
 
-    err = ncmpi_def_var (ncid, "salinitySurfaceRestoringTendency", NC_DOUBLE, 2, dimids,
+    err = e3sm_pnc_def_var (ncid, "salinitySurfaceRestoringTendency", NC_DOUBLE, 2, dimids,
                          &salinitySurfaceRestoringTendency);
     ERR
     err = ncmpi_put_att_text (ncid, salinitySurfaceRestoringTendency, "units", 7, "m PSU/s");
@@ -2941,7 +2942,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevelsP1;
 
-    err = ncmpi_def_var (ncid, "vertTransportVelocityTop", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "vertTransportVelocityTop", NC_DOUBLE, 3, dimids,
                          &vertTransportVelocityTop);
     ERR
     err = ncmpi_put_att_text (ncid, vertTransportVelocityTop, "units", 8, "m s^{-1}");
@@ -2955,7 +2956,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = vertTransportVelocityTop;
 
-    err = ncmpi_def_var (ncid, "vertGMBolusVelocityTop", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "vertGMBolusVelocityTop", NC_DOUBLE, 3, dimids,
                          &vertGMBolusVelocityTop);
     ERR
     err = ncmpi_put_att_text (ncid, vertGMBolusVelocityTop, "units", 8, "m s^{-1}");
@@ -2969,7 +2970,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = vertGMBolusVelocityTop;
 
-    err = ncmpi_def_var (ncid, "vertAleTransportTop", NC_DOUBLE, 3, dimids, &vertAleTransportTop);
+    err = e3sm_pnc_def_var (ncid, "vertAleTransportTop", NC_DOUBLE, 3, dimids, &vertAleTransportTop);
     ERR
     err = ncmpi_put_att_text (ncid, vertAleTransportTop, "units", 8, "m s^{-1}");
     ERR
@@ -2983,7 +2984,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_nCells;
 
-    err = ncmpi_def_var (ncid, "tendSSH", NC_DOUBLE, 2, dimids, &tendSSH);
+    err = e3sm_pnc_def_var (ncid, "tendSSH", NC_DOUBLE, 2, dimids, &tendSSH);
     ERR
     err = ncmpi_put_att_text (ncid, tendSSH, "units", 8, "m s^{-1}");
     ERR
@@ -2997,7 +2998,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "layerThickness", NC_DOUBLE, 3, dimids, &layerThickness);
+    err = e3sm_pnc_def_var (ncid, "layerThickness", NC_DOUBLE, 3, dimids, &layerThickness);
     ERR
     err = ncmpi_put_att_text (ncid, layerThickness, "units", 1, "m");
     ERR
@@ -3010,7 +3011,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nEdges;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "normalVelocity", NC_DOUBLE, 3, dimids, &normalVelocity);
+    err = e3sm_pnc_def_var (ncid, "normalVelocity", NC_DOUBLE, 3, dimids, &normalVelocity);
     ERR
     err = ncmpi_put_att_text (ncid, normalVelocity, "units", 8, "m s^{-1}");
     ERR
@@ -3024,7 +3025,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_nCells;
 
-    err = ncmpi_def_var (ncid, "ssh", NC_DOUBLE, 2, dimids, &ssh);
+    err = e3sm_pnc_def_var (ncid, "ssh", NC_DOUBLE, 2, dimids, &ssh);
     ERR
     err = ncmpi_put_att_text (ncid, ssh, "units", 1, "m");
     ERR
@@ -3035,7 +3036,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 1 int (nEdges) */
     dimids[0] = dim_nEdges;
 
-    err = ncmpi_def_var (ncid, "maxLevelEdgeTop", NC_INT, 1, dimids, &maxLevelEdgeTop);
+    err = e3sm_pnc_def_var (ncid, "maxLevelEdgeTop", NC_INT, 1, dimids, &maxLevelEdgeTop);
     ERR
     err = ncmpi_put_att_text (ncid, maxLevelEdgeTop, "units", 8, "unitless");
     ERR
@@ -3048,7 +3049,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 1 double (nVertLevels) */
     dimids[0] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "vertCoordMovementWeights", NC_DOUBLE, 1, dimids,
+    err = e3sm_pnc_def_var (ncid, "vertCoordMovementWeights", NC_DOUBLE, 1, dimids,
                          &vertCoordMovementWeights);
     ERR
     err = ncmpi_put_att_text (ncid, vertCoordMovementWeights, "units", 8, "unitless");
@@ -3064,7 +3065,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[0] = dim_nEdges;
     dimids[1] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "edgeMask", NC_INT, 2, dimids, &edgeMask);
+    err = e3sm_pnc_def_var (ncid, "edgeMask", NC_INT, 2, dimids, &edgeMask);
     ERR
     err = ncmpi_put_att_text (ncid, edgeMask, "units", 8, "unitless");
     ERR
@@ -3078,7 +3079,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[0] = dim_nCells;
     dimids[1] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "cellMask", NC_INT, 2, dimids, &cellMask);
+    err = e3sm_pnc_def_var (ncid, "cellMask", NC_INT, 2, dimids, &cellMask);
     ERR
     err = ncmpi_put_att_text (ncid, cellMask, "units", 8, "unitless");
     ERR
@@ -3092,7 +3093,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[0] = dim_nVertices;
     dimids[1] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "vertexMask", NC_INT, 2, dimids, &vertexMask);
+    err = e3sm_pnc_def_var (ncid, "vertexMask", NC_INT, 2, dimids, &vertexMask);
     ERR
     err = ncmpi_put_att_text (ncid, vertexMask, "units", 8, "unitless");
     ERR
@@ -3105,7 +3106,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 2 double (nVertLevels) */
     dimids[0] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "refZMid", NC_DOUBLE, 1, dimids, &refZMid);
+    err = e3sm_pnc_def_var (ncid, "refZMid", NC_DOUBLE, 1, dimids, &refZMid);
     ERR
     err = ncmpi_put_att_text (ncid, refZMid, "units", 1, "m");
     ERR
@@ -3115,7 +3116,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = refZMid;
 
-    err = ncmpi_def_var (ncid, "refLayerThickness", NC_DOUBLE, 1, dimids, &refLayerThickness);
+    err = e3sm_pnc_def_var (ncid, "refLayerThickness", NC_DOUBLE, 1, dimids, &refLayerThickness);
     ERR
     err = ncmpi_put_att_text (ncid, refLayerThickness, "units", 1, "m");
     ERR
@@ -3129,7 +3130,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[0] = dim_Time;
     dimids[1] = dim_StrLen;
 
-    err = ncmpi_def_var (ncid, "xtime", NC_CHAR, 2, dimids, &xtime);
+    err = e3sm_pnc_def_var (ncid, "xtime", NC_CHAR, 2, dimids, &xtime);
     ERR
     err = ncmpi_put_att_text (ncid, xtime, "units", 8, "unitless");
     ERR
@@ -3143,7 +3144,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "kineticEnergyCell", NC_DOUBLE, 3, dimids, &kineticEnergyCell);
+    err = e3sm_pnc_def_var (ncid, "kineticEnergyCell", NC_DOUBLE, 3, dimids, &kineticEnergyCell);
     ERR
     err = ncmpi_put_att_text (ncid, kineticEnergyCell, "units", 10, "m^2 s^{-2}");
     ERR
@@ -3154,7 +3155,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     varids[i++] = kineticEnergyCell;
 
     err =
-        ncmpi_def_var (ncid, "relativeVorticityCell", NC_DOUBLE, 3, dimids, &relativeVorticityCell);
+        e3sm_pnc_def_var (ncid, "relativeVorticityCell", NC_DOUBLE, 3, dimids, &relativeVorticityCell);
     ERR
     err = ncmpi_put_att_text (ncid, relativeVorticityCell, "units", 6, "s^{-1}");
     ERR
@@ -3169,7 +3170,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nVertices;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "relativeVorticity", NC_DOUBLE, 3, dimids, &relativeVorticity);
+    err = e3sm_pnc_def_var (ncid, "relativeVorticity", NC_DOUBLE, 3, dimids, &relativeVorticity);
     ERR
     err = ncmpi_put_att_text (ncid, relativeVorticity, "units", 6, "s^{-1}");
     ERR
@@ -3184,7 +3185,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "divergence", NC_DOUBLE, 3, dimids, &divergence);
+    err = e3sm_pnc_def_var (ncid, "divergence", NC_DOUBLE, 3, dimids, &divergence);
     ERR
     err = ncmpi_put_att_text (ncid, divergence, "units", 6, "s^{-1}");
     ERR
@@ -3196,7 +3197,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 6 double (Time) */
     dimids[0] = dim_Time;
 
-    err = ncmpi_def_var (ncid, "areaCellGlobal", NC_DOUBLE, 1, dimids, &areaCellGlobal);
+    err = e3sm_pnc_def_var (ncid, "areaCellGlobal", NC_DOUBLE, 1, dimids, &areaCellGlobal);
     ERR
     err = ncmpi_put_att_text (ncid, areaCellGlobal, "units", 3, "m^2");
     ERR
@@ -3206,7 +3207,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = areaCellGlobal;
 
-    err = ncmpi_def_var (ncid, "areaEdgeGlobal", NC_DOUBLE, 1, dimids, &areaEdgeGlobal);
+    err = e3sm_pnc_def_var (ncid, "areaEdgeGlobal", NC_DOUBLE, 1, dimids, &areaEdgeGlobal);
     ERR
     err = ncmpi_put_att_text (ncid, areaEdgeGlobal, "units", 3, "m^2");
     ERR
@@ -3216,7 +3217,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = areaEdgeGlobal;
 
-    err = ncmpi_def_var (ncid, "areaTriangleGlobal", NC_DOUBLE, 1, dimids, &areaTriangleGlobal);
+    err = e3sm_pnc_def_var (ncid, "areaTriangleGlobal", NC_DOUBLE, 1, dimids, &areaTriangleGlobal);
     ERR
     err = ncmpi_put_att_text (ncid, areaTriangleGlobal, "units", 3, "m^2");
     ERR
@@ -3226,7 +3227,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = areaTriangleGlobal;
 
-    err = ncmpi_def_var (ncid, "volumeCellGlobal", NC_DOUBLE, 1, dimids, &volumeCellGlobal);
+    err = e3sm_pnc_def_var (ncid, "volumeCellGlobal", NC_DOUBLE, 1, dimids, &volumeCellGlobal);
     ERR
     err = ncmpi_put_att_text (ncid, volumeCellGlobal, "units", 3, "m^3");
     ERR
@@ -3236,7 +3237,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = volumeCellGlobal;
 
-    err = ncmpi_def_var (ncid, "volumeEdgeGlobal", NC_DOUBLE, 1, dimids, &volumeEdgeGlobal);
+    err = e3sm_pnc_def_var (ncid, "volumeEdgeGlobal", NC_DOUBLE, 1, dimids, &volumeEdgeGlobal);
     ERR
     err = ncmpi_put_att_text (ncid, volumeEdgeGlobal, "units", 3, "m^3");
     ERR
@@ -3246,7 +3247,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = volumeEdgeGlobal;
 
-    err = ncmpi_def_var (ncid, "CFLNumberGlobal", NC_DOUBLE, 1, dimids, &CFLNumberGlobal);
+    err = e3sm_pnc_def_var (ncid, "CFLNumberGlobal", NC_DOUBLE, 1, dimids, &CFLNumberGlobal);
     ERR
     err = ncmpi_put_att_text (ncid, CFLNumberGlobal, "units", 8, "unitless");
     ERR
@@ -3260,7 +3261,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "BruntVaisalaFreqTop", NC_DOUBLE, 3, dimids, &BruntVaisalaFreqTop);
+    err = e3sm_pnc_def_var (ncid, "BruntVaisalaFreqTop", NC_DOUBLE, 3, dimids, &BruntVaisalaFreqTop);
     ERR
     err = ncmpi_put_att_text (ncid, BruntVaisalaFreqTop, "units", 6, "s^{-2}");
     ERR
@@ -3275,7 +3276,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevelsP1;
 
-    err = ncmpi_def_var (ncid, "vertVelocityTop", NC_DOUBLE, 3, dimids, &vertVelocityTop);
+    err = e3sm_pnc_def_var (ncid, "vertVelocityTop", NC_DOUBLE, 3, dimids, &vertVelocityTop);
     ERR
     err = ncmpi_put_att_text (ncid, vertVelocityTop, "units", 8, "m s^{-1}");
     ERR
@@ -3290,7 +3291,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "velocityZonal", NC_DOUBLE, 3, dimids, &velocityZonal);
+    err = e3sm_pnc_def_var (ncid, "velocityZonal", NC_DOUBLE, 3, dimids, &velocityZonal);
     ERR
     err = ncmpi_put_att_text (ncid, velocityZonal, "units", 8, "m s^{-1}");
     ERR
@@ -3300,7 +3301,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = velocityZonal;
 
-    err = ncmpi_def_var (ncid, "velocityMeridional", NC_DOUBLE, 3, dimids, &velocityMeridional);
+    err = e3sm_pnc_def_var (ncid, "velocityMeridional", NC_DOUBLE, 3, dimids, &velocityMeridional);
     ERR
     err = ncmpi_put_att_text (ncid, velocityMeridional, "units", 8, "m s^{-1}");
     ERR
@@ -3310,7 +3311,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = velocityMeridional;
 
-    err = ncmpi_def_var (ncid, "displacedDensity", NC_DOUBLE, 3, dimids, &displacedDensity);
+    err = e3sm_pnc_def_var (ncid, "displacedDensity", NC_DOUBLE, 3, dimids, &displacedDensity);
     ERR
     err = ncmpi_put_att_text (ncid, displacedDensity, "units", 9, "kg m^{-3}");
     ERR
@@ -3322,7 +3323,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = displacedDensity;
 
-    err = ncmpi_def_var (ncid, "potentialDensity", NC_DOUBLE, 3, dimids, &potentialDensity);
+    err = e3sm_pnc_def_var (ncid, "potentialDensity", NC_DOUBLE, 3, dimids, &potentialDensity);
     ERR
     err = ncmpi_put_att_text (ncid, potentialDensity, "units", 9, "kg m^{-3}");
     ERR
@@ -3332,7 +3333,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = potentialDensity;
 
-    err = ncmpi_def_var (ncid, "pressure", NC_DOUBLE, 3, dimids, &pressure);
+    err = e3sm_pnc_def_var (ncid, "pressure", NC_DOUBLE, 3, dimids, &pressure);
     ERR
     err = ncmpi_put_att_text (ncid, pressure, "units", 8, "N m^{-2}");
     ERR
@@ -3344,7 +3345,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 1 double (nVertLevels) */
     dimids[0] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "refBottomDepth", NC_DOUBLE, 1, dimids, &refBottomDepth);
+    err = e3sm_pnc_def_var (ncid, "refBottomDepth", NC_DOUBLE, 1, dimids, &refBottomDepth);
     ERR
     err = ncmpi_put_att_text (ncid, refBottomDepth, "units", 1, "m");
     ERR
@@ -3359,7 +3360,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "zMid", NC_DOUBLE, 3, dimids, &zMid);
+    err = e3sm_pnc_def_var (ncid, "zMid", NC_DOUBLE, 3, dimids, &zMid);
     ERR
     err = ncmpi_put_att_text (ncid, zMid, "units", 1, "m");
     ERR
@@ -3371,7 +3372,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 1 double (nCells) */
     dimids[0] = dim_nCells;
 
-    err = ncmpi_def_var (ncid, "bottomDepth", NC_DOUBLE, 1, dimids, &bottomDepth);
+    err = e3sm_pnc_def_var (ncid, "bottomDepth", NC_DOUBLE, 1, dimids, &bottomDepth);
     ERR
     err = ncmpi_put_att_text (ncid, bottomDepth, "units", 1, "m");
     ERR
@@ -3384,7 +3385,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 1 int (nCells) */
     dimids[0] = dim_nCells;
 
-    err = ncmpi_def_var (ncid, "maxLevelCell", NC_INT, 1, dimids, &maxLevelCell);
+    err = e3sm_pnc_def_var (ncid, "maxLevelCell", NC_INT, 1, dimids, &maxLevelCell);
     ERR
     err = ncmpi_put_att_text (ncid, maxLevelCell, "units", 8, "unitless");
     ERR
@@ -3396,7 +3397,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     /* 1 int (nEdges) */
     dimids[0] = dim_nEdges;
 
-    err = ncmpi_def_var (ncid, "maxLevelEdgeBot", NC_INT, 1, dimids, &maxLevelEdgeBot);
+    err = e3sm_pnc_def_var (ncid, "maxLevelEdgeBot", NC_INT, 1, dimids, &maxLevelEdgeBot);
     ERR
     err = ncmpi_put_att_text (ncid, maxLevelEdgeBot, "units", 8, "unitless");
     ERR
@@ -3411,7 +3412,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
 
     err =
-        ncmpi_def_var (ncid, "columnIntegratedSpeed", NC_DOUBLE, 2, dimids, &columnIntegratedSpeed);
+        e3sm_pnc_def_var (ncid, "columnIntegratedSpeed", NC_DOUBLE, 2, dimids, &columnIntegratedSpeed);
     ERR
     err = ncmpi_put_att_text (ncid, columnIntegratedSpeed, "units", 10, "m^2 s^{-1}");
     ERR
@@ -3427,7 +3428,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     dimids[1] = dim_nCells;
     dimids[2] = dim_nVertLevels;
 
-    err = ncmpi_def_var (ncid, "temperatureHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "temperatureHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids,
                          &temperatureHorizontalAdvectionTendency);
     ERR
     err = ncmpi_put_att_text (ncid, temperatureHorizontalAdvectionTendency, "long_name", 58,
@@ -3439,7 +3440,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = temperatureHorizontalAdvectionTendency;
 
-    err = ncmpi_def_var (ncid, "salinityHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "salinityHorizontalAdvectionTendency", NC_DOUBLE, 3, dimids,
                          &salinityHorizontalAdvectionTendency);
     ERR
     err = ncmpi_put_att_text (ncid, salinityHorizontalAdvectionTendency, "long_name", 45,
@@ -3451,7 +3452,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = salinityHorizontalAdvectionTendency;
 
-    err = ncmpi_def_var (ncid, "temperatureVerticalAdvectionTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "temperatureVerticalAdvectionTendency", NC_DOUBLE, 3, dimids,
                          &temperatureVerticalAdvectionTendency);
     ERR
     err = ncmpi_put_att_text (ncid, temperatureVerticalAdvectionTendency, "long_name", 56,
@@ -3463,7 +3464,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = temperatureVerticalAdvectionTendency;
 
-    err = ncmpi_def_var (ncid, "salinityVerticalAdvectionTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "salinityVerticalAdvectionTendency", NC_DOUBLE, 3, dimids,
                          &salinityVerticalAdvectionTendency);
     ERR
     err = ncmpi_put_att_text (ncid, salinityVerticalAdvectionTendency, "long_name", 43,
@@ -3475,7 +3476,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = salinityVerticalAdvectionTendency;
 
-    err = ncmpi_def_var (ncid, "temperatureVertMixTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "temperatureVertMixTendency", NC_DOUBLE, 3, dimids,
                          &temperatureVertMixTendency);
     ERR
     err = ncmpi_put_att_text (ncid, temperatureVertMixTendency, "long_name", 53,
@@ -3487,7 +3488,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = temperatureVertMixTendency;
 
-    err = ncmpi_def_var (ncid, "salinityVertMixTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "salinityVertMixTendency", NC_DOUBLE, 3, dimids,
                          &salinityVertMixTendency);
     ERR
     err = ncmpi_put_att_text (ncid, salinityVertMixTendency, "long_name", 40,
@@ -3497,7 +3498,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = salinityVertMixTendency;
 
-    err = ncmpi_def_var (ncid, "temperatureSurfaceFluxTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "temperatureSurfaceFluxTendency", NC_DOUBLE, 3, dimids,
                          &temperatureSurfaceFluxTendency);
     ERR
     err = ncmpi_put_att_text (ncid, temperatureSurfaceFluxTendency, "long_name", 52,
@@ -3509,7 +3510,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = temperatureSurfaceFluxTendency;
 
-    err = ncmpi_def_var (ncid, "salinitySurfaceFluxTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "salinitySurfaceFluxTendency", NC_DOUBLE, 3, dimids,
                          &salinitySurfaceFluxTendency);
     ERR
     err = ncmpi_put_att_text (ncid, salinitySurfaceFluxTendency, "long_name", 39,
@@ -3519,7 +3520,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = salinitySurfaceFluxTendency;
 
-    err = ncmpi_def_var (ncid, "temperatureShortWaveTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "temperatureShortWaveTendency", NC_DOUBLE, 3, dimids,
                          &temperatureShortWaveTendency);
     ERR
     err = ncmpi_put_att_text (ncid, temperatureShortWaveTendency, "units", 26,
@@ -3531,7 +3532,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = temperatureShortWaveTendency;
 
-    err = ncmpi_def_var (ncid, "temperatureNonLocalTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "temperatureNonLocalTendency", NC_DOUBLE, 3, dimids,
                          &temperatureNonLocalTendency);
     ERR
     err = ncmpi_put_att_text (ncid, temperatureNonLocalTendency, "long_name", 56,
@@ -3543,7 +3544,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = temperatureNonLocalTendency;
 
-    err = ncmpi_def_var (ncid, "salinityNonLocalTendency", NC_DOUBLE, 3, dimids,
+    err = e3sm_pnc_def_var (ncid, "salinityNonLocalTendency", NC_DOUBLE, 3, dimids,
                          &salinityNonLocalTendency);
     ERR
     err = ncmpi_put_att_text (ncid, salinityNonLocalTendency, "long_name", 43,
@@ -3553,7 +3554,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = salinityNonLocalTendency;
 
-    err = ncmpi_def_var (ncid, "temperature", NC_DOUBLE, 3, dimids, &temperature);
+    err = e3sm_pnc_def_var (ncid, "temperature", NC_DOUBLE, 3, dimids, &temperature);
     ERR
     err = ncmpi_put_att_text (ncid, temperature, "long_name", 21, "potential temperature");
     ERR
@@ -3561,7 +3562,7 @@ int def_G_case_h0 (int ncid,                    /* file ID */
     ERR
     varids[i++] = temperature;
 
-    err = ncmpi_def_var (ncid, "salinity", NC_DOUBLE, 3, dimids, &salinity);
+    err = e3sm_pnc_def_var (ncid, "salinity", NC_DOUBLE, 3, dimids, &salinity);
     ERR
     err = ncmpi_put_att_text (ncid, salinity, "long_name", 8, "salinity");
     ERR

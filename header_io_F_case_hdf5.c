@@ -8996,7 +8996,7 @@ fn_exit:
 }
 
 /*----< inq_F_case_h0() >----------------------------------------------------*/
-int inq_F_case_h0_hdf5 (int ncid,           /* file ID */
+int inq_F_case_h0_hdf5 (hid_t ncid,           /* file ID */
                         MPI_Offset dims[2], /* dimension sizes */
                         int nvars,          /* number of variables */
                         int *varids)        /* variable IDs */
@@ -15176,7 +15176,7 @@ fn_exit:
 }
 
 /*----< inq_F_case_h1() >----------------------------------------------------*/
-int inq_F_case_h1_hdf5 (int ncid,           /* file ID */
+int inq_F_case_h1_hdf5 (hid_t ncid,           /* file ID */
                         MPI_Offset dims[2], /* dimension sizes */
                         int nvars,          /* number of variables */
                         int *varids)        /* variable IDs */

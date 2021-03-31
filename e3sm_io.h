@@ -13,6 +13,7 @@
 #include <mpi.h>
 #include <pnetcdf.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "config.h"
 #ifdef ENABLE_HDF5
@@ -27,11 +28,18 @@
 #define UNDER_API_PNC  0
 #define UNDER_API_HDF5 1
 
+#define LAYOUT_CONTIG 0
+#define LAYOUT_CHUNK 1
+#define LAYOUT_ZLIB 2
+
 #define MAX_NUM_DECOMP 6
 
 int verbose;      /* verbose mode to print additional messages on screen */
+int show_result;      /* verbose mode to print additional messages on screen */
 int keep_outfile; /* whether to keep the output files when exits */
 int two_buf;
+int layout;
+size_t chunk_size;
 
 #ifndef MAX
 #define MAX(a, b) ((a) > (b)) ? (a) : (b)
@@ -45,6 +53,7 @@ int two_buf;
         if (err != NC_NOERR) {                                                         \
             printf ("Error in %s:%d: %s\n", __FILE__, __LINE__, ncmpi_strerror (err)); \
             nerrs++;                                                                   \
+            abort();\
             goto fn_exit;                                                              \
         }                                                                              \
     }
@@ -202,7 +211,7 @@ extern int def_F_case_h0_hdf5 (hid_t ncid,                  /* file ID */
                                const MPI_Offset dims[2],    /* dimension sizes */
                                int nvars,                   /* number of variables */
                                int *varids);                /* variable IDs */
-extern int inq_F_case_h0_hdf5 (int ncid,                    /* file ID */
+extern int inq_F_case_h0_hdf5 (hid_t ncid,                    /* file ID */
                                MPI_Offset dims[2],          /* dimension sizes */
                                int nvars,                   /* number of variables */
                                int *varids);                /* variable IDs */
@@ -210,10 +219,19 @@ extern int def_F_case_h1_hdf5 (hid_t ncid,                  /* file ID */
                                const MPI_Offset dims[2],    /* dimension sizes */
                                int nvars,                   /* number of variables */
                                int *varids);                /* variable IDs */
-extern int inq_F_case_h1_hdf5 (int ncid,                    /* file ID */
+extern int inq_F_case_h1_hdf5 (hid_t ncid,                    /* file ID */
                                MPI_Offset dims[2],          /* dimension sizes */
                                int nvars,                   /* number of variables */
                                int *varids);                /* variable IDs */
+extern int def_G_case_h0_hdf5_mpi (hid_t ncid,                  /* file ID */
+                        const MPI_Offset dims_D1[1], /* dimension sizes of decomposition 1 */
+                        const MPI_Offset dims_D2[1], /* dimension sizes of decomposition 2 */
+                        const MPI_Offset dims_D3[2], /* dimension sizes of decomposition 3 */
+                        const MPI_Offset dims_D4[2], /* dimension sizes of decomposition 4 */
+                        const MPI_Offset dims_D5[2], /* dimension sizes of decomposition 5 */
+                        const MPI_Offset dims_D6[2], /* dimension sizes of decomposition 6 */
+                        int nvars,                   /* number of variables */
+                        int *varids);                 /* variable IDs */
 int extern def_G_case_h0_hdf5 (hid_t ncid,                  /* file ID */
                                const MPI_Offset dims_D1[1], /* dimension sizes of decomposition 1 */
                                const MPI_Offset dims_D2[1], /* dimension sizes of decomposition 2 */

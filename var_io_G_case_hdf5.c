@@ -170,7 +170,8 @@ int run_varn_G_case_hdf5 (
     char outfname[512];
     int i, j, k, err, nerrs = 0, rank, cmode, *varids;
     herr_t herr;
-    hid_t ncid, faplid;
+    hid_t ncid, faplid, faplid_indp, fcplid_indp;
+    ;
     int rec_no, my_nreqs, nvars_D[6];
     size_t rec_buflen, nelems[6];
     double *D1_rec_dbl_buf, *D3_rec_dbl_buf, *D4_rec_dbl_buf, *D5_rec_dbl_buf, *D6_rec_dbl_buf,
@@ -439,15 +440,33 @@ int run_varn_G_case_hdf5 (
     err = hdf5_wrap_init ();
     ERR;
 
+    // We are going to let rank 0 to handle datasets init and attributes alone.
+    if (!rank) {
+        faplid_indp = H5Pcreate (H5P_FILE_ACCESS);
+        fcplid_indp = H5Pcreate (H5P_FILE_CREATE);
+        ncid        = H5Fcreate (outfname, H5F_ACC_TRUNC, fcplid_indp, faplid_indp);
+
+        err = def_G_case_h0_hdf5 (ncid, dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], nvars,
+                                  varids);
+        ERR
+        /* exit define mode and enter data mode */
+        err = HDF5_NOP1 (ncid);
+        ERR
+        herr = hdf5_close_vars (ncid);
+        H5Pclose (faplid_indp);
+        H5Pclose (fcplid_indp);
+        H5Fclose (ncid);
+    }
+
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL
     H5Pset_fapl_mpio (faplid, io_comm, info);
-    H5Pset_all_coll_metadata_ops (faplid, 1);
+    H5Pset_all_coll_metadata_ops (faplid, 0);
 #ifdef ENABLE_LOGVOL
     H5Pset_vol (faplid, log_vlid, NULL);
 #endif
     // Create file
-    ncid = H5Fcreate (outfname, H5F_ACC_TRUNC, H5P_DEFAULT, faplid);
+    ncid = H5Fopen (outfname, H5F_ACC_RDWR, faplid);
     CHECK_HID (ncid)
 
     /* create a new CDF-5 file for writing */
@@ -458,8 +477,8 @@ int run_varn_G_case_hdf5 (
     // err = ncmpi_buffer_attach(ncid, put_buffer_size_limit); ERR
 
     /* define dimensions, variables, and attributes */
-    err = def_G_case_h0_hdf5 (ncid, dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], nvars,
-                              varids);
+    err = def_G_case_h0_hdf5_mpi (ncid, dims[0], dims[1], dims[2], dims[3], dims[4], dims[5], nvars,
+                                  varids);
     ERR
 
     /* exit define mode and enter data mode */
@@ -479,113 +498,199 @@ int run_varn_G_case_hdf5 (
     /* write 7 fixed-size variables */
 
     /* int maxLevelEdgeTop(nEdges) */
-    err = HDF5_IPUT_VARN (ncid, 8, xnreqs[1], fix_starts_D2, fix_counts_D2, D2_fix_int_buf,
-                          nelems[1], MPI_INT, NULL);
+    err = HDF5_IPUT_VARN_MPI (ncid, 8, xnreqs[1], fix_starts_D2, fix_counts_D2, D2_fix_int_buf,
+                          nelems[1], MPI_INT);
     ERR
     my_nreqs += xnreqs[1];
     nvars_D[1]++;
 
     /* int maxLevelEdgeBot(nEdges) */
-    err = HDF5_IPUT_VARN (ncid, 37, xnreqs[1], fix_starts_D2, fix_counts_D2,
-                          D2_fix_int_buf + nelems[1], nelems[1], MPI_INT, NULL);
+    err = HDF5_IPUT_VARN_MPI (ncid, 37, xnreqs[1], fix_starts_D2, fix_counts_D2,
+                          D2_fix_int_buf + nelems[1], nelems[1], MPI_INT);
     ERR
     my_nreqs += xnreqs[1];
     nvars_D[1]++;
 
     /* int edgeMask(nEdges, nVertLevels) */
-    err = HDF5_IPUT_VARN (ncid, 10, xnreqs[3], fix_starts_D4, fix_counts_D4, D4_fix_int_buf,
-                          nelems[3], MPI_INT, NULL);
+    err = HDF5_IPUT_VARN_MPI (ncid, 10, xnreqs[3], fix_starts_D4, fix_counts_D4, D4_fix_int_buf,
+                          nelems[3], MPI_INT);
     ERR
     my_nreqs += xnreqs[3];
     nvars_D[3]++;
 
     /* int cellMask(nCells, nVertLevels) */
-    err = HDF5_IPUT_VARN (ncid, 11, xnreqs[2], fix_starts_D3, fix_counts_D3, D3_fix_int_buf,
-                          nelems[2], MPI_INT, NULL);
+    err = HDF5_IPUT_VARN_MPI (ncid, 11, xnreqs[2], fix_starts_D3, fix_counts_D3, D3_fix_int_buf,
+                          nelems[2], MPI_INT);
     ERR
     my_nreqs += xnreqs[2];
     nvars_D[2]++;
 
     /* int vertexMask(nVertices, nVertLevels) */
-    err = HDF5_IPUT_VARN (ncid, 12, xnreqs[4], fix_starts_D5, fix_counts_D5, D5_fix_int_buf,
-                          nelems[4], MPI_INT, NULL);
+    err = HDF5_IPUT_VARN_MPI (ncid, 12, xnreqs[4], fix_starts_D5, fix_counts_D5, D5_fix_int_buf,
+                          nelems[4], MPI_INT);
     ERR
     my_nreqs += xnreqs[4];
     nvars_D[4]++;
 
     /* double bottomDepth(nCells)  */
-    err = HDF5_IPUT_VARN (ncid, 35, xnreqs[0], fix_starts_D1, fix_counts_D1, D1_fix_dbl_buf,
-                          nelems[0], MPI_DOUBLE, NULL);
+    err = HDF5_IPUT_VARN_MPI (ncid, 35, xnreqs[0], fix_starts_D1, fix_counts_D1, D1_fix_dbl_buf,
+                          nelems[0], MPI_DOUBLE);
     ERR
     my_nreqs += xnreqs[0];
     nvars_D[0]++;
 
     /* int maxLevelCell(nCells) */
-    err = HDF5_IPUT_VARN (ncid, 36, xnreqs[0], fix_starts_D1, fix_counts_D1, D1_fix_int_buf,
-                          nelems[0], MPI_INT, NULL);
+    err = HDF5_IPUT_VARN_MPI (ncid, 36, xnreqs[0], fix_starts_D1, fix_counts_D1, D1_fix_int_buf,
+                          nelems[0], MPI_INT);
     ERR
     my_nreqs += xnreqs[0];
     nvars_D[0]++;
 
+    post_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+    flush_multidatasets ();
+    wait_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+
     /* next 11 small variables are written by rank 0 only */
-    if (rank == 0) {
-        count[0] = dims[2][1]; /* dimension nVertLevels */
+    if (layout == LAYOUT_CONTIG) {
+        if (rank == 0) {
+            count[0] = dims[2][1]; /* dimension nVertLevels */
 
-        /* double vertCoordMovementWeights(nVertLevels) */
-        err = HDF5_BPUT_VARS_DOUBLE (ncid, 9, start, count, stride, dummy_double_buf, NULL);
-        ERR
-
-        /* double refZMid(nVertLevels) */
-        err = HDF5_BPUT_VARS_DOUBLE (ncid, 13, start, count, stride, dummy_double_buf, NULL);
-        ERR
-
-        /* double refLayerThickness(nVertLevels) */
-        err = HDF5_BPUT_VARS_DOUBLE (ncid, 14, start, count, stride, dummy_double_buf, NULL);
-        ERR
-
-        /* double refBottomDepth(nVertLevels) */
-        err = HDF5_BPUT_VARS_DOUBLE (ncid, 33, start, count, stride, dummy_double_buf, NULL);
-        ERR
-
-        my_nreqs += 4; /* 4 non-record variables */
-
-        for (rec_no = 0; rec_no < num_recs; rec_no++) {
-            start[0] = rec_no;
-            count[0] = 1;
-
-            count[1] = 64; /* dimension StrLen */
-
-            /* char xtime(Time, StrLen) */
-            err = HDF5_BPUT_VARS_TEXT (ncid, 15, start, count, stride, dummy_char_buf, NULL);
+            /* double vertCoordMovementWeights(nVertLevels) */
+            err = HDF5_BPUT_VARS_DOUBLE (ncid, 9, start, count, stride, dummy_double_buf, NULL);
             ERR
 
-            /* double areaCellGlobal(Time) */
-            err = HDF5_BPUT_VARS_DOUBLE (ncid, 20, start, count, stride, dummy_double_buf, NULL);
+            /* double refZMid(nVertLevels) */
+            err = HDF5_BPUT_VARS_DOUBLE (ncid, 13, start, count, stride, dummy_double_buf, NULL);
             ERR
 
-            /* double areaEdgeGlobal(Time) */
-            err = HDF5_BPUT_VARS_DOUBLE (ncid, 21, start, count, stride, dummy_double_buf, NULL);
+            /* double refLayerThickness(nVertLevels) */
+            err = HDF5_BPUT_VARS_DOUBLE (ncid, 14, start, count, stride, dummy_double_buf, NULL);
             ERR
 
-            /* double areaTriangleGlobal(Time) */
-            err = HDF5_BPUT_VARS_DOUBLE (ncid, 22, start, count, stride, dummy_double_buf, NULL);
+            /* double refBottomDepth(nVertLevels) */
+            err = HDF5_BPUT_VARS_DOUBLE (ncid, 33, start, count, stride, dummy_double_buf, NULL);
             ERR
 
-            /* double volumeCellGlobal(Time) */
-            err = HDF5_BPUT_VARS_DOUBLE (ncid, 23, start, count, stride, dummy_double_buf, NULL);
+            my_nreqs += 4; /* 4 non-record variables */
+
+            for (rec_no = 0; rec_no < num_recs; rec_no++) {
+                start[0] = rec_no;
+                count[0] = 1;
+                count[1] = 64; /* dimension StrLen */
+
+                /* char xtime(Time, StrLen) */
+                err = HDF5_BPUT_VARS_TEXT (ncid, 15, start, count, stride, dummy_char_buf, NULL);
+                ERR
+
+                /* double areaCellGlobal(Time) */
+                err =
+                    HDF5_BPUT_VARS_DOUBLE (ncid, 20, start, count, stride, dummy_double_buf, NULL);
+                ERR
+
+                /* double areaEdgeGlobal(Time) */
+                err =
+                    HDF5_BPUT_VARS_DOUBLE (ncid, 21, start, count, stride, dummy_double_buf, NULL);
+                ERR
+
+                /* double areaTriangleGlobal(Time) */
+                err =
+                    HDF5_BPUT_VARS_DOUBLE (ncid, 22, start, count, stride, dummy_double_buf, NULL);
+                ERR
+
+                /* double volumeCellGlobal(Time) */
+                err =
+                    HDF5_BPUT_VARS_DOUBLE (ncid, 23, start, count, stride, dummy_double_buf, NULL);
+                ERR
+
+                /* double volumeEdgeGlobal(Time) */
+                err =
+                    HDF5_BPUT_VARS_DOUBLE (ncid, 24, start, count, stride, dummy_double_buf, NULL);
+                ERR
+
+                /* double CFLNumberGlobal(Time) */
+                err =
+                    HDF5_BPUT_VARS_DOUBLE (ncid, 25, start, count, stride, dummy_double_buf, NULL);
+                ERR
+
+                my_nreqs += 7; /* 7 record variables */
+            }
+        } else {
+            if (rank == 0) {
+                count[0] = dims[2][1]; /* dimension nVertLevels */
+            } else {
+                count[0] = count[1] = 0;
+            }
+
+            /* double vertCoordMovementWeights(nVertLevels) */
+            err = HDF5_PUT_VARS_DOUBLE_ALL (ncid, 9, start, count, stride, dummy_double_buf);
             ERR
 
-            /* double volumeEdgeGlobal(Time) */
-            err = HDF5_BPUT_VARS_DOUBLE (ncid, 24, start, count, stride, dummy_double_buf, NULL);
+            /* double refZMid(nVertLevels) */
+            err = HDF5_PUT_VARS_DOUBLE_ALL (ncid, 13, start, count, stride, dummy_double_buf);
             ERR
 
-            /* double CFLNumberGlobal(Time) */
-            err = HDF5_BPUT_VARS_DOUBLE (ncid, 25, start, count, stride, dummy_double_buf, NULL);
+            /* double refLayerThickness(nVertLevels) */
+            err = HDF5_PUT_VARS_DOUBLE_ALL (ncid, 14, start, count, stride, dummy_double_buf);
             ERR
 
-            my_nreqs += 7; /* 7 record variables */
+            /* double refBottomDepth(nVertLevels) */
+            err = HDF5_PUT_VARS_DOUBLE_ALL (ncid, 33, start, count, stride, dummy_double_buf);
+            ERR
+
+            my_nreqs += 4; /* 4 non-record variables */
+
+            for (rec_no = 0; rec_no < num_recs; rec_no++) {
+                start[0] = rec_no;
+                if (rank == 0) {
+                    count[0] = 1;
+                    count[1] = 64; /* dimension StrLen */
+                } else {
+                    count[0] = count[1] = 0;
+                }
+
+                /* char xtime(Time, StrLen) */
+                err = HDF5_PUT_VARS_TEXT_ALL (ncid, 15, start, count, stride, dummy_char_buf);
+                ERR
+
+                /* double areaCellGlobal(Time) */
+                err =
+                    HDF5_PUT_VARS_DOUBLE_ALL (ncid, 20, start, count, stride, dummy_double_buf);
+                ERR
+
+                /* double areaEdgeGlobal(Time) */
+                err =
+                    HDF5_PUT_VARS_DOUBLE_ALL (ncid, 21, start, count, stride, dummy_double_buf);
+                ERR
+
+                /* double areaTriangleGlobal(Time) */
+                err =
+                    HDF5_PUT_VARS_DOUBLE_ALL (ncid, 22, start, count, stride, dummy_double_buf);
+                ERR
+
+                /* double volumeCellGlobal(Time) */
+                err =
+                    HDF5_PUT_VARS_DOUBLE_ALL (ncid, 23, start, count, stride, dummy_double_buf);
+                ERR
+
+                /* double volumeEdgeGlobal(Time) */
+                err =
+                    HDF5_PUT_VARS_DOUBLE_ALL (ncid, 24, start, count, stride, dummy_double_buf);
+                ERR
+
+                /* double CFLNumberGlobal(Time) */
+                err =
+                    HDF5_PUT_VARS_DOUBLE_ALL (ncid, 25, start, count, stride, dummy_double_buf);
+                ERR
+
+                my_nreqs += 7; /* 7 record variables */
+            }
         }
     }
+
+    wait_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
 
     /* write 34 record variables */
 
@@ -595,8 +700,8 @@ int run_varn_G_case_hdf5 (
 
         rec_buf_ptr = D1_rec_dbl_buf;
         for (j = 0; j < nD1_rec_2d_vars; j++) {
-            err = HDF5_IPUT_VARN (ncid, D1_rec_2d_varids[j], xnreqs[0], starts_D1, counts_D1,
-                                  rec_buf_ptr, nelems[0], MPI_DOUBLE, NULL);
+            err = HDF5_IPUT_VARN_MPI(ncid, D1_rec_2d_varids[j], xnreqs[0], starts_D1, counts_D1,
+                                  rec_buf_ptr, nelems[0], MPI_DOUBLE);
             ERR
             rec_buf_ptr += nelems[0];
             my_nreqs += xnreqs[0];
@@ -604,14 +709,20 @@ int run_varn_G_case_hdf5 (
         }
     }
 
+    post_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+    flush_multidatasets ();
+    wait_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+
     /* 4 D6 record variables: double (Time, nCells, nVertLevelsP1) */
     for (rec_no = 0; rec_no < num_recs; rec_no++) {
         for (j = 0; j < xnreqs[5]; j++) starts_D6[j][0] = rec_no;
 
         rec_buf_ptr = D6_rec_dbl_buf;
         for (j = 0; j < nD6_rec_3d_vars; j++) {
-            err = HDF5_IPUT_VARN (ncid, D6_rec_3d_varids[j], xnreqs[5], starts_D6, counts_D6,
-                                  rec_buf_ptr, nelems[5], MPI_DOUBLE, NULL);
+            err = HDF5_IPUT_VARN_MPI (ncid, D6_rec_3d_varids[j], xnreqs[5], starts_D6, counts_D6,
+                                  rec_buf_ptr, nelems[5], MPI_DOUBLE);
             ERR
             rec_buf_ptr += nelems[5];
             my_nreqs += xnreqs[5];
@@ -619,14 +730,20 @@ int run_varn_G_case_hdf5 (
         }
     }
 
+    post_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+    flush_multidatasets ();
+    wait_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+
     /* 24 D3 record variables: double (Time, nCells, nVertLevels) */
     for (rec_no = 0; rec_no < num_recs; rec_no++) {
         for (j = 0; j < xnreqs[2]; j++) starts_D3[j][0] = rec_no;
 
         rec_buf_ptr = D3_rec_dbl_buf;
         for (j = 0; j < nD3_rec_3d_vars; j++) {
-            err = HDF5_IPUT_VARN (ncid, D3_rec_3d_varids[j], xnreqs[2], starts_D3, counts_D3,
-                                  rec_buf_ptr, nelems[2], MPI_DOUBLE, NULL);
+            err = HDF5_IPUT_VARN_MPI (ncid, D3_rec_3d_varids[j], xnreqs[2], starts_D3, counts_D3,
+                                  rec_buf_ptr, nelems[2], MPI_DOUBLE);
             ERR
             rec_buf_ptr += nelems[2];
             my_nreqs += xnreqs[2];
@@ -634,14 +751,20 @@ int run_varn_G_case_hdf5 (
         }
     }
 
+    post_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+    flush_multidatasets ();
+    wait_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+
     /* 1 D4 record variable: double (Time, nEdges, nVertLevels) */
     for (rec_no = 0; rec_no < num_recs; rec_no++) {
         for (j = 0; j < xnreqs[3]; j++) starts_D4[j][0] = rec_no;
 
         rec_buf_ptr = D4_rec_dbl_buf;
         for (j = 0; j < nD4_rec_3d_vars; j++) {
-            err = HDF5_IPUT_VARN (ncid, D4_rec_3d_varids[j], xnreqs[3], starts_D4, counts_D4,
-                                  rec_buf_ptr, nelems[3], MPI_DOUBLE, NULL);
+            err = HDF5_IPUT_VARN_MPI (ncid, D4_rec_3d_varids[j], xnreqs[3], starts_D4, counts_D4,
+                                  rec_buf_ptr, nelems[3], MPI_DOUBLE);
             ERR
             rec_buf_ptr += nelems[3];
             my_nreqs += xnreqs[3];
@@ -649,14 +772,20 @@ int run_varn_G_case_hdf5 (
         }
     }
 
+    post_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+    flush_multidatasets ();
+    wait_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+
     /* 1 D5 record variable: double (Time, nVertices, nVertLevels) */
     for (rec_no = 0; rec_no < num_recs; rec_no++) {
         for (j = 0; j < xnreqs[4]; j++) starts_D5[j][0] = rec_no;
 
         rec_buf_ptr = D5_rec_dbl_buf;
         for (j = 0; j < nD5_rec_3d_vars; j++) {
-            err = HDF5_IPUT_VARN (ncid, D5_rec_3d_varids[j], xnreqs[4], starts_D5, counts_D5,
-                                  rec_buf_ptr, nelems[4], MPI_DOUBLE, NULL);
+            err = HDF5_IPUT_VARN_MPI (ncid, D5_rec_3d_varids[j], xnreqs[4], starts_D5, counts_D5,
+                                  rec_buf_ptr, nelems[4], MPI_DOUBLE);
             ERR
             rec_buf_ptr += nelems[4];
             my_nreqs += xnreqs[4];
@@ -666,6 +795,9 @@ int run_varn_G_case_hdf5 (
     total_nreqs += my_nreqs;
 
     post_timing += MPI_Wtime () - timing;
+    timing = MPI_Wtime ();
+    flush_multidatasets ();
+    wait_timing += MPI_Wtime () - timing;
 
     MPI_Barrier (io_comm); /*-----------------------------------------*/
     timing = MPI_Wtime ();

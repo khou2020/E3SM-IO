@@ -461,7 +461,7 @@ int run_varn_G_case_hdf5 (
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     // MPI and collective metadata is required by LOG VOL
     H5Pset_fapl_mpio (faplid, io_comm, info);
-    H5Pset_all_coll_metadata_ops (faplid, 0);
+    H5Pset_all_coll_metadata_ops (faplid, 1);
 #ifdef ENABLE_LOGVOL
     H5Pset_vol (faplid, log_vlid, NULL);
 #endif

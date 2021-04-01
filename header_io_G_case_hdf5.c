@@ -2850,8 +2850,8 @@ int def_G_case_h0_hdf5_mpi (hid_t ncid,                  /* file ID */
     int dim_nVertLevelsP1, dim_nCells, dim_Time, dim_nVertLevels, dim_nEdges, dim_nVertices,
         dim_StrLen;
 
-    err = define_global_attributes_hdf5 (ncid);
-    ERR
+    //err = define_global_attributes_hdf5 (ncid);
+    //ERR
 
     /* define dimensions */
     err = hdf5_def_dim_mpi (ncid, &dim_nCells);

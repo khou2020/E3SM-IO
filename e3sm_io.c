@@ -533,7 +533,7 @@ int main (int argc, char **argv) {
 #ifdef ENABLE_HDF5
                 if (api == UNDER_API_HDF5) {
                     nerrs += run_varn_G_case_rd_hdf5 (
-                        io_comm, in_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
                         blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
                         &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
                         &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
@@ -542,7 +542,7 @@ int main (int argc, char **argv) {
                 {
 
                     nerrs += run_varn_G_case_rd (
-                        io_comm, in_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
                         blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
                         &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
                         &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
@@ -561,6 +561,34 @@ int main (int argc, char **argv) {
 
                 nvars    = 52;
                 outfname = "g_case_hist_varn.nc";
+
+                // Load input data if provided
+                // Run a dummy read test to fill the data buffer
+                if (in_dir[0] != '\0') {
+                    int tmplayout;
+                    int tmpapi;
+                    int tmpverbose;
+
+                    tmplayout  = layout;
+                    tmpapi     = api;
+                    tmpverbose = verbose;
+
+                    api         = UNDER_API_PNC;  // Input data always in pnc format
+                    layout      = LAYOUT_CONTIG;  // Input data always in contig layout
+                    verbose     = 0;              // Disable all output
+                    show_result = 0;
+
+                    nerrs += run_varn_G_case_rd (
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
+                        blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
+                        &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
+                        &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
+
+                    layout      = tmplayout;
+                    api         = tmpapi;
+                    verbose     = tmpverbose;
+                    show_result = 1;
+                }
 #ifdef ENABLE_HDF5
                 if (api == UNDER_API_HDF5) {
                     nerrs += run_varn_G_case_hdf5 (

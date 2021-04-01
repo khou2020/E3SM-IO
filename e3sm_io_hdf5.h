@@ -27,6 +27,7 @@ extern hid_t log_vlid;
     {                                                                 \
         if (err != 0) {                                               \
             printf ("Error at line %d in %s:\n", __LINE__, __FILE__); \
+            abort ();                                                 \
             goto fn_exit;                                             \
         }                                                             \
     }
@@ -47,6 +48,7 @@ extern hid_t log_vlid;
             printf ("Error at line %d in %s:\n", __LINE__, __FILE__); \
             H5Eprint1 (stdout);                                       \
             herr = -1;                                                \
+            abort ();                                                 \
             goto fn_exit;                                             \
         }                                                             \
     }

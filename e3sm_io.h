@@ -29,13 +29,13 @@
 #define UNDER_API_HDF5 1
 
 #define LAYOUT_CONTIG 0
-#define LAYOUT_CHUNK 1
-#define LAYOUT_ZLIB 2
+#define LAYOUT_CHUNK  1
+#define LAYOUT_ZLIB   2
 
 #define MAX_NUM_DECOMP 6
 
 int verbose;      /* verbose mode to print additional messages on screen */
-int show_result;      /* verbose mode to print additional messages on screen */
+int show_result;  /* verbose mode to print additional messages on screen */
 int keep_outfile; /* whether to keep the output files when exits */
 int two_buf;
 int layout;
@@ -52,8 +52,9 @@ size_t chunk_size;
     {                                                                                  \
         if (err != NC_NOERR) {                                                         \
             printf ("Error in %s:%d: %s\n", __FILE__, __LINE__, ncmpi_strerror (err)); \
+            fflush (stdout);                                                           \
             nerrs++;                                                                   \
-            abort();\
+            abort ();                                                                  \
             goto fn_exit;                                                              \
         }                                                                              \
     }
@@ -207,31 +208,32 @@ extern int run_varn_G_case_rd (
     double **D6_rec_dbl_bufp,  /* D6 rec double buffer */
     double **D1_fix_dbl_bufp); /* D1 fix double buffer */
 #ifdef ENABLE_HDF5
-extern int def_F_case_h0_hdf5 (hid_t ncid,                  /* file ID */
-                               const MPI_Offset dims[2],    /* dimension sizes */
-                               int nvars,                   /* number of variables */
-                               int *varids);                /* variable IDs */
-extern int inq_F_case_h0_hdf5 (hid_t ncid,                    /* file ID */
-                               MPI_Offset dims[2],          /* dimension sizes */
-                               int nvars,                   /* number of variables */
-                               int *varids);                /* variable IDs */
-extern int def_F_case_h1_hdf5 (hid_t ncid,                  /* file ID */
-                               const MPI_Offset dims[2],    /* dimension sizes */
-                               int nvars,                   /* number of variables */
-                               int *varids);                /* variable IDs */
-extern int inq_F_case_h1_hdf5 (hid_t ncid,                    /* file ID */
-                               MPI_Offset dims[2],          /* dimension sizes */
-                               int nvars,                   /* number of variables */
-                               int *varids);                /* variable IDs */
-extern int def_G_case_h0_hdf5_mpi (hid_t ncid,                  /* file ID */
-                        const MPI_Offset dims_D1[1], /* dimension sizes of decomposition 1 */
-                        const MPI_Offset dims_D2[1], /* dimension sizes of decomposition 2 */
-                        const MPI_Offset dims_D3[2], /* dimension sizes of decomposition 3 */
-                        const MPI_Offset dims_D4[2], /* dimension sizes of decomposition 4 */
-                        const MPI_Offset dims_D5[2], /* dimension sizes of decomposition 5 */
-                        const MPI_Offset dims_D6[2], /* dimension sizes of decomposition 6 */
-                        int nvars,                   /* number of variables */
-                        int *varids);                 /* variable IDs */
+extern int def_F_case_h0_hdf5 (hid_t ncid,               /* file ID */
+                               const MPI_Offset dims[2], /* dimension sizes */
+                               int nvars,                /* number of variables */
+                               int *varids);             /* variable IDs */
+extern int inq_F_case_h0_hdf5 (hid_t ncid,               /* file ID */
+                               MPI_Offset dims[2],       /* dimension sizes */
+                               int nvars,                /* number of variables */
+                               int *varids);             /* variable IDs */
+extern int def_F_case_h1_hdf5 (hid_t ncid,               /* file ID */
+                               const MPI_Offset dims[2], /* dimension sizes */
+                               int nvars,                /* number of variables */
+                               int *varids);             /* variable IDs */
+extern int inq_F_case_h1_hdf5 (hid_t ncid,               /* file ID */
+                               MPI_Offset dims[2],       /* dimension sizes */
+                               int nvars,                /* number of variables */
+                               int *varids);             /* variable IDs */
+extern int def_G_case_h0_hdf5_mpi (
+    hid_t ncid,                                             /* file ID */
+    const MPI_Offset dims_D1[1],                            /* dimension sizes of decomposition 1 */
+    const MPI_Offset dims_D2[1],                            /* dimension sizes of decomposition 2 */
+    const MPI_Offset dims_D3[2],                            /* dimension sizes of decomposition 3 */
+    const MPI_Offset dims_D4[2],                            /* dimension sizes of decomposition 4 */
+    const MPI_Offset dims_D5[2],                            /* dimension sizes of decomposition 5 */
+    const MPI_Offset dims_D6[2],                            /* dimension sizes of decomposition 6 */
+    int nvars,                                              /* number of variables */
+    int *varids);                                           /* variable IDs */
 int extern def_G_case_h0_hdf5 (hid_t ncid,                  /* file ID */
                                const MPI_Offset dims_D1[1], /* dimension sizes of decomposition 1 */
                                const MPI_Offset dims_D2[1], /* dimension sizes of decomposition 2 */

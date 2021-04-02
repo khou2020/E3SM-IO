@@ -438,6 +438,7 @@ int run_varn_G_case (
                 MPI_Info_set (info, "nc_zip_driver", "zlib");
                 break;
             default:
+                if (rank == 0) { printf ("ERROR: Unrecognized layout\n"); }
                 abort ();
         }
     }
@@ -1081,6 +1082,7 @@ int run_varn_G_case_rd (
                 MPI_Info_set (info, "nc_zip_driver", "zlib");
                 break;
             default:
+                if (rank == 0) { printf ("ERROR: Unrecognized layout\n"); }
                 abort ();
         }
     }

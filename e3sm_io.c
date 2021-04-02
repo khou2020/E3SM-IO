@@ -124,6 +124,9 @@ int main (int argc, char **argv) {
                     layout = LAYOUT_CHUNK;
                 } else if (strcmp (optarg, "zlib") == 0) {
                     layout = LAYOUT_ZLIB;
+                } else {
+                    if (rank == 0) { printf ("ERROR: Unrecognized layout options\n"); }
+                    abort ();
                 }
                 break;
             case 'c':
@@ -533,8 +536,8 @@ int main (int argc, char **argv) {
 #ifdef ENABLE_HDF5
                 if (api == UNDER_API_HDF5) {
                     nerrs += run_varn_G_case_rd_hdf5 (
-                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
-                        blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs,
+                        disps, blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
                         &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
                         &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
                 } else
@@ -542,8 +545,8 @@ int main (int argc, char **argv) {
                 {
 
                     nerrs += run_varn_G_case_rd (
-                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
-                        blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs,
+                        disps, blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
                         &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
                         &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
                 }
@@ -579,8 +582,8 @@ int main (int argc, char **argv) {
                     show_result = 0;
 
                     nerrs += run_varn_G_case_rd (
-                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs, disps,
-                        blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
+                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs,
+                        disps, blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
                         &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
                         &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);
 

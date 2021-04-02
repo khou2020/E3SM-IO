@@ -490,6 +490,7 @@ int run_vard_F_case (
                 MPI_Info_set (info, "nc_zip_driver", "zlib");
                 break;
             default:
+                if (rank == 0) { printf ("ERROR: Unrecognized layout\n"); }
                 abort ();
         }
     }
@@ -1026,6 +1027,7 @@ int run_varn_F_case (
                 MPI_Info_set (info, "nc_zip_driver", "zlib");
                 break;
             default:
+                if (rank == 0) { printf ("ERROR: Unrecognized layout\n"); }
                 abort ();
         }
     }
@@ -1304,7 +1306,7 @@ int run_varn_F_case (
         free (starts_D2[0]);
         free (starts_D2);
     }
-    if (rec_bufp==NULL) free (rec_buf);
+    if (rec_bufp == NULL) free (rec_buf);
     if (dbl_bufp == NULL) free (dbl_buf);
     free (varids);
 
@@ -1496,6 +1498,7 @@ int run_varn_F_case_rd (
                 MPI_Info_set (info, "nc_zip_driver", "zlib");
                 break;
             default:
+                if (rank == 0) { printf ("ERROR: Unrecognized layout\n"); }
                 abort ();
         }
     }

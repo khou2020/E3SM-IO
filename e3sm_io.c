@@ -584,7 +584,7 @@ int main (int argc, char **argv) {
                     show_result = 0;
 
                     nerrs += run_varn_G_case_rd (
-                        io_comm, out_dir, outfname, nvars, num_recs, info, dims, contig_nreqs,
+                        io_comm, in_dir, outfname, nvars, num_recs, info, dims, contig_nreqs,
                         disps, blocklens, &D1_fix_int_buf, &D2_fix_int_buf, &D3_fix_int_buf,
                         &D4_fix_int_buf, &D5_fix_int_buf, &D1_rec_dbl_buf, &D3_rec_dbl_buf,
                         &D4_rec_dbl_buf, &D5_rec_dbl_buf, &D6_rec_dbl_buf, &D1_fix_dbl_buf);

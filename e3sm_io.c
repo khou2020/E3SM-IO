@@ -120,7 +120,9 @@ int main (int argc, char **argv) {
                 two_buf = 1;
                 break;
             case 'l':
-                if (strcmp (optarg, "chunk") == 0) {
+                if (strcmp (optarg, "contig") == 0) {
+                    layout = LAYOUT_CONTIG;
+                } else if (strcmp (optarg, "chunk") == 0) {
                     layout = LAYOUT_CHUNK;
                 } else if (strcmp (optarg, "zlib") == 0) {
                     layout = LAYOUT_ZLIB;
